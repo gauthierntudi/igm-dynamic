@@ -1,0 +1,23 @@
+# Dépendances & builds
+node_modules/
+.next/
+out/
+dist/
+
+# Env & secrets
+.env
+.env.local
+.env.*.local
+
+# Vercel / IDE
+.vercel/
+.DS_Store
+*.tsbuildinfo
+
+# cPanel (front uniquement)
+igm-next/cpanel-basepath.txt
+
+# Tests / logs
+test-results/
+playwright-report/
+*.log

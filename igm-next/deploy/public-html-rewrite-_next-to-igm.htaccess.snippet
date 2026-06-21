@@ -1,0 +1,9 @@
+# Coller dans public_html/.htaccess à la RACINE du domaine (pas seulement dans public_html/igm/).
+# Quand le HTML demande encore /_next/... au lieu de /igm/_next/..., cette règle redirige vers l’app Node.
+# LiteSpeed / Apache mod_rewrite
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{REQUEST_URI} ^/_next/
+RewriteRule ^_next/(.*)$ /igm/_next/$1 [R=307,L]
+</IfModule>

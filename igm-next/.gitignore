@@ -1,0 +1,12 @@
+# Build & deps
+/.next/
+/node_modules/
+/public/assets/video
+.env
+.env.local
+.vercel
+.DS_Store
+out
+
+# cPanel uniquement — contient `/igm`, ne pas pousser sur Vercel
+/cpanel-basepath.txt

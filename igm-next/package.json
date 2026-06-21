@@ -1,0 +1,29 @@
+{
+  "name": "igm-next",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build --webpack",
+    "build:cpanel": "BASE_PATH=/igm next build --webpack",
+    "start": "next start",
+    "start:cpanel": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "dependencies": {
+    "@types/node": "^25.6.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "next": "^16.2.6",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-toastify": "^11.1.0",
+    "typescript": "^6.0.3"
+  }
+}
