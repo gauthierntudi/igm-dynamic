@@ -9,10 +9,33 @@ export function cdnUrl(path: string | null | undefined): string {
   return `${base}/${path.replace(/^\//, "")}`;
 }
 
-/** URL d’un objet Payload media (champ url ou filename + prefix). */
-export function mediaUrl(media: { url?: string | null; filename?: string | null } | null | undefined): string {
+type MediaLike = {
+  url?: string | null;
+  filename?: string | null;
+  prefix?: string | null;
+};
+
+/** URL publique d’un média Payload — CDN / URL absolue prioritaire. */
+export function mediaUrl(media: MediaLike | null | undefined): string {
   if (!media) return "";
-  if (media.url) return cdnUrl(media.url);
-  if (media.filename) return cdnUrl(media.filename);
+
+  if (media.url && /^https?:\/\//i.test(media.url)) {
+    return media.url;
+  }
+
+  if (media.filename) {
+    const fromFilename = cdnUrl(
+      [media.prefix, media.filename].filter(Boolean).join("/"),
+    );
+    if (fromFilename) return fromFilename;
+  }
+
+  if (media.url) {
+    if (media.url.includes("/api/") && media.filename) {
+      return cdnUrl([media.prefix, media.filename].filter(Boolean).join("/"));
+    }
+    return cdnUrl(media.url);
+  }
+
   return "";
 }

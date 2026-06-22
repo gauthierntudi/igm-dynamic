@@ -1,13 +1,25 @@
+"use client";
+
+import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import { NavMenu } from "@/components/i18n/NavMenu";
+import { useLocale } from "@/components/i18n/LocaleProvider";
 import { DenoncerOpenTrigger } from "@/components/signalement/DenoncerOpenTrigger";
+import { useSiteNavigation } from "@/components/providers/SiteSettingsProvider";
+import { hrefForRoute } from "@/i18n/paths";
 import { withDeployedBase } from "@/lib/deployBasePath";
 
 export default function TemplateHeader() {
+  const { locale, messages } = useLocale();
+  const { phoneVert } = useSiteNavigation();
+  const homeHref = hrefForRoute("home", locale);
+  const phoneHref = `tel:${phoneVert.replace(/\s/g, "")}`;
+
   return (
     <>
       <div className="right-sidebar-menu">
         <div className="sidebar-logo-area d-flex justify-content-between align-items-center">
           <div className="sidebar-logo-wrap">
-            <a href="/">
+            <a href={homeHref}>
               <img
                 alt="image"
                 src={withDeployedBase("/assets/img/logo-color.png")}
@@ -21,12 +33,7 @@ export default function TemplateHeader() {
             </a>
           </div>
           <div className="right-sidebar-close-btn">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              xmlns="http://www.w3.org/2000/svg"
-            >
+            <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
               <path
                 fillRule="evenodd"
                 clipRule="evenodd"
@@ -37,19 +44,16 @@ export default function TemplateHeader() {
         </div>
         <div className="sidebar-content-wrap">
           <div className="sidebar-content">
-            <h3>Numéro Vert</h3>
+            <h3>{messages.common.greenNumber}</h3>
             <ul className="contact-area">
               <li className="single-contact">
                 <div className="icon">
-                  <img
-                    src={withDeployedBase("/assets/img/home1/icon/contact-call-icon.svg")}
-                    alt=""
-                  />
+                  <img src={withDeployedBase("/assets/img/home1/icon/contact-call-icon.svg")} alt="" />
                 </div>
                 <div className="content">
-                  <span>Numéro Vert</span>
+                  <span>{messages.common.greenNumber}</span>
                   <h6>
-                    <a href="tel:+243976844563">+243 97 684 4563</a>
+                    <a href={phoneHref}>{phoneVert}</a>
                   </h6>
                 </div>
               </li>
@@ -61,7 +65,7 @@ export default function TemplateHeader() {
       <header className="header-area style-4">
         <div className="container-fluid d-flex flex-nowrap align-items-center justify-content-between">
           <div className="company-logo">
-            <a className="logo-dark" href="/">
+            <a className="logo-dark" href={homeHref}>
               <img
                 alt="image"
                 className="img-fluid"
@@ -69,7 +73,7 @@ export default function TemplateHeader() {
                 style={{ maxHeight: 62, width: "auto" }}
               />
             </a>
-            <a className="logo-light" href="/">
+            <a className="logo-light" href={homeHref}>
               <img
                 alt="image"
                 className="img-fluid"
@@ -82,7 +86,7 @@ export default function TemplateHeader() {
           <div className="menu-wrap">
             <div className="main-menu">
               <div className="mobile-logo-area d-lg-none d-flex align-items-center justify-content-between">
-                <a className="mobile-logo-wrap" href="/">
+                <a className="mobile-logo-wrap" href={homeHref}>
                   <img
                     alt="image"
                     className="img-fluid light"
@@ -101,157 +105,7 @@ export default function TemplateHeader() {
                 </div>
               </div>
 
-              <ul className="menu-list">
-                <li>
-                  <a href="/">Accueil</a>
-                </li>
-
-                <li className="menu-item-has-children">
-                  <a className="drop-down" href="#">
-                    Présentation
-                  </a>
-                  <i className="bi bi-plus dropdown-icon" />
-                  <ul className="sub-menu none">
-                    <li className="menu-item-has-children">
-                      <a href="#">Qui sommes-nous ?</a>
-                      <i className="d-lg-flex d-none bi-caret-right-fill dropdown-icon" />
-                      <ul className="sub-menu none">
-                        <li>
-                          <a href="/a-propos">A propos</a>
-                        </li>
-                        <li>
-                          <a href="/historique">Historique</a>
-                        </li>
-                        <li>
-                          <a href="/mission">Mission</a>
-                        </li>
-                      </ul>
-                    </li>
-                    <li>
-                      <a href="/organigramme">Organigramme</a>
-                    </li>
-                    <li>
-                      <a href="/cartographie">Cartographie</a>
-                    </li>
-                  </ul>
-                </li>
-
-                <li className="menu-item-has-children">
-                  <a className="drop-down" href="#">
-                    LCFCM
-                  </a>
-                  <i className="bi bi-plus dropdown-icon" />
-                  <ul className="sub-menu none">
-                    <li>
-                      <a href="/fraude-miniere">Fraude minière</a>
-                    </li>
-                    <li>
-                      <a href="/contrebande-miniere">Contrebande minière</a>
-                    </li>
-                    <li>
-                      <DenoncerOpenTrigger variant="navSubmenu" />
-                    </li>
-                    <li>
-                      <a href="/sanctions">Sanctions</a>
-                    </li>
-                  </ul>
-                </li>
-
-                <li className="nav-hide-1020">
-                  <a href="/actualites">Actualités</a>
-                </li>
-
-                <li className="menu-item-has-children nav-hide-1565">
-                  <a className="drop-down" href="#">
-                    Législation
-                  </a>
-                  <i className="bi bi-plus dropdown-icon" />
-                  <ul className="sub-menu none">
-                    <li>
-                      <a href="/ordonnances">Ordonnances</a>
-                    </li>
-                    <li>
-                      <a href="/lois">Lois</a>
-                    </li>
-                    <li>
-                      <a href="/decrets">Décrets</a>
-                    </li>
-                    <li>
-                      <a href="/decisions">Décisions</a>
-                    </li>
-                  </ul>
-                </li>
-
-                <li className="menu-item-has-children nav-hide-1565">
-                  <a className="drop-down" href="#">
-                    Médiathèque
-                  </a>
-                  <i className="bi bi-plus dropdown-icon" />
-                  <ul className="sub-menu none">
-                    <li>
-                      <a href="/photos">Photos</a>
-                    </li>
-                    <li>
-                      <a href="/videos">Vidéos</a>
-                    </li>
-                    <li>
-                      <a href="/audios">Audios</a>
-                    </li>
-                  </ul>
-                </li>
-
-                <li className="menu-item-has-children nav-show-1565">
-                  <a className="drop-down" href="#">
-                    Ressources
-                  </a>
-                  <i className="bi bi-plus dropdown-icon" />
-                  <ul className="sub-menu none">
-                    <li className="nav-show-1020">
-                      <a href="/actualites">Actualités</a>
-                    </li>
-                    <li className="menu-item-has-children">
-                      <a href="#">Législation</a>
-                      <i className="bi bi-plus dropdown-icon" />
-                      <ul className="sub-menu none">
-                        <li>
-                          <a href="/ordonnances">Ordonnances</a>
-                        </li>
-                        <li>
-                          <a href="/lois">Lois</a>
-                        </li>
-                        <li>
-                          <a href="/decrets">Décrets</a>
-                        </li>
-                        <li>
-                          <a href="/decisions">Décisions</a>
-                        </li>
-                      </ul>
-                    </li>
-                    <li className="menu-item-has-children">
-                      <a href="#">Médiathèque</a>
-                      <i className="bi bi-plus dropdown-icon" />
-                      <ul className="sub-menu none">
-                        <li>
-                          <a href="/photos">Photos</a>
-                        </li>
-                        <li>
-                          <a href="/videos">Vidéos</a>
-                        </li>
-                        <li>
-                          <a href="/audios">Audios</a>
-                        </li>
-                      </ul>
-                    </li>
-                    <li>
-                      <a href="/contact">Contact</a>
-                    </li>
-                  </ul>
-                </li>
-
-                <li className="nav-hide-1565">
-                  <a href="/contact">Contact</a>
-                </li>
-              </ul>
+              <NavMenu />
 
               <div className="d-lg-none" style={{ padding: "10px 0 24px" }}>
                 <div className="contact-area" style={{ padding: "0 0 16px" }}>
@@ -259,30 +113,34 @@ export default function TemplateHeader() {
                     <i className="bx bx-phone" style={{ fontSize: 26 }} />
                   </div>
                   <div className="content">
-                    <span>Numéro Vert</span>
+                    <span>{messages.common.greenNumber}</span>
                     <h6 style={{ margin: 0 }}>
-                      <a href="tel:+243976844563">+243 97 684 4563</a>
+                      <a href={phoneHref}>{phoneVert}</a>
                     </h6>
                   </div>
                 </div>
 
+                <LanguageSwitcher className="igm-lang-switch-mobile" />
+
                 <DenoncerOpenTrigger
                   variant="primary"
                   className="primary-btn4"
-                  style={{ width: "100%" }}
+                  style={{ width: "100%", marginTop: 12 }}
                 />
               </div>
             </div>
 
             <div className="nav-right">
-              <div className="contact-area d-lg-flex d-none">
+              <LanguageSwitcher className="d-lg-flex d-none" />
+
+              <div className="contact-area d-lg-flex d-none igm-header-phone-desktop">
                 <div className="icon">
-                  <i className="bx bx-phone" style={{ fontSize: 30 }} />
+                  <i className="bx bx-phone" />
                 </div>
                 <div className="content">
-                  <span>Numéro Vert</span>
+                  <span>{messages.common.greenNumber}</span>
                   <h6>
-                    <a href="tel:+243976844563">+243 97 684 4563</a>
+                    <a href={phoneHref}>{phoneVert}</a>
                   </h6>
                 </div>
               </div>
@@ -290,12 +148,7 @@ export default function TemplateHeader() {
               <DenoncerOpenTrigger variant="primary" className="primary-btn4 d-lg-flex d-none" />
 
               <div className="sidebar-button mobile-menu-btn">
-                <svg
-                  width="20"
-                  height="18"
-                  viewBox="0 0 20 18"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
+                <svg width="20" height="18" viewBox="0 0 20 18" xmlns="http://www.w3.org/2000/svg">
                   <path d="M1.29445 2.8421H10.5237C11.2389 2.8421 11.8182 2.2062 11.8182 1.42105C11.8182 0.635903 11.2389 0 10.5237 0H1.29445C0.579249 0 0 0.635903 0 1.42105C0 2.2062 0.579249 2.8421 1.29445 2.8421Z" />
                   <path d="M1.23002 10.421H18.77C19.4496 10.421 20 9.78506 20 8.99991C20 8.21476 19.4496 7.57886 18.77 7.57886H1.23002C0.550421 7.57886 0 8.21476 0 8.99991C0 9.78506 0.550421 10.421 1.23002 10.421Z" />
                   <path d="M18.8052 15.1579H10.2858C9.62563 15.1579 9.09094 15.7938 9.09094 16.5789C9.09094 17.3641 9.62563 18 10.2858 18H18.8052C19.4653 18 20 17.3641 20 16.5789C20 15.7938 19.4653 15.1579 18.8052 15.1579Z" />

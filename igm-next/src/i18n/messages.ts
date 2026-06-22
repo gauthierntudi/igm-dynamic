@@ -1,0 +1,157 @@
+import type { SupportedLocale } from "./locales";
+
+const fr = {
+  nav: {
+    home: "Accueil",
+    presentation: "Présentation",
+    whoWeAre: "Qui sommes-nous ?",
+    about: "A propos",
+    history: "Historique",
+    mission: "Mission",
+    orgChart: "Organigramme",
+    map: "Cartographie",
+    lcfcm: "LCFCM",
+    miningFraud: "Fraude minière",
+    miningSmuggling: "Contrebande minière",
+    report: "Dénoncer",
+    sanctions: "Sanctions",
+    news: "Actualités",
+    legislation: "Législation",
+    ordinances: "Ordonnances",
+    laws: "Lois",
+    decrees: "Décrets",
+    decisions: "Décisions",
+    mediaLibrary: "Médiathèque",
+    photos: "Photos",
+    videos: "Vidéos",
+    audios: "Audios",
+    resources: "Ressources",
+    contact: "Contact",
+  },
+  common: {
+    greenNumber: "Numéro Vert",
+    report: "Dénoncer",
+    home: "Accueil",
+    readMore: "Lire la suite",
+    newsFallback: "Actualités",
+  },
+  footer: {
+    hqAddress: "Adresse du siège",
+    organs: "Organes",
+    usefulLinks: "Liens utiles",
+    contactTitle: "Contact",
+    contactLead: "Besoin d’aide ou d’informations ? Contactez-nous dès maintenant.",
+    social: "Réseaux sociaux",
+    copyright: "Copyright 2026",
+    rights: "All Right Reserved.",
+    terms: "Conditions Générales",
+    cookies: "Politiques des cookies",
+  },
+  cms: {
+    breadcrumbHome: "Accueil",
+    emptyContent: "Le contenu de cette page sera bientôt disponible.",
+    breadcrumbLabel: "Fil d'Ariane",
+  },
+  underConstruction: {
+    eyebrow: "Inspection Générale des Mines",
+    title: "Page en construction",
+    lead: "Cette section du site est en cours de préparation. Merci de votre patience.",
+    backHome: "Retour à l'accueil",
+    callUs: "Nous appeler",
+    metaTitle: "Page en construction — IGM",
+  },
+  denoncer: {
+    backHome: "← Retour à l'accueil",
+    title: "Formulaire de signalement",
+    subtitle:
+      "Transmettez des informations sur des infractions ou pratiques irrégulières dans le secteur minier. Les champs marqués d’une astérisque sont obligatoires.",
+    metaTitle: "Signalement — IGM",
+    metaDescription: "Formulaire de signalement (lanceur d’alerte)",
+  },
+  loader: {
+    ariaLabel: "Inspection Générale de Mines — Bienvenue",
+    loading: "Chargement",
+  },
+} as const;
+
+const en = {
+  nav: {
+    home: "Home",
+    presentation: "About us",
+    whoWeAre: "Who we are",
+    about: "About",
+    history: "History",
+    mission: "Mission",
+    orgChart: "Organisation chart",
+    map: "Mapping",
+    lcfcm: "LCFCM",
+    miningFraud: "Mining fraud",
+    miningSmuggling: "Mining smuggling",
+    report: "Report",
+    sanctions: "Sanctions",
+    news: "News",
+    legislation: "Legislation",
+    ordinances: "Ordinances",
+    laws: "Laws",
+    decrees: "Decrees",
+    decisions: "Decisions",
+    mediaLibrary: "Media library",
+    photos: "Photos",
+    videos: "Videos",
+    audios: "Audio",
+    resources: "Resources",
+    contact: "Contact",
+  },
+  common: {
+    greenNumber: "Green line",
+    report: "Report",
+    home: "Home",
+    readMore: "Read more",
+    newsFallback: "News",
+  },
+  footer: {
+    hqAddress: "Head office address",
+    organs: "Institutions",
+    usefulLinks: "Useful links",
+    contactTitle: "Contact",
+    contactLead: "Need help or information? Contact us now.",
+    social: "Social media",
+    copyright: "Copyright 2026",
+    rights: "All rights reserved.",
+    terms: "Terms & conditions",
+    cookies: "Cookie policy",
+  },
+  cms: {
+    breadcrumbHome: "Home",
+    emptyContent: "The content of this page will be available soon.",
+    breadcrumbLabel: "Breadcrumb",
+  },
+  underConstruction: {
+    eyebrow: "General Mine Inspectorate",
+    title: "Page under construction",
+    lead: "This section of the website is being prepared. Thank you for your patience.",
+    backHome: "Back to home",
+    callUs: "Call us",
+    metaTitle: "Page under construction — IGM",
+  },
+  denoncer: {
+    backHome: "← Back to home",
+    title: "Report form",
+    subtitle:
+      "Submit information about offences or irregular practices in the mining sector. Fields marked with an asterisk are required.",
+    metaTitle: "Report — IGM",
+    metaDescription: "Whistleblowing report form",
+  },
+  loader: {
+    ariaLabel: "General Mine Inspectorate — Welcome",
+    loading: "Loading",
+  },
+} as const;
+
+export type Messages = typeof fr;
+
+export const MESSAGES: Record<SupportedLocale, Messages> = { fr, en };
+
+export function getMessages(locale: SupportedLocale): Messages {
+  return MESSAGES[locale];
+}

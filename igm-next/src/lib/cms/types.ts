@@ -5,6 +5,18 @@ export type CmsSiteSettings = {
   address?: string;
   footerText?: string;
   logo?: CmsMedia | string | null;
+  headerNav?: import("./navigationTypes").CmsNavMenuItem[] | null;
+  footerHqHeading?: string | null;
+  footerHqText?: string | null;
+  footerColumns?: import("./navigationTypes").CmsFooterColumn[] | null;
+  footerContactTitle?: string | null;
+  footerContactLead?: string | null;
+  footerContactPhone?: string | null;
+  footerContactEmail?: string | null;
+  footerSocialTitle?: string | null;
+  footerSocial?: import("./navigationTypes").CmsFooterSocial[] | null;
+  footerLegalLinks?: import("./navigationTypes").CmsFooterLink[] | null;
+  footerCopyright?: string | null;
 };
 
 export type CmsMedia = {
@@ -15,23 +27,26 @@ export type CmsMedia = {
 };
 
 export type CmsPage = {
-  id: string;
+  id: number;
   slug: string;
   title: string;
+  summary?: string | null;
   hero?: {
     eyebrow?: string | null;
     title?: string | null;
     lead?: string | null;
     ctaLabel?: string | null;
     ctaHref?: string | null;
-    media?: CmsMedia | string | null;
+    media?: CmsMedia | string | number | null;
   };
+  content?: unknown;
+  contentHtml?: string | null;
   seoTitle?: string | null;
   seoDescription?: string | null;
 };
 
 export type CmsNews = {
-  id: string;
+  id: number;
   slug: string;
   title: string;
   excerpt: string;
@@ -41,7 +56,7 @@ export type CmsNews = {
 };
 
 export type CmsStat = {
-  id: string;
+  id: number;
   key: string;
   label: string;
   value: number;
