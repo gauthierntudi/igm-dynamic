@@ -51,8 +51,12 @@ export type CmsNews = {
   title: string;
   excerpt: string;
   category?: string | null;
+  categoryCustom?: string | null;
   publishedAt: string;
   cover?: CmsMedia | string | null;
+  contentHtml?: string | null;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
 };
 
 export type CmsStat = {

@@ -687,8 +687,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
 
   function init() {
     var container = document.querySelector(".home4-contact-btn-area");
-    if (!container) return;
-
+    if (!container || container.classList.contains("active")) return;
     activate(container);
   }
 

@@ -109,11 +109,21 @@ export type CmsHomeNewsSection = {
   maxItems?: number | null;
 };
 
+export type CmsHomeContactMediaItem = {
+  id?: string | null;
+  kind?: "image" | "video" | null;
+  image?: CmsMedia | number | null;
+  video?: CmsMedia | number | null;
+  displayWidth?: number | null;
+  alt?: string | null;
+};
+
 export type CmsHomeContactSection = {
   title?: string | null;
   lead?: string | null;
   buttonLabel?: string | null;
   buttonHref?: string | null;
+  gallery?: CmsHomeContactMediaItem[] | null;
 };
 
 export type CmsHome = {

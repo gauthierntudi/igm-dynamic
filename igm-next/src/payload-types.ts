@@ -100,10 +100,12 @@ export interface Config {
   globals: {
     'site-settings': SiteSetting;
     home: Home;
+    'who-we-are': WhoWeAre;
   };
   globalsSelect: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     home: HomeSelect<false> | HomeSelect<true>;
+    'who-we-are': WhoWeAreSelect<false> | WhoWeAreSelect<true>;
   };
   locale: 'fr' | 'en';
   widgets: {
@@ -255,7 +257,7 @@ export interface Page {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Contenu éditorial en français et en anglais (onglets FR / EN).
+ * Articles publiés sur la page Actualités et dans le carrousel de la page d'accueil. Renseignez le contenu en français et en anglais (onglets FR / EN).
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "news".
@@ -263,11 +265,46 @@ export interface Page {
 export interface News {
   id: number;
   title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  /**
+   * Généré automatiquement depuis le titre. Modifiez-le pour personnaliser l'URL.
+   */
   slug: string;
+  /**
+   * Court résumé affiché sur la carte et en tête de l'article.
+   */
   excerpt: string;
-  category?: string | null;
+  category: 'inspection' | 'cadastre' | 'digitalisation' | 'conformite' | 'communique-presse' | 'custom';
+  /**
+   * Libellé affiché sur la carte et l'article lorsque « Personnaliser » est sélectionné.
+   */
+  categoryCustom?: string | null;
   publishedAt: string;
+  /**
+   * Image affichée sur la carte et en tête de l'article.
+   */
   cover?: (number | null) | Media;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  contentHtml?: string | null;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -551,11 +588,17 @@ export interface PagesSelect<T extends boolean = true> {
  */
 export interface NewsSelect<T extends boolean = true> {
   title?: T;
+  generateSlug?: T;
   slug?: T;
   excerpt?: T;
   category?: T;
+  categoryCustom?: T;
   publishedAt?: T;
   cover?: T;
+  content?: T;
+  contentHtml?: T;
+  seoTitle?: T;
+  seoDescription?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -1093,13 +1136,210 @@ export interface Home {
   newsSection?: {
     title?: string | null;
     lead?: string | null;
+    /**
+     * Articles récents affichés sur la page d'accueil (publiés uniquement).
+     */
     maxItems?: number | null;
   };
+  /**
+   * Titre, texte, bouton et galerie d'images/vidéos affichés en bas de la page d'accueil. Renseignez le contenu en français et en anglais.
+   */
   contactSection?: {
     title?: string | null;
     lead?: string | null;
     buttonLabel?: string | null;
+    /**
+     * Chemin interne (ex. /denoncer, /contact) ou URL absolue. Les liens « dénoncer » ouvrent la modale signalement.
+     */
     buttonHref?: string | null;
+    /**
+     * Images et vidéos à côté du bouton. L'ordre définit l'affichage. Si vide, les visuels par défaut du thème sont utilisés.
+     */
+    gallery?:
+      | {
+          kind?: ('image' | 'video') | null;
+          image?: (number | null) | Media;
+          video?: (number | null) | Media;
+          /**
+           * Optionnel — ex. 150 ou 190 selon la taille souhaitée.
+           */
+          displayWidth?: number | null;
+          alt?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Contenu éditorial de la page Qui sommes-nous (/a-propos). Renseignez chaque section en français et en anglais.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "who-we-are".
+ */
+export interface WhoWeAre {
+  id: number;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+  /**
+   * Grand titre en haut de page (colonne gauche).
+   */
+  headline?: string | null;
+  /**
+   * Texte d'accroche (colonne droite).
+   */
+  intro?: string | null;
+  heroImage?: (number | null) | Media;
+  navAboutLabel?: string | null;
+  navHistoryLabel?: string | null;
+  navMissionLabel?: string | null;
+  aboutSection?: {
+    title?: string | null;
+    /**
+     * Un paragraphe par ligne.
+     */
+    body?: string | null;
+    image?: (number | null) | Media;
+    quote?: {
+      text?: string | null;
+      authorName?: string | null;
+      authorRole?: string | null;
+      authorPhoto?: (number | null) | Media;
+    };
+  };
+  historySection?: {
+    title?: string | null;
+    lead?: string | null;
+    /**
+     * Un paragraphe par ligne. Lignes commençant par « • » pour les listes. Liens : [libellé](/chemin).
+     */
+    body?: string | null;
+  };
+  missionSection?: {
+    title?: string | null;
+    lead?: string | null;
+    headline?: string | null;
+    /**
+     * Un paragraphe par ligne.
+     */
+    body?: string | null;
+    statutoryTitle?: string | null;
+    statutoryItems?:
+      | {
+          label: string;
+          id?: string | null;
+        }[]
+      | null;
+    prioritiesTitle?: string | null;
+    priorities?:
+      | {
+          label: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  statsSection?: {
+    items?:
+      | {
+          label: string;
+          value: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  teamSection?: {
+    title?: string | null;
+    lead?: string | null;
+    members?:
+      | {
+          name: string;
+          role?: string | null;
+          photo?: (number | null) | Media;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  ctaSection?: {
+    title?: string | null;
+    text?: string | null;
+    link?: {
+      label?: string | null;
+      /**
+       * Sélectionnez une page du menu du site.
+       */
+      navLink?:
+        | (
+            | '/'
+            | '/a-propos'
+            | '/historique'
+            | '/mission'
+            | '/vision'
+            | '/organigramme'
+            | '/cartographie'
+            | '/fraude-miniere'
+            | '/contrebande-miniere'
+            | '/denoncer'
+            | '/sanctions'
+            | '/actualites'
+            | '/ordonnances'
+            | '/lois'
+            | '/decrets'
+            | '/decisions'
+            | '/photos'
+            | '/videos'
+            | '/audios'
+            | '/contact'
+            | '__custom__'
+          )
+        | null;
+      /**
+       * Ex. https://…, mailto:…, ou un chemin non listé.
+       */
+      customHref?: string | null;
+    };
+  };
+  contactSection?: {
+    title?: string | null;
+    lead?: string | null;
+    primaryCta?: {
+      label?: string | null;
+      /**
+       * Sélectionnez une page du menu du site.
+       */
+      navLink?:
+        | (
+            | '/'
+            | '/a-propos'
+            | '/historique'
+            | '/mission'
+            | '/vision'
+            | '/organigramme'
+            | '/cartographie'
+            | '/fraude-miniere'
+            | '/contrebande-miniere'
+            | '/denoncer'
+            | '/sanctions'
+            | '/actualites'
+            | '/ordonnances'
+            | '/lois'
+            | '/decrets'
+            | '/decisions'
+            | '/photos'
+            | '/videos'
+            | '/audios'
+            | '/contact'
+            | '__custom__'
+          )
+        | null;
+      /**
+       * Ex. https://…, mailto:…, ou un chemin non listé.
+       */
+      customHref?: string | null;
+    };
+    phoneLabel?: string | null;
+    phoneHref?: string | null;
+    image?: (number | null) | Media;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -1347,6 +1587,131 @@ export interface HomeSelect<T extends boolean = true> {
         lead?: T;
         buttonLabel?: T;
         buttonHref?: T;
+        gallery?:
+          | T
+          | {
+              kind?: T;
+              image?: T;
+              video?: T;
+              displayWidth?: T;
+              alt?: T;
+              id?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "who-we-are_select".
+ */
+export interface WhoWeAreSelect<T extends boolean = true> {
+  seoTitle?: T;
+  seoDescription?: T;
+  headline?: T;
+  intro?: T;
+  heroImage?: T;
+  navAboutLabel?: T;
+  navHistoryLabel?: T;
+  navMissionLabel?: T;
+  aboutSection?:
+    | T
+    | {
+        title?: T;
+        body?: T;
+        image?: T;
+        quote?:
+          | T
+          | {
+              text?: T;
+              authorName?: T;
+              authorRole?: T;
+              authorPhoto?: T;
+            };
+      };
+  historySection?:
+    | T
+    | {
+        title?: T;
+        lead?: T;
+        body?: T;
+      };
+  missionSection?:
+    | T
+    | {
+        title?: T;
+        lead?: T;
+        headline?: T;
+        body?: T;
+        statutoryTitle?: T;
+        statutoryItems?:
+          | T
+          | {
+              label?: T;
+              id?: T;
+            };
+        prioritiesTitle?: T;
+        priorities?:
+          | T
+          | {
+              label?: T;
+              id?: T;
+            };
+      };
+  statsSection?:
+    | T
+    | {
+        items?:
+          | T
+          | {
+              label?: T;
+              value?: T;
+              id?: T;
+            };
+      };
+  teamSection?:
+    | T
+    | {
+        title?: T;
+        lead?: T;
+        members?:
+          | T
+          | {
+              name?: T;
+              role?: T;
+              photo?: T;
+              id?: T;
+            };
+      };
+  ctaSection?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        link?:
+          | T
+          | {
+              label?: T;
+              navLink?: T;
+              customHref?: T;
+            };
+      };
+  contactSection?:
+    | T
+    | {
+        title?: T;
+        lead?: T;
+        primaryCta?:
+          | T
+          | {
+              label?: T;
+              navLink?: T;
+              customHref?: T;
+            };
+        phoneLabel?: T;
+        phoneHref?: T;
+        image?: T;
       };
   updatedAt?: T;
   createdAt?: T;

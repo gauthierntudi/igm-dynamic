@@ -63,6 +63,66 @@ export function localizeHref(href: string, locale: SupportedLocale = DEFAULT_LOC
   return prefix ? `${prefix}/${slug}` : `/${slug}`;
 }
 
+/** Slug d’article actualités si l’URL est `actualites/{slug}` ou `news/{slug}`. */
+export function parseNewsArticleSlug(
+  pathSegments: string[],
+  locale: SupportedLocale,
+): string | null {
+  if (pathSegments.length !== 2) return null;
+  const [sectionSlug, articleSlug] = pathSegments;
+  if (findRouteKey(sectionSlug, locale) !== "news") return null;
+  return articleSlug;
+}
+
+/** URL d’un article actualités pour une locale donnée. */
+export function hrefForNewsArticle(slug: string, locale: SupportedLocale): string {
+  return `${hrefForRoute("news", locale)}/${slug}`;
+}
+
+/** True si le chemin est la page liste actualités (`actualites` / `news`). */
+export function isNewsListingPath(
+  pathSegments: string[],
+  locale: SupportedLocale,
+): boolean {
+  if (pathSegments.length !== 1) return false;
+  return findRouteKey(pathSegments[0], locale) === "news";
+}
+
+export type WhoWeAreSectionId = "about" | "history" | "mission";
+
+const WHO_WE_ARE_ROUTE_KEYS: WhoWeAreSectionId[] = ["about", "history", "mission"];
+
+/** Section « Qui sommes-nous » si le slug est `a-propos`, `historique`, `mission`, etc. */
+export function parseWhoWeAreSection(
+  pathSegments: string[],
+  locale: SupportedLocale,
+): WhoWeAreSectionId | null {
+  if (pathSegments.length !== 1) return null;
+  const routeKey = findRouteKey(pathSegments[0], locale);
+  if (!routeKey || !WHO_WE_ARE_ROUTE_KEYS.includes(routeKey as WhoWeAreSectionId)) {
+    return null;
+  }
+  return routeKey as WhoWeAreSectionId;
+}
+
+export type NewsListingQuery = {
+  page?: number;
+  q?: string;
+};
+
+/** URL de la page liste actualités avec pagination / recherche. */
+export function hrefForNewsListing(
+  locale: SupportedLocale,
+  query: NewsListingQuery = {},
+): string {
+  const base = hrefForRoute("news", locale);
+  const params = new URLSearchParams();
+  if (query.q?.trim()) params.set("q", query.q.trim());
+  if (query.page && query.page > 1) params.set("page", String(query.page));
+  const qs = params.toString();
+  return qs ? `${base}?${qs}` : base;
+}
+
 /** URL équivalente dans une autre langue (navigation, sélecteur FR/EN). */
 export function switchLocaleHref(pathname: string, targetLocale: SupportedLocale): string {
   const segments = pathname.split("/").filter(Boolean);
@@ -70,6 +130,11 @@ export function switchLocaleHref(pathname: string, targetLocale: SupportedLocale
 
   if (pathSegments.length === 0) {
     return hrefForRoute("home", targetLocale);
+  }
+
+  const newsSlug = parseNewsArticleSlug(pathSegments, currentLocale);
+  if (newsSlug) {
+    return hrefForNewsArticle(newsSlug, targetLocale);
   }
 
   const slug = pathSegments.join("/");

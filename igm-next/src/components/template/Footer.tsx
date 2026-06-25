@@ -25,7 +25,7 @@ export default function TemplateFooter() {
                 <ul className="location-list">
                   <li>
                     <span>{nav.footerHqHeading}</span>
-                    <a href="#!" style={{ textDecoration: "none", color: "#fff" }}>
+                    <a href="#!" className="igm-footer-hq-address">
                       {nav.footerHqText.split("\n").map((line, i, arr) => (
                         <span key={i}>
                           {line}

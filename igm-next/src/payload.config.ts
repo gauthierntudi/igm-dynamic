@@ -15,6 +15,7 @@ import { Stats } from "./collections/Stats";
 import { Users } from "./collections/Users";
 import { SiteSettings } from "./globals/SiteSettings";
 import { Home } from "./globals/Home";
+import { WhoWeAre } from "./globals/WhoWeAre";
 import { mediaFilenameVersioningPlugin } from "./plugins/mediaFilenameVersioning";
 import { videoPosterPlugin } from "./plugins/videoPosterPlugin";
 
@@ -47,7 +48,7 @@ export default buildConfig({
     },
   },
   collections: [Users, Media, SignalementFiles, Pages, News, Stats, Signalements],
-  globals: [SiteSettings, Home],
+  globals: [SiteSettings, Home, WhoWeAre],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {

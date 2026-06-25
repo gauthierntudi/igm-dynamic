@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import { withDeployedBase } from "@/lib/deployBasePath";
 import { SUPPORTED_LOCALES, type SupportedLocale } from "@/i18n/locales";
@@ -10,8 +11,39 @@ const SHORT_LABELS: Record<SupportedLocale, string> = {
   en: "EN",
 };
 
+function defaultHrefByLocale(pathname: string): Record<SupportedLocale, string> {
+  return Object.fromEntries(
+    SUPPORTED_LOCALES.map((code) => [code, switchLocaleHref(pathname, code)]),
+  ) as Record<SupportedLocale, string>;
+}
+
 export function LanguageSwitcher({ className }: { className?: string }) {
   const { locale, pathname } = useLocale();
+  const [hrefByLocale, setHrefByLocale] = useState<Record<SupportedLocale, string>>(() =>
+    defaultHrefByLocale(pathname),
+  );
+
+  useEffect(() => {
+    setHrefByLocale(defaultHrefByLocale(pathname));
+
+    const controller = new AbortController();
+    const url = withDeployedBase(
+      `/api/i18n/alternate-paths?pathname=${encodeURIComponent(pathname)}`,
+    );
+
+    fetch(url, { signal: controller.signal })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { hrefs?: Record<SupportedLocale, string> } | null) => {
+        if (data?.hrefs) {
+          setHrefByLocale(data.hrefs);
+        }
+      })
+      .catch(() => {
+        /* fallback: switchLocaleHref already applied */
+      });
+
+    return () => controller.abort();
+  }, [pathname]);
 
   return (
     <nav
@@ -27,7 +59,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
             </span>
           ) : (
             <a
-              href={withDeployedBase(switchLocaleHref(pathname, code))}
+              href={withDeployedBase(hrefByLocale[code])}
               className="igm-lang-switch-link"
               hrefLang={code}
               lang={code}

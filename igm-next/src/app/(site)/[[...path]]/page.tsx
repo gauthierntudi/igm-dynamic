@@ -8,21 +8,32 @@ import { notFound } from "next/navigation";
 import dynamic from "next/dynamic";
 
 import { CmsPageView } from "@/components/cms/CmsPageView";
+import { CmsNewsArticleView } from "@/components/cms/CmsNewsArticleView";
+import { NewsListingView } from "@/components/cms/news-listing/NewsListingView";
+import { WhoWeArePageView } from "@/components/cms/who-we-are/WhoWeArePageView";
 import { DenoncerPageContent } from "@/components/signalement/DenoncerPageContent";
 import { applyHomeToHtml } from "@/lib/cms/applyHome";
-import { getHome, getHomePageBundle, getPageBySlug } from "@/lib/cms/client";
+import { getWhoWeAre, getHome, getHomePageBundle, getNewsBySlug, getNewsListing, getPageBySlug, getPublishedNews } from "@/lib/cms/client";
 import { stripAboutSection } from "@/lib/cms/home/stripAboutSection";
 import { stripBannerSection } from "@/lib/cms/home/stripBannerSection";
 import { stripOrgChartSection } from "@/lib/cms/home/stripOrgChartSection";
 import { stripActionSection } from "@/lib/cms/home/stripActionSection";
+import { stripContactSection } from "@/lib/cms/home/stripContactSection";
+import { stripNewsSection } from "@/lib/cms/home/stripNewsSection";
 import { stripPartnersSection } from "@/lib/cms/home/stripPartnersSection";
 import { stripStatsSection } from "@/lib/cms/home/stripStatsSection";
 import { stripStrategySection } from "@/lib/cms/home/stripStrategySection";
 import { loadHomeHtmlFile } from "@/lib/cms/homeHtmlCache";
+import { ARTICLE_RELATED_NEWS_MAX_ITEMS } from "@/lib/newsDisplay";
 import { deployedBasePath } from "@/lib/deployBasePath";
 import { getMessages } from "@/i18n/messages";
 import { parseLocaleFromSegments, type SupportedLocale } from "@/i18n/locales";
-import { findRouteKey, hrefForRoute } from "@/i18n/paths";
+import { findRouteKey, hrefForRoute, isNewsListingPath, parseNewsArticleSlug, parseWhoWeAreSection } from "@/i18n/paths";
+import { getWhoWeAreMeta } from "@/lib/cms/who-we-are/resolveWhoWeArePage";
+import {
+  NEWS_LISTING_HERO_COUNT,
+  NEWS_LISTING_PAGE_SIZE,
+} from "@/lib/newsListing";
 
 const HomeBannerSlider = dynamic(
   () => import("@/components/home/banner/HomeBannerSlider"),
@@ -56,6 +67,16 @@ const HomeActionSection = dynamic(
 
 const HomeOrgChartSection = dynamic(
   () => import("@/components/home/orgchart/HomeOrgChartSection"),
+  { ssr: true },
+);
+
+const HomeContactSection = dynamic(
+  () => import("@/components/home/contact/HomeContactSection"),
+  { loading: () => null },
+);
+
+const HomeNewsSection = dynamic(
+  () => import("@/components/home/news/HomeNewsSection"),
   { ssr: true },
 );
 
@@ -266,13 +287,14 @@ async function renderHomePage(locale: SupportedLocale) {
   const noPartners = stripPartnersSection(noStats);
   const noAction = stripActionSection(noPartners);
   const noOrgChart = stripOrgChartSection(noAction);
-  const noScripts = stripAllScripts(noOrgChart);
+  const noNews = stripNewsSection(noOrgChart);
+  const noContact = stripContactSection(noNews);
+  const noScripts = stripAllScripts(noContact);
   const { stats, home, news } = await getHomePageBundle(locale);
-  const maxNews = home?.newsSection?.maxItems ?? 6;
   const bannerSlides = home?.bannerSlides?.filter((slide) => slide.title?.trim()) ?? [];
   const withHome = applyHomeToHtml(
     noScripts,
-    home ? { home, news: news.slice(0, maxNews), locale } : null,
+    home ? { home, news: [], locale } : null,
   );
   const rewritten = prefixInjectedHtmlRootPaths(rewriteUrls(withHome));
 
@@ -289,6 +311,8 @@ async function renderHomePage(locale: SupportedLocale) {
       <HomePartnersSection partnersSection={home?.partnersSection} />
       <HomeActionSection actionSection={home?.actionSection} locale={locale} />
       <HomeOrgChartSection orgChartSection={home?.orgChartSection} locale={locale} />
+      <HomeNewsSection newsSection={home?.newsSection} news={news} locale={locale} />
+      <HomeContactSection contactSection={home?.contactSection} locale={locale} />
       <div dangerouslySetInnerHTML={{ __html: rewritten }} />
     </main>
   );
@@ -307,6 +331,35 @@ export async function generateMetadata({
     return {
       title: home?.seoTitle?.trim() || "IGM — Inspection Générale des Mines",
       description: home?.seoDescription?.trim() || undefined,
+    };
+  }
+
+  const newsArticleSlug = parseNewsArticleSlug(pathSegments, locale);
+  if (newsArticleSlug) {
+    const article = await getNewsBySlug(newsArticleSlug, locale);
+    if (article) {
+      return {
+        title: article.seoTitle?.trim() || `${article.title} — IGM`,
+        description: article.seoDescription?.trim() || article.excerpt?.trim() || undefined,
+      };
+    }
+  }
+
+  if (isNewsListingPath(pathSegments, locale)) {
+    const m = getMessages(locale).newsListing;
+    return {
+      title: m.metaTitle,
+      description: m.metaDescription,
+    };
+  }
+
+  const whoWeAreSection = parseWhoWeAreSection(pathSegments, locale);
+  if (whoWeAreSection) {
+    const whoWeAre = await getWhoWeAre(locale);
+    const meta = getWhoWeAreMeta(whoWeAre, locale);
+    return {
+      title: meta.title,
+      description: meta.description,
     };
   }
 
@@ -332,14 +385,66 @@ export async function generateMetadata({
 
 export default async function TemplatePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ path?: string[] }>;
+  searchParams: Promise<{ page?: string; q?: string }>;
 }) {
   const { path: segments = [] } = await params;
+  const { page: pageParam, q: qParam } = await searchParams;
   const { locale, pathSegments } = parseLocaleFromSegments(segments);
 
   if (isPublishedHomePage(pathSegments)) {
     return renderHomePage(locale);
+  }
+
+  const newsArticleSlug = parseNewsArticleSlug(pathSegments, locale);
+  if (newsArticleSlug) {
+    const article = await getNewsBySlug(newsArticleSlug, locale);
+    if (article) {
+      const related = await getPublishedNews(ARTICLE_RELATED_NEWS_MAX_ITEMS + 1, locale);
+      return <CmsNewsArticleView article={article} related={related} locale={locale} />;
+    }
+  }
+
+  if (isNewsListingPath(pathSegments, locale)) {
+    const page = Math.max(1, Number.parseInt(pageParam ?? "1", 10) || 1);
+    const q = qParam?.trim() ?? "";
+
+    const [listing, heroListing] = await Promise.all([
+      getNewsListing(locale, {
+        page,
+        limit: NEWS_LISTING_PAGE_SIZE,
+        q: q || undefined,
+      }),
+      q
+        ? Promise.resolve({ docs: [], totalDocs: 0, totalPages: 0, page: 1 })
+        : getNewsListing(locale, { page: 1, limit: NEWS_LISTING_HERO_COUNT }),
+    ]);
+
+    return (
+      <NewsListingView
+        locale={locale}
+        heroArticles={heroListing.docs}
+        articles={listing.docs}
+        page={listing.page}
+        totalPages={listing.totalPages}
+        totalDocs={listing.totalDocs}
+        q={q || undefined}
+      />
+    );
+  }
+
+  const whoWeAreSection = parseWhoWeAreSection(pathSegments, locale);
+  if (whoWeAreSection) {
+    const whoWeAre = await getWhoWeAre(locale);
+    return (
+      <WhoWeArePageView
+        locale={locale}
+        activeSection={whoWeAreSection}
+        content={whoWeAre}
+      />
+    );
   }
 
   const slug = pageSlugFromSegments(pathSegments);

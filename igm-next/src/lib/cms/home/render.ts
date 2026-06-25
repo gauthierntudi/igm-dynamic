@@ -1,6 +1,12 @@
 import { mediaUrl } from "@/lib/cdnUrl";
 import { resolveBannerCtaHref } from "@/lib/cms/resolveCtaLink";
 import { getMessages } from "@/i18n/messages";
+import { resolveNewsCategoryLabel } from "@/lib/newsCategories";
+import {
+  NEWS_CARD_EXCERPT_MAX_LENGTH,
+  NEWS_CARD_TITLE_MAX_LENGTH,
+  truncateNewsCardText,
+} from "@/lib/newsDisplay";
 import { DEFAULT_LOCALE, type SupportedLocale } from "@/i18n/locales";
 import { hrefForRoute, localizeHref } from "@/i18n/paths";
 
@@ -12,7 +18,6 @@ import type {
   CmsHomeStrategy,
   CmsHomeStatsSection,
   CmsHomeNewsSection,
-  CmsHomeContactSection,
   CmsHomeCta,
   HomeRenderContext,
 } from "./types";
@@ -299,22 +304,32 @@ function renderNewsCard(item: CmsNews, locale: SupportedLocale): string {
   const imgSrc = cover || "assets/img/img-06.jpg";
   const newsBase = localizeHref("/actualites", locale);
   const href = escapeHtml(`${newsBase}/${item.slug}`);
-  const category = item.category?.trim()
-    ? escapeHtml(item.category.trim())
+  const categoryLabel = resolveNewsCategoryLabel(
+    item.category,
+    item.categoryCustom,
+    locale,
+  );
+  const category = categoryLabel
+    ? escapeHtml(categoryLabel)
     : escapeHtml(getMessages(locale).common.newsFallback);
   const date = formatNewsDate(item.publishedAt, locale);
-  const excerpt = escapeHtml(item.excerpt.trim());
+  const title = escapeHtml(
+    truncateNewsCardText(item.title.trim(), NEWS_CARD_TITLE_MAX_LENGTH),
+  );
+  const excerpt = escapeHtml(
+    truncateNewsCardText(item.excerpt.trim(), NEWS_CARD_EXCERPT_MAX_LENGTH),
+  );
   const readMore = escapeHtml(getMessages(locale).common.readMore);
 
   return `<div class="swiper-slide">
         <div class="menu-blog-card igm-news-card">
-          <a class="blog-img" href="${href}"><img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(item.title.trim())}" /></a>
+          <a class="blog-img" href="${href}"><img src="${escapeHtml(imgSrc)}" alt="${title}" /></a>
           <div class="blog-content">
             <ul class="blog-meta">
               <li><a href="${href}">${category}</a></li>
               <li class="blog-date"><a href="${href}">${escapeHtml(date)}</a></li>
             </ul>
-            <h5><a href="${href}">${escapeHtml(item.title.trim())}</a></h5>
+            <h5><a href="${href}">${title}</a></h5>
             <p class="igm-news-excerpt">${excerpt}</p>
             <a class="read-more-btn" href="${href}">${readMore}${BTN_ARROW_SVG}</a>
           </div>
@@ -365,56 +380,10 @@ export function renderNewsSection(
 </div>`;
 }
 
-export function renderContactSection(
-  contact: CmsHomeContactSection | null | undefined,
-  locale: SupportedLocale = DEFAULT_LOCALE,
-): string | null {
-  if (!contact?.title?.trim()) return null;
-
-  const lead = contact.lead?.trim() ? `<p>${escapeHtml(contact.lead.trim())}</p>` : "";
-  const label = escapeHtml(contact.buttonLabel?.trim() || getMessages(locale).common.report);
-  const rawHref = localizeHref(contact.buttonHref?.trim() || hrefForRoute("report", locale), locale);
-  const href = escapeHtml(rawHref);
-  const reportHref = hrefForRoute("report", locale);
-  const signalementAttr =
-    rawHref.includes("/denoncer") || rawHref === reportHref ? ' data-igm-open-signalement' : "";
-
-  return `<div class="home4-contact-section mb-130">
-      <div class="container">
-        <div class="row justify-content-center">
-          <div class="col-xl-6 col-lg-8">
-            <div class="contact-wrapper">
-              <div class="contact-content">
-                <div class="section-title2">
-                  <h2>${escapeHtml(contact.title.trim())}</h2>
-                  ${lead}
-                </div>
-                <div class="home4-contact-btn-area">
-                  <a class="primary-btn4" href="${href}"${signalementAttr}><span class="icon">${BTN_ARROW_SVG}</span><span class="content">${label}</span><span class="icon two">${BTN_ARROW_SVG}</span></a>
-                  <ul class="img-list">
-                    <li><img src="assets/img/img-06.jpg" width="150" /></li>
-                    <li><img src="assets/img/slides/2.jpg" width="150" /></li>
-                    <li><video class="video2" autoplay="" loop="" muted="" playsinline="" src="assets/video/mining.mp4"></video></li>
-                    <li><img src="assets/img/slides/1.jpg" alt="" width="190" /></li>
-                    <li><img src="assets/img/01.jpg" alt="" width="190" /></li>
-                    <li><img src="assets/img/slides/5.jpg" width="190" /></li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>`;
-}
-
 export function buildHomeSections(ctx: HomeRenderContext): Record<string, string | null> {
-  const { home, news, locale = DEFAULT_LOCALE } = ctx;
-  const maxNews = home.newsSection?.maxItems ?? 6;
+  const { home } = ctx;
 
   return {
     "home-stats-header": renderStatsHeader(home.statsSection),
-    "home-news": renderNewsSection(home.newsSection, news.slice(0, maxNews), locale),
-    "home-contact": renderContactSection(home.contactSection, locale),
   };
 }

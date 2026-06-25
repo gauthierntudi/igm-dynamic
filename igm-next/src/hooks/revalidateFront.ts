@@ -61,6 +61,20 @@ export const revalidateFrontGlobal: GlobalAfterChangeHook = ({ global, doc }) =>
   for (const locale of SUPPORTED_LOCALES) {
     tags.push(`global:${global.slug}:${locale}`);
   }
+
+  if (global.slug === "who-we-are") {
+    try {
+      revalidatePath("/a-propos");
+      revalidatePath("/historique");
+      revalidatePath("/mission");
+      revalidatePath("/en/about");
+      revalidatePath("/en/history");
+      revalidatePath("/en/mission");
+    } catch {
+      // Hors contexte Next.js.
+    }
+  }
+
   revalidateSite(tags);
   return doc;
 };

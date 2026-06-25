@@ -10,6 +10,21 @@ function hasDatabase(): boolean {
   return Boolean(process.env.DATABASE_URI?.trim() || process.env.DATABASE_URL?.trim());
 }
 
+async function fetchWhoWeAre(locale: SupportedLocale) {
+  if (!hasDatabase()) return null;
+  try {
+    const payload = await getPayloadClient();
+    return (await payload.findGlobal({
+      slug: "who-we-are",
+      depth: 2,
+      locale,
+    })) as import("./who-we-are/types").CmsWhoWeAre;
+  } catch (err) {
+    console.error("[cms] getWhoWeAre:", err);
+    return null;
+  }
+}
+
 async function fetchHome(locale: SupportedLocale): Promise<CmsHome | null> {
   if (!hasDatabase()) return null;
   try {
@@ -38,22 +53,120 @@ async function fetchStats(locale: SupportedLocale): Promise<CmsStat[]> {
   }
 }
 
-async function fetchPublishedNews(limit: number, locale: SupportedLocale): Promise<CmsNews[]> {
-  if (!hasDatabase()) return [];
+async function fetchPublishedNewsPage(
+  locale: SupportedLocale,
+  options: { page?: number; limit?: number; q?: string } = {},
+): Promise<{ docs: CmsNews[]; totalDocs: number; totalPages: number; page: number }> {
+  if (!hasDatabase()) {
+    return { docs: [], totalDocs: 0, totalPages: 0, page: 1 };
+  }
+
+  const limit = Math.max(1, options.limit ?? 12);
+  const page = Math.max(1, options.page ?? 1);
+  const q = options.q?.trim();
+
+  try {
+    const payload = await getPayloadClient();
+    const where = q
+      ? {
+          and: [
+            { _status: { equals: "published" as const } },
+            {
+              or: [
+                { title: { contains: q } },
+                { excerpt: { contains: q } },
+                { categoryCustom: { contains: q } },
+              ],
+            },
+          ],
+        }
+      : { _status: { equals: "published" as const } };
+
+    const result = await payload.find({
+      collection: "news",
+      limit,
+      page,
+      sort: "-publishedAt",
+      depth: 1,
+      locale,
+      where,
+    });
+
+    return {
+      docs: result.docs as CmsNews[],
+      totalDocs: result.totalDocs,
+      totalPages: result.totalPages,
+      page: result.page ?? page,
+    };
+  } catch (err) {
+    console.error("[cms] fetchPublishedNewsPage:", err);
+    return { docs: [], totalDocs: 0, totalPages: 0, page: 1 };
+  }
+}
+
+async function fetchNewsBySlug(slug: string, locale: SupportedLocale): Promise<CmsNews | null> {
+  if (!hasDatabase()) return null;
   try {
     const payload = await getPayloadClient();
     const result = await payload.find({
       collection: "news",
-      limit,
-      sort: "-publishedAt",
+      where: {
+        and: [{ slug: { equals: slug } }, { _status: { equals: "published" } }],
+      },
+      limit: 1,
       depth: 1,
       locale,
-      where: { _status: { equals: "published" } },
     });
-    return result.docs as CmsNews[];
+    return (result.docs[0] as CmsNews | undefined) ?? null;
   } catch (err) {
-    console.error("[cms] getPublishedNews:", err);
-    return [];
+    console.error("[cms] getNewsBySlug:", err);
+    return null;
+  }
+}
+
+async function fetchNewsById(id: number, locale: SupportedLocale): Promise<CmsNews | null> {
+  if (!hasDatabase()) return null;
+  try {
+    const payload = await getPayloadClient();
+    const doc = await payload.findByID({
+      collection: "news",
+      id,
+      depth: 1,
+      locale,
+    });
+    if (!doc || doc._status !== "published") return null;
+    return doc as CmsNews;
+  } catch (err) {
+    console.error("[cms] getNewsById:", err);
+    return null;
+  }
+}
+
+async function fetchNewsByPublishedAt(
+  publishedAt: string,
+  locale: SupportedLocale,
+  excludeId?: number,
+): Promise<CmsNews | null> {
+  if (!hasDatabase()) return null;
+  try {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "news",
+      where: {
+        and: [
+          { publishedAt: { equals: publishedAt } },
+          { _status: { equals: "published" } },
+          ...(excludeId != null ? [{ id: { not_equals: excludeId } }] : []),
+        ],
+      },
+      limit: 1,
+      depth: 1,
+      locale,
+    });
+    return (result.docs[0] as CmsNews | undefined) ?? null;
+  } catch (err) {
+    console.error("[cms] getNewsByPublishedAt:", err);
+    return null;
   }
 }
 
@@ -117,6 +230,15 @@ async function fetchHomePageBundleUncached(maxNews: number, locale: SupportedLoc
   }
 }
 
+const whoWeAreCacheByLocale = {
+  fr: unstable_cache(() => fetchWhoWeAre("fr"), ["cms-global-who-we-are", "fr"], {
+    tags: ["global:who-we-are", "global:who-we-are:fr"],
+  }),
+  en: unstable_cache(() => fetchWhoWeAre("en"), ["cms-global-who-we-are", "en"], {
+    tags: ["global:who-we-are", "global:who-we-are:en"],
+  }),
+} satisfies Record<SupportedLocale, () => Promise<import("./who-we-are/types").CmsWhoWeAre | null>>;
+
 const homeCacheByLocale = {
   fr: unstable_cache(() => fetchHome("fr"), ["cms-global-home", "fr"], {
     tags: ["global:home", "global:home:fr"],
@@ -156,6 +278,15 @@ const homePageBundleCacheByLocale = {
   () => Promise<{ stats: CmsStat[]; home: CmsHome | null; news: CmsNews[] }>
 >;
 
+export async function getWhoWeAre(
+  locale: SupportedLocale = DEFAULT_LOCALE,
+): Promise<import("./who-we-are/types").CmsWhoWeAre | null> {
+  if (process.env.NODE_ENV === "development") {
+    return fetchWhoWeAre(locale);
+  }
+  return whoWeAreCacheByLocale[locale]();
+}
+
 export async function getHome(locale: SupportedLocale = DEFAULT_LOCALE): Promise<CmsHome | null> {
   return homeCacheByLocale[locale]();
 }
@@ -178,8 +309,69 @@ export async function getPublishedNews(
   return bundle.news.slice(0, limit);
 }
 
+export async function getNewsListing(
+  locale: SupportedLocale = DEFAULT_LOCALE,
+  options: { page?: number; limit?: number; q?: string } = {},
+) {
+  const page = Math.max(1, options.page ?? 1);
+  const limit = options.limit ?? 12;
+  const q = options.q?.trim() ?? "";
+
+  const cached = unstable_cache(
+    () => fetchPublishedNewsPage(locale, { page, limit, q: q || undefined }),
+    ["cms-news-listing", locale, String(page), String(limit), q],
+    {
+      tags: ["collection:news", `collection:news:${locale}`, "collection:news:listing"],
+    },
+  );
+  return cached();
+}
+
 export async function getHomePageBundle(locale: SupportedLocale = DEFAULT_LOCALE) {
   return homePageBundleCacheByLocale[locale]();
+}
+
+export async function getNewsBySlug(
+  slug: string,
+  locale: SupportedLocale = DEFAULT_LOCALE,
+): Promise<CmsNews | null> {
+  const cached = unstable_cache(
+    () => fetchNewsBySlug(slug, locale),
+    ["cms-news", slug, locale],
+    {
+      tags: ["collection:news", `news:slug:${slug}`, `news:slug:${slug}:${locale}`],
+    },
+  );
+  return cached();
+}
+
+export async function getNewsById(
+  id: number,
+  locale: SupportedLocale = DEFAULT_LOCALE,
+): Promise<CmsNews | null> {
+  const cached = unstable_cache(
+    () => fetchNewsById(id, locale),
+    ["cms-news-id", String(id), locale],
+    {
+      tags: ["collection:news", `news:id:${id}`, `news:id:${id}:${locale}`],
+    },
+  );
+  return cached();
+}
+
+export async function getNewsByPublishedAt(
+  publishedAt: string,
+  locale: SupportedLocale = DEFAULT_LOCALE,
+  excludeId?: number,
+): Promise<CmsNews | null> {
+  const cached = unstable_cache(
+    () => fetchNewsByPublishedAt(publishedAt, locale, excludeId),
+    ["cms-news-date", publishedAt, locale, String(excludeId ?? "")],
+    {
+      tags: ["collection:news", `news:date:${publishedAt}`, `news:date:${publishedAt}:${locale}`],
+    },
+  );
+  return cached();
 }
 
 export async function getPageBySlug(

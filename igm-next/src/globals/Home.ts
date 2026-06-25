@@ -547,9 +547,12 @@ export const Home: GlobalConfig = {
                   name: "maxItems",
                   type: "number",
                   label: "Nombre d'articles",
-                  defaultValue: 6,
+                  defaultValue: 4,
                   min: 1,
-                  max: 12,
+                  max: 6,
+                  admin: {
+                    description: "Articles récents affichés sur la page d'accueil (publiés uniquement).",
+                  },
                 },
               ],
             },
@@ -561,12 +564,104 @@ export const Home: GlobalConfig = {
             {
               type: "group",
               name: "contactSection",
-              label: "Appel à l'action",
+              label: "Section contact (fin de page d'accueil)",
+              admin: {
+                description:
+                  "Titre, texte, bouton et galerie d'images/vidéos affichés en bas de la page d'accueil. Renseignez le contenu en français et en anglais.",
+              },
               fields: [
-                { name: "title", type: "text", label: "Titre", ...LOCALIZED },
-                { name: "lead", type: "textarea", label: "Texte", ...LOCALIZED },
-                { name: "buttonLabel", type: "text", label: "Bouton", defaultValue: "Dénoncer", ...LOCALIZED },
-                { name: "buttonHref", type: "text", label: "Lien", defaultValue: "/denoncer", ...LOCALIZED },
+                {
+                  name: "title",
+                  type: "text",
+                  label: "Titre",
+                  defaultValue: "Dénoncer un abus ?",
+                  ...LOCALIZED,
+                },
+                {
+                  name: "lead",
+                  type: "textarea",
+                  label: "Texte",
+                  defaultValue: "Irrégularité constatée ? Contactez l'IGM.",
+                  ...LOCALIZED,
+                },
+                {
+                  name: "buttonLabel",
+                  type: "text",
+                  label: "Libellé du bouton",
+                  defaultValue: "Dénoncer",
+                  ...LOCALIZED,
+                },
+                {
+                  name: "buttonHref",
+                  type: "text",
+                  label: "Lien du bouton",
+                  defaultValue: "/denoncer",
+                  ...LOCALIZED,
+                  admin: {
+                    description:
+                      "Chemin interne (ex. /denoncer, /contact) ou URL absolue. Les liens « dénoncer » ouvrent la modale signalement.",
+                  },
+                },
+                {
+                  name: "gallery",
+                  type: "array",
+                  label: "Galerie médias",
+                  labels: { singular: "Média", plural: "Médias" },
+                  admin: {
+                    initCollapsed: true,
+                    description:
+                      "Images et vidéos à côté du bouton. L'ordre définit l'affichage. Si vide, les visuels par défaut du thème sont utilisés.",
+                  },
+                  fields: [
+                    {
+                      name: "kind",
+                      type: "select",
+                      label: "Type",
+                      defaultValue: "image",
+                      options: [
+                        { label: "Image", value: "image" },
+                        { label: "Vidéo", value: "video" },
+                      ],
+                    },
+                    {
+                      name: "image",
+                      type: "upload",
+                      relationTo: "media",
+                      label: "Image",
+                      admin: {
+                        condition: (_, siblingData) => siblingData?.kind !== "video",
+                      },
+                    },
+                    {
+                      name: "video",
+                      type: "upload",
+                      relationTo: "media",
+                      label: "Vidéo",
+                      admin: {
+                        condition: (_, siblingData) => siblingData?.kind === "video",
+                      },
+                    },
+                    {
+                      name: "displayWidth",
+                      type: "number",
+                      label: "Largeur affichée (px)",
+                      min: 80,
+                      max: 400,
+                      admin: {
+                        description: "Optionnel — ex. 150 ou 190 selon la taille souhaitée.",
+                      },
+                    },
+                    {
+                      name: "alt",
+                      type: "text",
+                      label: "Texte alternatif (image)",
+                      ...LOCALIZED,
+                      admin: {
+                        condition: (_, siblingData) => siblingData?.kind !== "video",
+                      },
+                    },
+                  ],
+                },
               ],
             },
           ],

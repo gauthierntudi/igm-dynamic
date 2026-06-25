@@ -39,6 +39,14 @@ export const enum_news_status = pgEnum("enum_news_status", [
   "draft",
   "published",
 ]);
+export const enum_news_category = pgEnum("enum_news_category", [
+  "inspection",
+  "cadastre",
+  "digitalisation",
+  "conformite",
+  "communique-presse",
+  "custom",
+]);
 export const enum__news_v_version_status = pgEnum(
   "enum__news_v_version_status",
   ["draft", "published"],
@@ -46,6 +54,17 @@ export const enum__news_v_version_status = pgEnum(
 export const enum__news_v_published_locale = pgEnum(
   "enum__news_v_published_locale",
   ["fr", "en"],
+);
+export const enum__news_v_version_category = pgEnum(
+  "enum__news_v_version_category",
+  [
+    "inspection",
+    "cadastre",
+    "digitalisation",
+    "conformite",
+    "communique-presse",
+    "custom",
+  ],
 );
 export const enum_signalements_status = pgEnum("enum_signalements_status", [
   "recu",
@@ -95,7 +114,6 @@ export const enum_signalements_type_infraction = pgEnum(
 export const enum_site_settings_header_nav_children_sub_items_item_type =
   pgEnum("enum_site_settings_header_nav_children_sub_items_item_type", [
     "link",
-    "dropdown",
     "report",
   ]);
 export const enum_site_settings_header_nav_children_sub_items_nav_link = pgEnum(
@@ -309,6 +327,62 @@ export const enum_home_banner_slides_secondary_cta_nav_link = pgEnum(
     "__custom__",
   ],
 );
+export const enum_home_contact_section_gallery_kind = pgEnum(
+  "enum_home_contact_section_gallery_kind",
+  ["image", "video"],
+);
+export const enum_who_we_are_cta_section_link_nav_link = pgEnum(
+  "enum_who_we_are_cta_section_link_nav_link",
+  [
+    "/",
+    "/a-propos",
+    "/historique",
+    "/mission",
+    "/vision",
+    "/organigramme",
+    "/cartographie",
+    "/fraude-miniere",
+    "/contrebande-miniere",
+    "/denoncer",
+    "/sanctions",
+    "/actualites",
+    "/ordonnances",
+    "/lois",
+    "/decrets",
+    "/decisions",
+    "/photos",
+    "/videos",
+    "/audios",
+    "/contact",
+    "__custom__",
+  ],
+);
+export const enum_who_we_are_contact_section_primary_cta_nav_link = pgEnum(
+  "enum_who_we_are_contact_section_primary_cta_nav_link",
+  [
+    "/",
+    "/a-propos",
+    "/historique",
+    "/mission",
+    "/vision",
+    "/organigramme",
+    "/cartographie",
+    "/fraude-miniere",
+    "/contrebande-miniere",
+    "/denoncer",
+    "/sanctions",
+    "/actualites",
+    "/ordonnances",
+    "/lois",
+    "/decrets",
+    "/decisions",
+    "/photos",
+    "/videos",
+    "/audios",
+    "/contact",
+    "__custom__",
+  ],
+);
 
 export const users_sessions = pgTable(
   "users_sessions",
@@ -408,11 +482,20 @@ export const media = pgTable(
     height: numeric("height", { mode: "number" }),
     focalX: numeric("focal_x", { mode: "number" }),
     focalY: numeric("focal_y", { mode: "number" }),
+    sizes_poster_url: varchar("sizes_poster_url"),
+    sizes_poster_width: numeric("sizes_poster_width", { mode: "number" }),
+    sizes_poster_height: numeric("sizes_poster_height", { mode: "number" }),
+    sizes_poster_mimeType: varchar("sizes_poster_mime_type"),
+    sizes_poster_filesize: numeric("sizes_poster_filesize", { mode: "number" }),
+    sizes_poster_filename: varchar("sizes_poster_filename"),
   },
   (columns) => [
     index("media_updated_at_idx").on(columns.updatedAt),
     index("media_created_at_idx").on(columns.createdAt),
     uniqueIndex("media_filename_idx").on(columns.filename),
+    index("media_sizes_poster_sizes_poster_filename_idx").on(
+      columns.sizes_poster_filename,
+    ),
   ],
 );
 
@@ -655,9 +738,15 @@ export const news_locales = pgTable(
   "news_locales",
   {
     title: varchar("title"),
+    generateSlug: boolean("generate_slug").default(true),
     slug: varchar("slug"),
     excerpt: varchar("excerpt"),
-    category: varchar("category"),
+    category: enum_news_category("category"),
+    categoryCustom: varchar("category_custom"),
+    content: jsonb("content"),
+    contentHtml: varchar("content_html"),
+    seoTitle: varchar("seo_title"),
+    seoDescription: varchar("seo_description"),
     id: serial("id").primaryKey(),
     _locale: enum__locales("_locale").notNull(),
     _parentID: integer("_parent_id").notNull(),
@@ -743,9 +832,15 @@ export const _news_v_locales = pgTable(
   "_news_v_locales",
   {
     version_title: varchar("version_title"),
+    version_generateSlug: boolean("version_generate_slug").default(true),
     version_slug: varchar("version_slug"),
     version_excerpt: varchar("version_excerpt"),
-    version_category: varchar("version_category"),
+    version_category: enum__news_v_version_category("version_category"),
+    version_categoryCustom: varchar("version_category_custom"),
+    version_content: jsonb("version_content"),
+    version_contentHtml: varchar("version_content_html"),
+    version_seoTitle: varchar("version_seo_title"),
+    version_seoDescription: varchar("version_seo_description"),
     id: serial("id").primaryKey(),
     _locale: enum__locales("_locale").notNull(),
     _parentID: integer("_parent_id").notNull(),
@@ -1080,10 +1175,11 @@ export const site_settings_header_nav_children_sub_items = pgTable(
     _order: integer("_order").notNull(),
     _parentID: varchar("_parent_id").notNull(),
     id: varchar("id").primaryKey(),
-    itemType:
-      enum_site_settings_header_nav_children_sub_items_item_type(
-        "item_type",
-      ).default("link"),
+    itemType: enum_site_settings_header_nav_children_sub_items_item_type(
+      "item_type",
+    )
+      .notNull()
+      .default("link"),
     navLink:
       enum_site_settings_header_nav_children_sub_items_nav_link("nav_link"),
     customHref: varchar("custom_href"),
@@ -1111,7 +1207,7 @@ export const site_settings_header_nav_children_sub_items = pgTable(
 export const site_settings_header_nav_children_sub_items_locales = pgTable(
   "site_settings_header_nav_children_sub_items_locales",
   {
-    label: varchar("label"),
+    label: varchar("label").notNull(),
     id: serial("id").primaryKey(),
     _locale: enum__locales("_locale").notNull(),
     _parentID: varchar("_parent_id").notNull(),
@@ -1134,10 +1230,9 @@ export const site_settings_header_nav_children = pgTable(
     _order: integer("_order").notNull(),
     _parentID: varchar("_parent_id").notNull(),
     id: varchar("id").primaryKey(),
-    itemType:
-      enum_site_settings_header_nav_children_item_type("item_type").default(
-        "link",
-      ),
+    itemType: enum_site_settings_header_nav_children_item_type("item_type")
+      .notNull()
+      .default("link"),
     navLink: enum_site_settings_header_nav_children_nav_link("nav_link"),
     customHref: varchar("custom_href"),
     cssClass: varchar("css_class"),
@@ -1162,7 +1257,7 @@ export const site_settings_header_nav_children = pgTable(
 export const site_settings_header_nav_children_locales = pgTable(
   "site_settings_header_nav_children_locales",
   {
-    label: varchar("label"),
+    label: varchar("label").notNull(),
     id: serial("id").primaryKey(),
     _locale: enum__locales("_locale").notNull(),
     _parentID: varchar("_parent_id").notNull(),
@@ -1527,6 +1622,45 @@ export const home_banner_slides_locales = pgTable(
   ],
 );
 
+export const home_strategy_ambitions = pgTable(
+  "home_strategy_ambitions",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+  },
+  (columns) => [
+    index("home_strategy_ambitions_order_idx").on(columns._order),
+    index("home_strategy_ambitions_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [home.id],
+      name: "home_strategy_ambitions_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const home_strategy_ambitions_locales = pgTable(
+  "home_strategy_ambitions_locales",
+  {
+    label: varchar("label").notNull(),
+    id: serial("id").primaryKey(),
+    _locale: enum__locales("_locale").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+  },
+  (columns) => [
+    uniqueIndex("home_strategy_ambitions_locales_locale_parent_id_unique").on(
+      columns._locale,
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [home_strategy_ambitions.id],
+      name: "home_strategy_ambitions_locales_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
 export const home_strategy_axes = pgTable(
   "home_strategy_axes",
   {
@@ -1548,8 +1682,7 @@ export const home_strategy_axes = pgTable(
 export const home_strategy_axes_locales = pgTable(
   "home_strategy_axes_locales",
   {
-    highlight: varchar("highlight"),
-    text: varchar("text"),
+    label: varchar("label").notNull(),
     id: serial("id").primaryKey(),
     _locale: enum__locales("_locale").notNull(),
     _parentID: varchar("_parent_id").notNull(),
@@ -1567,6 +1700,186 @@ export const home_strategy_axes_locales = pgTable(
   ],
 );
 
+export const home_partners_section_partners = pgTable(
+  "home_partners_section_partners",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    logo: integer("logo_id")
+      .notNull()
+      .references(() => media.id, {
+        onDelete: "set null",
+      }),
+    logoDark: integer("logo_dark_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+    url: varchar("url"),
+  },
+  (columns) => [
+    index("home_partners_section_partners_order_idx").on(columns._order),
+    index("home_partners_section_partners_parent_id_idx").on(columns._parentID),
+    index("home_partners_section_partners_logo_idx").on(columns.logo),
+    index("home_partners_section_partners_logo_dark_idx").on(columns.logoDark),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [home.id],
+      name: "home_partners_section_partners_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const home_partners_section_partners_locales = pgTable(
+  "home_partners_section_partners_locales",
+  {
+    name: varchar("name").notNull(),
+    id: serial("id").primaryKey(),
+    _locale: enum__locales("_locale").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+  },
+  (columns) => [
+    uniqueIndex(
+      "home_partners_section_partners_locales_locale_parent_id_uniq",
+    ).on(columns._locale, columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [home_partners_section_partners.id],
+      name: "home_partners_section_partners_locales_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const home_action_section_items = pgTable(
+  "home_action_section_items",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+  },
+  (columns) => [
+    index("home_action_section_items_order_idx").on(columns._order),
+    index("home_action_section_items_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [home.id],
+      name: "home_action_section_items_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const home_action_section_items_locales = pgTable(
+  "home_action_section_items_locales",
+  {
+    title: varchar("title").notNull(),
+    text: varchar("text").notNull(),
+    id: serial("id").primaryKey(),
+    _locale: enum__locales("_locale").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+  },
+  (columns) => [
+    uniqueIndex("home_action_section_items_locales_locale_parent_id_unique").on(
+      columns._locale,
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [home_action_section_items.id],
+      name: "home_action_section_items_locales_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const home_org_chart_section_units = pgTable(
+  "home_org_chart_section_units",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    image: integer("image_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+  },
+  (columns) => [
+    index("home_org_chart_section_units_order_idx").on(columns._order),
+    index("home_org_chart_section_units_parent_id_idx").on(columns._parentID),
+    index("home_org_chart_section_units_image_idx").on(columns.image),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [home.id],
+      name: "home_org_chart_section_units_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const home_org_chart_section_units_locales = pgTable(
+  "home_org_chart_section_units_locales",
+  {
+    name: varchar("name").notNull(),
+    role: varchar("role").notNull(),
+    id: serial("id").primaryKey(),
+    _locale: enum__locales("_locale").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+  },
+  (columns) => [
+    uniqueIndex(
+      "home_org_chart_section_units_locales_locale_parent_id_unique",
+    ).on(columns._locale, columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [home_org_chart_section_units.id],
+      name: "home_org_chart_section_units_locales_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const home_contact_section_gallery = pgTable(
+  "home_contact_section_gallery",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    kind: enum_home_contact_section_gallery_kind("kind").default("image"),
+    image: integer("image_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+    video: integer("video_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+    displayWidth: numeric("display_width", { mode: "number" }),
+  },
+  (columns) => [
+    index("home_contact_section_gallery_order_idx").on(columns._order),
+    index("home_contact_section_gallery_parent_id_idx").on(columns._parentID),
+    index("home_contact_section_gallery_image_idx").on(columns.image),
+    index("home_contact_section_gallery_video_idx").on(columns.video),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [home.id],
+      name: "home_contact_section_gallery_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const home_contact_section_gallery_locales = pgTable(
+  "home_contact_section_gallery_locales",
+  {
+    alt: varchar("alt"),
+    id: serial("id").primaryKey(),
+    _locale: enum__locales("_locale").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+  },
+  (columns) => [
+    uniqueIndex(
+      "home_contact_section_gallery_locales_locale_parent_id_unique",
+    ).on(columns._locale, columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [home_contact_section_gallery.id],
+      name: "home_contact_section_gallery_locales_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
 export const home = pgTable(
   "home",
   {
@@ -1574,9 +1887,18 @@ export const home = pgTable(
     about_image: integer("about_image_id").references(() => media.id, {
       onDelete: "set null",
     }),
+    strategy_video: integer("strategy_video_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+    orgChartSection_diagram: integer("org_chart_section_diagram_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
     newsSection_maxItems: numeric("news_section_max_items", {
       mode: "number",
-    }).default(6),
+    }).default(4),
     updatedAt: timestamp("updated_at", {
       mode: "string",
       withTimezone: true,
@@ -1588,7 +1910,13 @@ export const home = pgTable(
       precision: 3,
     }),
   },
-  (columns) => [index("home_about_about_image_idx").on(columns.about_image)],
+  (columns) => [
+    index("home_about_about_image_idx").on(columns.about_image),
+    index("home_strategy_strategy_video_idx").on(columns.strategy_video),
+    index("home_org_chart_section_org_chart_section_diagram_idx").on(
+      columns.orgChartSection_diagram,
+    ),
+  ],
 );
 
 export const home_locales = pgTable(
@@ -1611,24 +1939,70 @@ export const home_locales = pgTable(
     about_detailText: varchar("about_detail_text"),
     about_signatureName: varchar("about_signature_name"),
     about_signatureRole: varchar("about_signature_role"),
-    strategy_title: varchar("strategy_title"),
-    strategy_lead: varchar("strategy_lead"),
+    strategy_title: varchar("strategy_title").default(
+      "Stratégie de déploiement",
+    ),
+    strategy_lead: varchar("strategy_lead").default(
+      "À travers cette stratégie, l'IGM ambitionne de :",
+    ),
     strategy_axesTitle: varchar("strategy_axes_title").default(
-      "Axes Stratégiques :",
+      "Axes stratégiques :",
     ),
-    strategy_counterLabel: varchar("strategy_counter_label").default(
-      "Provinces de présence.",
+    strategy_ctaLabel: varchar("strategy_cta_label").default(
+      "Consulter notre stratégie",
     ),
-    strategy_ctaLabel: varchar("strategy_cta_label"),
     strategy_ctaHref: varchar("strategy_cta_href").default("/contact"),
     statsSection_title: varchar("stats_section_title"),
     statsSection_lead: varchar("stats_section_lead"),
+    partnersSection_title: varchar("partners_section_title").default(
+      "- Nos Partenaires -",
+    ),
+    actionSection_titlePrefix: varchar("action_section_title_prefix").default(
+      "Notre",
+    ),
+    actionSection_titleHighlight: varchar(
+      "action_section_title_highlight",
+    ).default("action"),
+    actionSection_titleSuffix: varchar("action_section_title_suffix").default(
+      "sur le terrain.",
+    ),
+    actionSection_lead: varchar("action_section_lead"),
+    actionSection_ctaLead: varchar("action_section_cta_lead"),
+    actionSection_ctaLabel: varchar("action_section_cta_label").default(
+      "Contactez-nous",
+    ),
+    actionSection_ctaHref: varchar("action_section_cta_href").default(
+      "/contact",
+    ),
+    orgChartSection_titlePrefix: varchar(
+      "org_chart_section_title_prefix",
+    ).default("Notre"),
+    orgChartSection_titleHighlight: varchar(
+      "org_chart_section_title_highlight",
+    ).default("organigramme"),
+    orgChartSection_titleSuffix: varchar(
+      "org_chart_section_title_suffix",
+    ).default("institutionnel."),
+    orgChartSection_lead: varchar("org_chart_section_lead"),
+    orgChartSection_ctaSidebarTitle: varchar(
+      "org_chart_section_cta_sidebar_title",
+    ).default("Structure institutionnelle"),
+    orgChartSection_ctaLabel: varchar("org_chart_section_cta_label").default(
+      "Voir l'organigramme complet",
+    ),
+    orgChartSection_ctaHref: varchar("org_chart_section_cta_href").default(
+      "/organigramme",
+    ),
     newsSection_title: varchar("news_section_title").default(
       "Dernières actualités.",
     ),
     newsSection_lead: varchar("news_section_lead"),
-    contactSection_title: varchar("contact_section_title"),
-    contactSection_lead: varchar("contact_section_lead"),
+    contactSection_title: varchar("contact_section_title").default(
+      "Dénoncer un abus ?",
+    ),
+    contactSection_lead: varchar("contact_section_lead").default(
+      "Irrégularité constatée ? Contactez l'IGM.",
+    ),
     contactSection_buttonLabel: varchar("contact_section_button_label").default(
       "Dénoncer",
     ),
@@ -1648,6 +2022,340 @@ export const home_locales = pgTable(
       columns: [columns["_parentID"]],
       foreignColumns: [home.id],
       name: "home_locales_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const who_we_are_history_section_milestones = pgTable(
+  "who_we_are_history_section_milestones",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    year: varchar("year").notNull(),
+  },
+  (columns) => [
+    index("who_we_are_history_section_milestones_order_idx").on(columns._order),
+    index("who_we_are_history_section_milestones_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [who_we_are.id],
+      name: "who_we_are_history_section_milestones_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const who_we_are_history_section_milestones_locales = pgTable(
+  "who_we_are_history_section_milestones_locales",
+  {
+    title: varchar("title").notNull(),
+    text: varchar("text"),
+    id: serial("id").primaryKey(),
+    _locale: enum__locales("_locale").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+  },
+  (columns) => [
+    uniqueIndex(
+      "who_we_are_history_section_milestones_locales_locale_parent_",
+    ).on(columns._locale, columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [who_we_are_history_section_milestones.id],
+      name: "who_we_are_history_section_milestones_locales_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const who_we_are_mission_section_statutory_items = pgTable(
+  "who_we_are_mission_section_statutory_items",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+  },
+  (columns) => [
+    index("who_we_are_mission_section_statutory_items_order_idx").on(
+      columns._order,
+    ),
+    index("who_we_are_mission_section_statutory_items_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [who_we_are.id],
+      name: "who_we_are_mission_section_statutory_items_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const who_we_are_mission_section_statutory_items_locales = pgTable(
+  "who_we_are_mission_section_statutory_items_locales",
+  {
+    label: varchar("label").notNull(),
+    id: serial("id").primaryKey(),
+    _locale: enum__locales("_locale").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+  },
+  (columns) => [
+    uniqueIndex(
+      "who_we_are_mission_section_statutory_items_locales_locale_pa",
+    ).on(columns._locale, columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [who_we_are_mission_section_statutory_items.id],
+      name: "who_we_are_mission_section_statutory_items_locales_parent_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const who_we_are_mission_section_priorities = pgTable(
+  "who_we_are_mission_section_priorities",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+  },
+  (columns) => [
+    index("who_we_are_mission_section_priorities_order_idx").on(columns._order),
+    index("who_we_are_mission_section_priorities_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [who_we_are.id],
+      name: "who_we_are_mission_section_priorities_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const who_we_are_mission_section_priorities_locales = pgTable(
+  "who_we_are_mission_section_priorities_locales",
+  {
+    label: varchar("label").notNull(),
+    id: serial("id").primaryKey(),
+    _locale: enum__locales("_locale").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+  },
+  (columns) => [
+    uniqueIndex(
+      "who_we_are_mission_section_priorities_locales_locale_parent_",
+    ).on(columns._locale, columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [who_we_are_mission_section_priorities.id],
+      name: "who_we_are_mission_section_priorities_locales_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const who_we_are_stats_section_items = pgTable(
+  "who_we_are_stats_section_items",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+  },
+  (columns) => [
+    index("who_we_are_stats_section_items_order_idx").on(columns._order),
+    index("who_we_are_stats_section_items_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [who_we_are.id],
+      name: "who_we_are_stats_section_items_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const who_we_are_stats_section_items_locales = pgTable(
+  "who_we_are_stats_section_items_locales",
+  {
+    label: varchar("label").notNull(),
+    value: varchar("value").notNull(),
+    id: serial("id").primaryKey(),
+    _locale: enum__locales("_locale").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+  },
+  (columns) => [
+    uniqueIndex(
+      "who_we_are_stats_section_items_locales_locale_parent_id_uniq",
+    ).on(columns._locale, columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [who_we_are_stats_section_items.id],
+      name: "who_we_are_stats_section_items_locales_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const who_we_are_team_section_members = pgTable(
+  "who_we_are_team_section_members",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    photo: integer("photo_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+  },
+  (columns) => [
+    index("who_we_are_team_section_members_order_idx").on(columns._order),
+    index("who_we_are_team_section_members_parent_id_idx").on(
+      columns._parentID,
+    ),
+    index("who_we_are_team_section_members_photo_idx").on(columns.photo),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [who_we_are.id],
+      name: "who_we_are_team_section_members_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const who_we_are_team_section_members_locales = pgTable(
+  "who_we_are_team_section_members_locales",
+  {
+    name: varchar("name").notNull(),
+    role: varchar("role"),
+    id: serial("id").primaryKey(),
+    _locale: enum__locales("_locale").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+  },
+  (columns) => [
+    uniqueIndex(
+      "who_we_are_team_section_members_locales_locale_parent_id_uni",
+    ).on(columns._locale, columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [who_we_are_team_section_members.id],
+      name: "who_we_are_team_section_members_locales_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const who_we_are = pgTable(
+  "who_we_are",
+  {
+    id: serial("id").primaryKey(),
+    heroImage: integer("hero_image_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+    aboutSection_image: integer("about_section_image_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    aboutSection_quote_authorPhoto: integer(
+      "about_section_quote_author_photo_id",
+    ).references(() => media.id, {
+      onDelete: "set null",
+    }),
+    ctaSection_link_navLink: enum_who_we_are_cta_section_link_nav_link(
+      "cta_section_link_nav_link",
+    ),
+    ctaSection_link_customHref: varchar("cta_section_link_custom_href"),
+    contactSection_primaryCta_navLink:
+      enum_who_we_are_contact_section_primary_cta_nav_link(
+        "contact_section_primary_cta_nav_link",
+      ),
+    contactSection_primaryCta_customHref: varchar(
+      "contact_section_primary_cta_custom_href",
+    ),
+    contactSection_phoneHref: varchar("contact_section_phone_href").default(
+      "tel:+243976844563",
+    ),
+    contactSection_image: integer("contact_section_image_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    }),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    }),
+  },
+  (columns) => [
+    index("who_we_are_hero_image_idx").on(columns.heroImage),
+    index("who_we_are_about_section_about_section_image_idx").on(
+      columns.aboutSection_image,
+    ),
+    index("who_we_are_about_section_quote_about_section_quote_autho_idx").on(
+      columns.aboutSection_quote_authorPhoto,
+    ),
+    index("who_we_are_contact_section_contact_section_image_idx").on(
+      columns.contactSection_image,
+    ),
+  ],
+);
+
+export const who_we_are_locales = pgTable(
+  "who_we_are_locales",
+  {
+    seoTitle: varchar("seo_title").default("Qui sommes-nous ? — IGM"),
+    seoDescription: varchar("seo_description"),
+    headline: varchar("headline"),
+    intro: varchar("intro"),
+    navAboutLabel: varchar("nav_about_label").default("À propos"),
+    navHistoryLabel: varchar("nav_history_label").default("Historique"),
+    navMissionLabel: varchar("nav_mission_label").default("Mission"),
+    aboutSection_title: varchar("about_section_title").default(
+      "À propos de l'IGM",
+    ),
+    aboutSection_body: varchar("about_section_body"),
+    aboutSection_quote_text: varchar("about_section_quote_text"),
+    aboutSection_quote_authorName: varchar("about_section_quote_author_name"),
+    aboutSection_quote_authorRole: varchar("about_section_quote_author_role"),
+    historySection_title: varchar("history_section_title").default(
+      "Historique",
+    ),
+    historySection_lead: varchar("history_section_lead"),
+    missionSection_title: varchar("mission_section_title").default("Mission"),
+    missionSection_lead: varchar("mission_section_lead"),
+    missionSection_headline: varchar("mission_section_headline").default(
+      "Ensemble, nous renforçons la gouvernance minière",
+    ),
+    missionSection_body: varchar("mission_section_body"),
+    missionSection_statutoryTitle: varchar(
+      "mission_section_statutory_title",
+    ).default("Missions statutaires"),
+    missionSection_prioritiesTitle: varchar(
+      "mission_section_priorities_title",
+    ).default("Priorités actuelles"),
+    teamSection_title: varchar("team_section_title").default(
+      "Notre équipe de direction",
+    ),
+    teamSection_lead: varchar("team_section_lead"),
+    ctaSection_title: varchar("cta_section_title"),
+    ctaSection_text: varchar("cta_section_text"),
+    ctaSection_link_label: varchar("cta_section_link_label"),
+    contactSection_title: varchar("contact_section_title"),
+    contactSection_lead: varchar("contact_section_lead"),
+    contactSection_primaryCta_label: varchar(
+      "contact_section_primary_cta_label",
+    ),
+    contactSection_phoneLabel: varchar("contact_section_phone_label"),
+    id: serial("id").primaryKey(),
+    _locale: enum__locales("_locale").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+  },
+  (columns) => [
+    uniqueIndex("who_we_are_locales_locale_parent_id_unique").on(
+      columns._locale,
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [who_we_are.id],
+      name: "who_we_are_locales_parent_id_fk",
     }).onDelete("cascade"),
   ],
 );
@@ -2118,6 +2826,29 @@ export const relations_home_banner_slides = relations(
     }),
   }),
 );
+export const relations_home_strategy_ambitions_locales = relations(
+  home_strategy_ambitions_locales,
+  ({ one }) => ({
+    _parentID: one(home_strategy_ambitions, {
+      fields: [home_strategy_ambitions_locales._parentID],
+      references: [home_strategy_ambitions.id],
+      relationName: "_locales",
+    }),
+  }),
+);
+export const relations_home_strategy_ambitions = relations(
+  home_strategy_ambitions,
+  ({ one, many }) => ({
+    _parentID: one(home, {
+      fields: [home_strategy_ambitions._parentID],
+      references: [home.id],
+      relationName: "strategy_ambitions",
+    }),
+    _locales: many(home_strategy_ambitions_locales, {
+      relationName: "_locales",
+    }),
+  }),
+);
 export const relations_home_strategy_axes_locales = relations(
   home_strategy_axes_locales,
   ({ one }) => ({
@@ -2141,6 +2872,123 @@ export const relations_home_strategy_axes = relations(
     }),
   }),
 );
+export const relations_home_partners_section_partners_locales = relations(
+  home_partners_section_partners_locales,
+  ({ one }) => ({
+    _parentID: one(home_partners_section_partners, {
+      fields: [home_partners_section_partners_locales._parentID],
+      references: [home_partners_section_partners.id],
+      relationName: "_locales",
+    }),
+  }),
+);
+export const relations_home_partners_section_partners = relations(
+  home_partners_section_partners,
+  ({ one, many }) => ({
+    _parentID: one(home, {
+      fields: [home_partners_section_partners._parentID],
+      references: [home.id],
+      relationName: "partnersSection_partners",
+    }),
+    _locales: many(home_partners_section_partners_locales, {
+      relationName: "_locales",
+    }),
+    logo: one(media, {
+      fields: [home_partners_section_partners.logo],
+      references: [media.id],
+      relationName: "logo",
+    }),
+    logoDark: one(media, {
+      fields: [home_partners_section_partners.logoDark],
+      references: [media.id],
+      relationName: "logoDark",
+    }),
+  }),
+);
+export const relations_home_action_section_items_locales = relations(
+  home_action_section_items_locales,
+  ({ one }) => ({
+    _parentID: one(home_action_section_items, {
+      fields: [home_action_section_items_locales._parentID],
+      references: [home_action_section_items.id],
+      relationName: "_locales",
+    }),
+  }),
+);
+export const relations_home_action_section_items = relations(
+  home_action_section_items,
+  ({ one, many }) => ({
+    _parentID: one(home, {
+      fields: [home_action_section_items._parentID],
+      references: [home.id],
+      relationName: "actionSection_items",
+    }),
+    _locales: many(home_action_section_items_locales, {
+      relationName: "_locales",
+    }),
+  }),
+);
+export const relations_home_org_chart_section_units_locales = relations(
+  home_org_chart_section_units_locales,
+  ({ one }) => ({
+    _parentID: one(home_org_chart_section_units, {
+      fields: [home_org_chart_section_units_locales._parentID],
+      references: [home_org_chart_section_units.id],
+      relationName: "_locales",
+    }),
+  }),
+);
+export const relations_home_org_chart_section_units = relations(
+  home_org_chart_section_units,
+  ({ one, many }) => ({
+    _parentID: one(home, {
+      fields: [home_org_chart_section_units._parentID],
+      references: [home.id],
+      relationName: "orgChartSection_units",
+    }),
+    _locales: many(home_org_chart_section_units_locales, {
+      relationName: "_locales",
+    }),
+    image: one(media, {
+      fields: [home_org_chart_section_units.image],
+      references: [media.id],
+      relationName: "image",
+    }),
+  }),
+);
+export const relations_home_contact_section_gallery_locales = relations(
+  home_contact_section_gallery_locales,
+  ({ one }) => ({
+    _parentID: one(home_contact_section_gallery, {
+      fields: [home_contact_section_gallery_locales._parentID],
+      references: [home_contact_section_gallery.id],
+      relationName: "_locales",
+    }),
+  }),
+);
+export const relations_home_contact_section_gallery = relations(
+  home_contact_section_gallery,
+  ({ one, many }) => ({
+    _parentID: one(home, {
+      fields: [home_contact_section_gallery._parentID],
+      references: [home.id],
+      relationName: "contactSection_gallery",
+    }),
+    _locales: many(home_contact_section_gallery_locales, {
+      relationName: "_locales",
+    }),
+    image: one(media, {
+      fields: [home_contact_section_gallery.image],
+      references: [media.id],
+      relationName: "image",
+    }),
+    video: one(media, {
+      fields: [home_contact_section_gallery.video],
+      references: [media.id],
+      relationName: "video",
+    }),
+  }),
+);
 export const relations_home_locales = relations(home_locales, ({ one }) => ({
   _parentID: one(home, {
     fields: [home_locales._parentID],
@@ -2157,10 +3005,202 @@ export const relations_home = relations(home, ({ one, many }) => ({
     references: [media.id],
     relationName: "about_image",
   }),
+  strategy_video: one(media, {
+    fields: [home.strategy_video],
+    references: [media.id],
+    relationName: "strategy_video",
+  }),
+  strategy_ambitions: many(home_strategy_ambitions, {
+    relationName: "strategy_ambitions",
+  }),
   strategy_axes: many(home_strategy_axes, {
     relationName: "strategy_axes",
   }),
+  partnersSection_partners: many(home_partners_section_partners, {
+    relationName: "partnersSection_partners",
+  }),
+  actionSection_items: many(home_action_section_items, {
+    relationName: "actionSection_items",
+  }),
+  orgChartSection_diagram: one(media, {
+    fields: [home.orgChartSection_diagram],
+    references: [media.id],
+    relationName: "orgChartSection_diagram",
+  }),
+  orgChartSection_units: many(home_org_chart_section_units, {
+    relationName: "orgChartSection_units",
+  }),
+  contactSection_gallery: many(home_contact_section_gallery, {
+    relationName: "contactSection_gallery",
+  }),
   _locales: many(home_locales, {
+    relationName: "_locales",
+  }),
+}));
+export const relations_who_we_are_history_section_milestones_locales =
+  relations(who_we_are_history_section_milestones_locales, ({ one }) => ({
+    _parentID: one(who_we_are_history_section_milestones, {
+      fields: [who_we_are_history_section_milestones_locales._parentID],
+      references: [who_we_are_history_section_milestones.id],
+      relationName: "_locales",
+    }),
+  }));
+export const relations_who_we_are_history_section_milestones = relations(
+  who_we_are_history_section_milestones,
+  ({ one, many }) => ({
+    _parentID: one(who_we_are, {
+      fields: [who_we_are_history_section_milestones._parentID],
+      references: [who_we_are.id],
+      relationName: "historySection_milestones",
+    }),
+    _locales: many(who_we_are_history_section_milestones_locales, {
+      relationName: "_locales",
+    }),
+  }),
+);
+export const relations_who_we_are_mission_section_statutory_items_locales =
+  relations(who_we_are_mission_section_statutory_items_locales, ({ one }) => ({
+    _parentID: one(who_we_are_mission_section_statutory_items, {
+      fields: [who_we_are_mission_section_statutory_items_locales._parentID],
+      references: [who_we_are_mission_section_statutory_items.id],
+      relationName: "_locales",
+    }),
+  }));
+export const relations_who_we_are_mission_section_statutory_items = relations(
+  who_we_are_mission_section_statutory_items,
+  ({ one, many }) => ({
+    _parentID: one(who_we_are, {
+      fields: [who_we_are_mission_section_statutory_items._parentID],
+      references: [who_we_are.id],
+      relationName: "missionSection_statutoryItems",
+    }),
+    _locales: many(who_we_are_mission_section_statutory_items_locales, {
+      relationName: "_locales",
+    }),
+  }),
+);
+export const relations_who_we_are_mission_section_priorities_locales =
+  relations(who_we_are_mission_section_priorities_locales, ({ one }) => ({
+    _parentID: one(who_we_are_mission_section_priorities, {
+      fields: [who_we_are_mission_section_priorities_locales._parentID],
+      references: [who_we_are_mission_section_priorities.id],
+      relationName: "_locales",
+    }),
+  }));
+export const relations_who_we_are_mission_section_priorities = relations(
+  who_we_are_mission_section_priorities,
+  ({ one, many }) => ({
+    _parentID: one(who_we_are, {
+      fields: [who_we_are_mission_section_priorities._parentID],
+      references: [who_we_are.id],
+      relationName: "missionSection_priorities",
+    }),
+    _locales: many(who_we_are_mission_section_priorities_locales, {
+      relationName: "_locales",
+    }),
+  }),
+);
+export const relations_who_we_are_stats_section_items_locales = relations(
+  who_we_are_stats_section_items_locales,
+  ({ one }) => ({
+    _parentID: one(who_we_are_stats_section_items, {
+      fields: [who_we_are_stats_section_items_locales._parentID],
+      references: [who_we_are_stats_section_items.id],
+      relationName: "_locales",
+    }),
+  }),
+);
+export const relations_who_we_are_stats_section_items = relations(
+  who_we_are_stats_section_items,
+  ({ one, many }) => ({
+    _parentID: one(who_we_are, {
+      fields: [who_we_are_stats_section_items._parentID],
+      references: [who_we_are.id],
+      relationName: "statsSection_items",
+    }),
+    _locales: many(who_we_are_stats_section_items_locales, {
+      relationName: "_locales",
+    }),
+  }),
+);
+export const relations_who_we_are_team_section_members_locales = relations(
+  who_we_are_team_section_members_locales,
+  ({ one }) => ({
+    _parentID: one(who_we_are_team_section_members, {
+      fields: [who_we_are_team_section_members_locales._parentID],
+      references: [who_we_are_team_section_members.id],
+      relationName: "_locales",
+    }),
+  }),
+);
+export const relations_who_we_are_team_section_members = relations(
+  who_we_are_team_section_members,
+  ({ one, many }) => ({
+    _parentID: one(who_we_are, {
+      fields: [who_we_are_team_section_members._parentID],
+      references: [who_we_are.id],
+      relationName: "teamSection_members",
+    }),
+    _locales: many(who_we_are_team_section_members_locales, {
+      relationName: "_locales",
+    }),
+    photo: one(media, {
+      fields: [who_we_are_team_section_members.photo],
+      references: [media.id],
+      relationName: "photo",
+    }),
+  }),
+);
+export const relations_who_we_are_locales = relations(
+  who_we_are_locales,
+  ({ one }) => ({
+    _parentID: one(who_we_are, {
+      fields: [who_we_are_locales._parentID],
+      references: [who_we_are.id],
+      relationName: "_locales",
+    }),
+  }),
+);
+export const relations_who_we_are = relations(who_we_are, ({ one, many }) => ({
+  heroImage: one(media, {
+    fields: [who_we_are.heroImage],
+    references: [media.id],
+    relationName: "heroImage",
+  }),
+  aboutSection_image: one(media, {
+    fields: [who_we_are.aboutSection_image],
+    references: [media.id],
+    relationName: "aboutSection_image",
+  }),
+  aboutSection_quote_authorPhoto: one(media, {
+    fields: [who_we_are.aboutSection_quote_authorPhoto],
+    references: [media.id],
+    relationName: "aboutSection_quote_authorPhoto",
+  }),
+  historySection_milestones: many(who_we_are_history_section_milestones, {
+    relationName: "historySection_milestones",
+  }),
+  missionSection_statutoryItems: many(
+    who_we_are_mission_section_statutory_items,
+    {
+      relationName: "missionSection_statutoryItems",
+    },
+  ),
+  missionSection_priorities: many(who_we_are_mission_section_priorities, {
+    relationName: "missionSection_priorities",
+  }),
+  statsSection_items: many(who_we_are_stats_section_items, {
+    relationName: "statsSection_items",
+  }),
+  teamSection_members: many(who_we_are_team_section_members, {
+    relationName: "teamSection_members",
+  }),
+  contactSection_image: one(media, {
+    fields: [who_we_are.contactSection_image],
+    references: [media.id],
+    relationName: "contactSection_image",
+  }),
+  _locales: many(who_we_are_locales, {
     relationName: "_locales",
   }),
 }));
@@ -2171,8 +3211,10 @@ type DatabaseSchema = {
   enum__pages_v_version_status: typeof enum__pages_v_version_status;
   enum__pages_v_published_locale: typeof enum__pages_v_published_locale;
   enum_news_status: typeof enum_news_status;
+  enum_news_category: typeof enum_news_category;
   enum__news_v_version_status: typeof enum__news_v_version_status;
   enum__news_v_published_locale: typeof enum__news_v_published_locale;
+  enum__news_v_version_category: typeof enum__news_v_version_category;
   enum_signalements_status: typeof enum_signalements_status;
   enum_signalements_province: typeof enum_signalements_province;
   enum_signalements_type_infraction: typeof enum_signalements_type_infraction;
@@ -2191,6 +3233,9 @@ type DatabaseSchema = {
   enum_home_banner_slides_slide_type: typeof enum_home_banner_slides_slide_type;
   enum_home_banner_slides_primary_cta_nav_link: typeof enum_home_banner_slides_primary_cta_nav_link;
   enum_home_banner_slides_secondary_cta_nav_link: typeof enum_home_banner_slides_secondary_cta_nav_link;
+  enum_home_contact_section_gallery_kind: typeof enum_home_contact_section_gallery_kind;
+  enum_who_we_are_cta_section_link_nav_link: typeof enum_who_we_are_cta_section_link_nav_link;
+  enum_who_we_are_contact_section_primary_cta_nav_link: typeof enum_who_we_are_contact_section_primary_cta_nav_link;
   users_sessions: typeof users_sessions;
   users: typeof users;
   media: typeof media;
@@ -2232,10 +3277,32 @@ type DatabaseSchema = {
   home_banner_slides_features_locales: typeof home_banner_slides_features_locales;
   home_banner_slides: typeof home_banner_slides;
   home_banner_slides_locales: typeof home_banner_slides_locales;
+  home_strategy_ambitions: typeof home_strategy_ambitions;
+  home_strategy_ambitions_locales: typeof home_strategy_ambitions_locales;
   home_strategy_axes: typeof home_strategy_axes;
   home_strategy_axes_locales: typeof home_strategy_axes_locales;
+  home_partners_section_partners: typeof home_partners_section_partners;
+  home_partners_section_partners_locales: typeof home_partners_section_partners_locales;
+  home_action_section_items: typeof home_action_section_items;
+  home_action_section_items_locales: typeof home_action_section_items_locales;
+  home_org_chart_section_units: typeof home_org_chart_section_units;
+  home_org_chart_section_units_locales: typeof home_org_chart_section_units_locales;
+  home_contact_section_gallery: typeof home_contact_section_gallery;
+  home_contact_section_gallery_locales: typeof home_contact_section_gallery_locales;
   home: typeof home;
   home_locales: typeof home_locales;
+  who_we_are_history_section_milestones: typeof who_we_are_history_section_milestones;
+  who_we_are_history_section_milestones_locales: typeof who_we_are_history_section_milestones_locales;
+  who_we_are_mission_section_statutory_items: typeof who_we_are_mission_section_statutory_items;
+  who_we_are_mission_section_statutory_items_locales: typeof who_we_are_mission_section_statutory_items_locales;
+  who_we_are_mission_section_priorities: typeof who_we_are_mission_section_priorities;
+  who_we_are_mission_section_priorities_locales: typeof who_we_are_mission_section_priorities_locales;
+  who_we_are_stats_section_items: typeof who_we_are_stats_section_items;
+  who_we_are_stats_section_items_locales: typeof who_we_are_stats_section_items_locales;
+  who_we_are_team_section_members: typeof who_we_are_team_section_members;
+  who_we_are_team_section_members_locales: typeof who_we_are_team_section_members_locales;
+  who_we_are: typeof who_we_are;
+  who_we_are_locales: typeof who_we_are_locales;
   relations_users_sessions: typeof relations_users_sessions;
   relations_users: typeof relations_users;
   relations_media: typeof relations_media;
@@ -2277,10 +3344,32 @@ type DatabaseSchema = {
   relations_home_banner_slides_features: typeof relations_home_banner_slides_features;
   relations_home_banner_slides_locales: typeof relations_home_banner_slides_locales;
   relations_home_banner_slides: typeof relations_home_banner_slides;
+  relations_home_strategy_ambitions_locales: typeof relations_home_strategy_ambitions_locales;
+  relations_home_strategy_ambitions: typeof relations_home_strategy_ambitions;
   relations_home_strategy_axes_locales: typeof relations_home_strategy_axes_locales;
   relations_home_strategy_axes: typeof relations_home_strategy_axes;
+  relations_home_partners_section_partners_locales: typeof relations_home_partners_section_partners_locales;
+  relations_home_partners_section_partners: typeof relations_home_partners_section_partners;
+  relations_home_action_section_items_locales: typeof relations_home_action_section_items_locales;
+  relations_home_action_section_items: typeof relations_home_action_section_items;
+  relations_home_org_chart_section_units_locales: typeof relations_home_org_chart_section_units_locales;
+  relations_home_org_chart_section_units: typeof relations_home_org_chart_section_units;
+  relations_home_contact_section_gallery_locales: typeof relations_home_contact_section_gallery_locales;
+  relations_home_contact_section_gallery: typeof relations_home_contact_section_gallery;
   relations_home_locales: typeof relations_home_locales;
   relations_home: typeof relations_home;
+  relations_who_we_are_history_section_milestones_locales: typeof relations_who_we_are_history_section_milestones_locales;
+  relations_who_we_are_history_section_milestones: typeof relations_who_we_are_history_section_milestones;
+  relations_who_we_are_mission_section_statutory_items_locales: typeof relations_who_we_are_mission_section_statutory_items_locales;
+  relations_who_we_are_mission_section_statutory_items: typeof relations_who_we_are_mission_section_statutory_items;
+  relations_who_we_are_mission_section_priorities_locales: typeof relations_who_we_are_mission_section_priorities_locales;
+  relations_who_we_are_mission_section_priorities: typeof relations_who_we_are_mission_section_priorities;
+  relations_who_we_are_stats_section_items_locales: typeof relations_who_we_are_stats_section_items_locales;
+  relations_who_we_are_stats_section_items: typeof relations_who_we_are_stats_section_items;
+  relations_who_we_are_team_section_members_locales: typeof relations_who_we_are_team_section_members_locales;
+  relations_who_we_are_team_section_members: typeof relations_who_we_are_team_section_members;
+  relations_who_we_are_locales: typeof relations_who_we_are_locales;
+  relations_who_we_are: typeof relations_who_we_are;
 };
 
 declare module "@payloadcms/db-postgres" {
