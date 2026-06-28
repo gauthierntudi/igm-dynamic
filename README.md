@@ -28,8 +28,51 @@ npm run dev
 
 ## Vercel
 
-- **Un projet**, Root Directory : `igm-next`
-- Variables : voir `igm-next/.env.example`
+Repo GitHub : `gauthierntudi/igm-dynamic` — branche `main`.
+
+### Import projet
+
+1. [vercel.com/new](https://vercel.com/new) → importer **igm-dynamic**
+2. **Root Directory** : `igm-next`
+3. Framework : **Next.js** (détecté automatiquement)
+4. `vercel.json` est déjà dans `igm-next/` (build webpack, région `iad1`, API 60s)
+
+### Variables d’environnement
+
+Liste complète : [`igm-next/.env.vercel.example`](./igm-next/.env.vercel.example)
+
+| Variable | Notes |
+|----------|--------|
+| `DATABASE_URI` | Neon PostgreSQL (pooler) |
+| `PAYLOAD_SECRET` | Identique à la prod locale |
+| `NEXT_PUBLIC_SERVER_URL` | **`https://votre-projet.vercel.app`** (pas localhost) |
+| `S3_*`, `NEXT_PUBLIC_CDN_URL` | Médias CloudFront |
+| `PAYLOAD_CLIENT_UPLOADS` | `true` |
+| `HOME_STATS_SECTION_VISIBLE` | `false` |
+| `HOME_ORG_CHART_UNITS_VISIBLE` | `false` |
+
+**Option A — Dashboard** : Vercel → Settings → Environment Variables → coller depuis `.env.local`.
+
+**Option B — CLI** (après `vercel link` dans `igm-next/`) :
+
+```bash
+cd igm-next
+chmod +x scripts/vercel-env-push.sh
+./scripts/vercel-env-push.sh
+# Puis définir NEXT_PUBLIC_SERVER_URL manuellement avec l’URL Vercel
+vercel --prod
+```
+
+### Après le 1er déploiement
+
+1. Copier l’URL Vercel (ex. `https://igm-dynamic.vercel.app`)
+2. Mettre à jour `NEXT_PUBLIC_SERVER_URL` dans Vercel
+3. **Redeploy** (Deployments → … → Redeploy)
+4. Tester `/`, `/admin`, upload média
+
+### Déploiements suivants
+
+Chaque push sur `main` redéploie automatiquement.
 
 ## cPanel (optionnel)
 
