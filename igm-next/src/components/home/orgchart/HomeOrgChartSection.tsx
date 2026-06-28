@@ -14,6 +14,7 @@ import { TeamCardDivider, TeamSectionArrow } from "./TeamSectionArrow";
 type Props = {
   orgChartSection?: CmsHomeOrgChartSection | null;
   locale: SupportedLocale;
+  variant?: "home" | "page";
 };
 
 type ResolvedUnit = {
@@ -88,8 +89,14 @@ function OrgChartUnitCard({ unit }: { unit: ResolvedUnit }) {
   );
 }
 
-export function HomeOrgChartSection({ orgChartSection, locale }: Props) {
-  if (!hasOrgChartContent(orgChartSection)) return null;
+export function HomeOrgChartSection({
+  orgChartSection,
+  locale,
+  variant = "home",
+}: Props) {
+  const isPage = variant === "page";
+
+  if (!isPage && !hasOrgChartContent(orgChartSection)) return null;
 
   const showUnits = isHomeOrgChartUnitsVisible();
   const titlePrefix = orgChartSection?.titlePrefix?.trim();
@@ -112,11 +119,17 @@ export function HomeOrgChartSection({ orgChartSection, locale }: Props) {
     : null;
 
   const hasTitle = Boolean(titlePrefix || titleHighlight || titleSuffix);
+  const showHomeHeader = !isPage && (hasTitle || lead || ctaSidebarTitle || ctaHref);
+  const showCtaSidebar = !isPage && (ctaSidebarTitle || ctaHref);
+
+  const sectionClassName = isPage
+    ? "home4-team-section igm-orgchart-section--page"
+    : "home4-team-section mb-130";
 
   return (
-    <div className="home4-team-section mb-130">
-      <div className="container">
-        {hasTitle || lead || ctaSidebarTitle || ctaHref ? (
+    <div className={sectionClassName}>
+      <div className={isPage ? undefined : "container"}>
+        {showHomeHeader ? (
           <div className="row justify-content-lg-end mb-70">
             <div className="col-xl-10 col-lg-11">
               <div className="row g-4 justify-content-between align-items-end">
@@ -138,7 +151,7 @@ export function HomeOrgChartSection({ orgChartSection, locale }: Props) {
                     </div>
                   </div>
                 ) : null}
-                {ctaSidebarTitle || ctaHref ? (
+                {showCtaSidebar ? (
                   <div
                     className="col-lg-3 col-md-6 d-flex justify-content-md-end wow animate fadeInRight"
                     data-wow-delay="200ms"
@@ -160,19 +173,35 @@ export function HomeOrgChartSection({ orgChartSection, locale }: Props) {
           </div>
         ) : null}
 
-        <div className="row wow animate fadeInUp" data-wow-delay="200ms" data-wow-duration="1500ms">
-          <div className="col-lg-12">
-            <div className="igm-orgchart-stage">
-              {diagramSrc ? (
-                <div className="igm-orgchart-diagram">
-                  <img src={diagramSrc} alt={diagramAlt} loading="lazy" decoding="async" />
-                </div>
-              ) : (
-                <OrgChartDecreeDiagram locale={locale} />
-              )}
+        {isPage ? (
+          <div className="igm-orgchart-stage">
+            {diagramSrc ? (
+              <div className="igm-orgchart-diagram">
+                <img src={diagramSrc} alt={diagramAlt} loading="lazy" decoding="async" />
+              </div>
+            ) : (
+              <OrgChartDecreeDiagram locale={locale} />
+            )}
+          </div>
+        ) : (
+          <div
+            className="row wow animate fadeInUp"
+            data-wow-delay="200ms"
+            data-wow-duration="1500ms"
+          >
+            <div className="col-lg-12">
+              <div className="igm-orgchart-stage">
+                {diagramSrc ? (
+                  <div className="igm-orgchart-diagram">
+                    <img src={diagramSrc} alt={diagramAlt} loading="lazy" decoding="async" />
+                  </div>
+                ) : (
+                  <OrgChartDecreeDiagram locale={locale} />
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {showUnits && units.length > 0 ? (
           <>

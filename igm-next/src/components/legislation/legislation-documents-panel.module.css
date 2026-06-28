@@ -1,0 +1,373 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.resultsCount {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  border: 1px solid #dde3ec;
+  border-radius: 10px;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.card:hover:not(:disabled),
+.card:focus-visible:not(:disabled) {
+  border-color: #1b4491;
+  box-shadow: 0 8px 22px rgba(27, 68, 145, 0.1);
+  transform: translateY(-1px);
+}
+
+.card:focus-visible {
+  outline: 2px solid #1b4491;
+  outline-offset: 2px;
+}
+
+.card:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.thumbWrap {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-bottom: 1px solid #e8eef4;
+  background: #f4f6f9;
+}
+
+.thumbFallback {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(165deg, #eef3fa 0%, #dce6f2 100%);
+}
+
+.pdfBadge {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 6px;
+  background: #0c1f3d;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(12, 31, 61, 0.25);
+  pointer-events: none;
+}
+
+.cardOverlay {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 2.25rem;
+  padding: 0.4rem 0.5rem;
+  background: linear-gradient(to top, rgba(12, 31, 61, 0.88), rgba(12, 31, 61, 0.45));
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.card:hover:not(:disabled) .cardOverlay,
+.card:focus-visible:not(:disabled) .cardOverlay {
+  opacity: 1;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.65rem 0.7rem 0.7rem;
+  border-top: 3px solid #ffba00;
+}
+
+.cardTitle {
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-height: 2.7em;
+  font-family: "Google Sans", Inter, system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #0c1f3d;
+}
+
+.cardMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.cardRef {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #1b4491;
+}
+
+.cardDate {
+  flex: 0 0 auto;
+  font-size: 0.6875rem;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.empty,
+.viewerLoading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 220px;
+  padding: 2rem;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #64748b;
+  text-align: center;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+  padding-top: 0.25rem;
+}
+
+.pageList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.pageBtn,
+.pageNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  height: 2.25rem;
+  padding: 0 0.5rem;
+  border: 1px solid #dde3ec;
+  border-radius: 8px;
+  background: #fff;
+  color: #475569;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.pageBtn:hover:not(:disabled),
+.pageNumber:hover {
+  border-color: #1b4491;
+  color: #1b4491;
+}
+
+.pageBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.pageNumberActive {
+  border-color: #1b4491;
+  background: #1b4491;
+  color: #fff;
+}
+
+.pageEllipsis {
+  min-width: 1.5rem;
+  text-align: center;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10060;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  background: rgba(12, 31, 61, 0.72);
+  animation: igmLegislationModalFade 0.2s ease-out;
+}
+
+.modalBackdropBtn {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.modalPanel {
+  position: relative;
+  z-index: 1;
+  width: min(1100px, 96vw);
+  height: min(92vh, 900px);
+  display: flex;
+  flex-direction: column;
+  animation: igmLegislationModalSlide 0.22s ease-out;
+}
+
+.modalSrTitle {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@keyframes igmLegislationModalFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes igmLegislationModalSlide {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Mobile : overlay toujours visible (pas de hover) */
+@media (hover: none) {
+  .cardOverlay {
+    opacity: 1;
+  }
+
+  .card:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
+@media (min-width: 576px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .cardTitle {
+    font-size: 0.875rem;
+    max-height: 2.8em;
+  }
+
+  .cardRef,
+  .cardDate {
+    font-size: 0.75rem;
+  }
+
+  .cardBody {
+    padding: 0.75rem 0.85rem 0.85rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.15rem;
+  }
+
+  .thumbWrap {
+    aspect-ratio: 4 / 5;
+  }
+
+  .cardTitle {
+    font-size: 0.9375rem;
+  }
+}
+
+@media (max-width: 575px) {
+  .resultsCount {
+    text-align: center;
+  }
+
+  .pagination {
+    gap: 0.25rem;
+  }
+
+  .pageBtn,
+  .pageNumber {
+    min-width: 2rem;
+    height: 2rem;
+    font-size: 0.8125rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .modalPanel {
+    width: 100%;
+    height: min(94vh, 900px);
+  }
+}

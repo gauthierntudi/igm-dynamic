@@ -2,6 +2,8 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import type { CollectionAfterChangeHook, GlobalAfterChangeHook } from "payload";
 
 import { localePathPrefix, SUPPORTED_LOCALES } from "@/i18n/locales";
+import { hrefForRoute, hrefForPhotoAlbum } from "@/i18n/paths";
+import { pageHeroRouteKeysForRevalidation } from "@/lib/page-heroes/constants";
 
 function revalidateSite(tags: string[]) {
   try {
@@ -52,6 +54,77 @@ export const revalidateFrontCollection: CollectionAfterChangeHook = ({ collectio
     revalidatePagePaths(doc.slug);
   }
 
+  if (collection.slug === "legislation-documents") {
+    try {
+      for (const slug of ["ordonnances", "lois", "decrets", "decisions"]) {
+        revalidatePagePaths(slug);
+      }
+      revalidatePath("/en/ordinances");
+      revalidatePath("/en/laws");
+      revalidatePath("/en/decrees");
+      revalidatePath("/en/decisions");
+    } catch {
+      // Hors contexte Next.js.
+    }
+  }
+
+  if (collection.slug === "media-gallery-items") {
+    try {
+      revalidatePath(hrefForRoute("videos", "fr"));
+      revalidatePath(hrefForRoute("videos", "en"));
+    } catch {
+      // Hors contexte Next.js.
+    }
+  }
+
+  if (collection.slug === "photo-albums") {
+    try {
+      revalidatePath(hrefForRoute("photos", "fr"));
+      revalidatePath(hrefForRoute("photos", "en"));
+      if (typeof doc.slug === "string" && doc.slug.length > 0) {
+        revalidatePath(hrefForPhotoAlbum(doc.slug, "fr"));
+        revalidatePath(hrefForPhotoAlbum(doc.slug, "en"));
+      }
+    } catch {
+      // Hors contexte Next.js.
+    }
+  }
+
+  if (collection.slug === "media") {
+    for (const globalSlug of ["page-heroes", "who-we-are", "legislation", "home"]) {
+      tags.push(`global:${globalSlug}`);
+      for (const locale of SUPPORTED_LOCALES) {
+        tags.push(`global:${globalSlug}:${locale}`);
+      }
+    }
+
+    try {
+      for (const routeKey of pageHeroRouteKeysForRevalidation()) {
+        revalidatePath(hrefForRoute(routeKey, "fr"));
+        revalidatePath(hrefForRoute(routeKey, "en"));
+      }
+      revalidatePath("/a-propos");
+      revalidatePath("/historique");
+      revalidatePath("/mission");
+      revalidatePath("/en/about");
+      revalidatePath("/en/history");
+      revalidatePath("/en/mission");
+      for (const slug of ["ordonnances", "lois", "decrets", "decisions"]) {
+        revalidatePagePaths(slug);
+      }
+      revalidatePath(hrefForRoute("photos", "fr"));
+      revalidatePath(hrefForRoute("photos", "en"));
+      revalidatePath(hrefForRoute("videos", "fr"));
+      revalidatePath(hrefForRoute("videos", "en"));
+      revalidatePath("/");
+      for (const locale of SUPPORTED_LOCALES) {
+        revalidatePath(localePathPrefix(locale) || "/");
+      }
+    } catch {
+      // Hors contexte Next.js.
+    }
+  }
+
   revalidateSite(tags);
   return doc;
 };
@@ -70,6 +143,40 @@ export const revalidateFrontGlobal: GlobalAfterChangeHook = ({ global, doc }) =>
       revalidatePath("/en/about");
       revalidatePath("/en/history");
       revalidatePath("/en/mission");
+    } catch {
+      // Hors contexte Next.js.
+    }
+  }
+
+  if (global.slug === "legislation") {
+    try {
+      for (const slug of ["ordonnances", "lois", "decrets", "decisions"]) {
+        revalidatePagePaths(slug);
+      }
+      revalidatePath("/en/ordinances");
+      revalidatePath("/en/laws");
+      revalidatePath("/en/decrees");
+      revalidatePath("/en/decisions");
+    } catch {
+      // Hors contexte Next.js.
+    }
+  }
+
+  if (global.slug === "page-heroes") {
+    try {
+      for (const routeKey of pageHeroRouteKeysForRevalidation()) {
+        revalidatePath(hrefForRoute(routeKey, "fr"));
+        revalidatePath(hrefForRoute(routeKey, "en"));
+      }
+    } catch {
+      // Hors contexte Next.js.
+    }
+  }
+
+  if (global.slug === "contact-page") {
+    try {
+      revalidatePath(hrefForRoute("contact", "fr"));
+      revalidatePath(hrefForRoute("contact", "en"));
     } catch {
       // Hors contexte Next.js.
     }

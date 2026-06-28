@@ -66,7 +66,10 @@ export const WhoWeAre: GlobalConfig = {
               name: "heroImage",
               type: "upload",
               relationTo: "media",
-              label: "Image principale",
+              label: "Image bannière (haut de page)",
+              admin: {
+                description: "Fond du bandeau principal sur /a-propos (et repli sur /historique si non renseigné).",
+              },
             },
             {
               type: "row",
@@ -124,7 +127,7 @@ export const WhoWeAre: GlobalConfig = {
                   name: "image",
                   type: "upload",
                   relationTo: "media",
-                  label: "Image (optionnelle)",
+                  label: "Image section À propos",
                 },
                 {
                   type: "group",
@@ -162,6 +165,15 @@ export const WhoWeAre: GlobalConfig = {
                   ...LOCALIZED,
                 },
                 {
+                  name: "headline",
+                  type: "text",
+                  label: "Accroche hero",
+                  admin: {
+                    description: "Phrase courte affichée dans le bandeau (max. ~70 caractères).",
+                  },
+                  ...LOCALIZED,
+                },
+                {
                   name: "lead",
                   type: "textarea",
                   label: "Chapô",
@@ -177,6 +189,42 @@ export const WhoWeAre: GlobalConfig = {
                   },
                   ...LOCALIZED,
                 },
+                {
+                  name: "heroImage",
+                  type: "upload",
+                  relationTo: "media",
+                  label: "Bannière page Historique",
+                  admin: {
+                    description: "Fond du bandeau en haut de /historique. Repli : bannière Introduction.",
+                  },
+                },
+                {
+                  name: "ctaImage",
+                  type: "upload",
+                  relationTo: "media",
+                  label: "Bandeau bas de page (CTA)",
+                  admin: {
+                    description: "Image de fond du bandeau « acteur central » en bas de /historique.",
+                  },
+                },
+                {
+                  name: "teaserImage1",
+                  type: "upload",
+                  relationTo: "media",
+                  label: "Galerie À propos — image 1",
+                  admin: {
+                    description: "Première vignette de la section Historique sur /a-propos.",
+                  },
+                },
+                {
+                  name: "teaserImage2",
+                  type: "upload",
+                  relationTo: "media",
+                  label: "Galerie À propos — image 2",
+                  admin: {
+                    description: "Deuxième vignette de la section Historique sur /a-propos.",
+                  },
+                },
               ],
             },
           ],
@@ -189,6 +237,15 @@ export const WhoWeAre: GlobalConfig = {
               name: "missionSection",
               label: "Section Mission",
               fields: [
+                {
+                  name: "image",
+                  type: "upload",
+                  relationTo: "media",
+                  label: "Image section Mission",
+                  admin: {
+                    description: "Grande image à gauche du bloc Mission sur /a-propos.",
+                  },
+                },
                 {
                   name: "title",
                   type: "text",

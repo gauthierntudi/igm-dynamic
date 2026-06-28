@@ -9,6 +9,7 @@ import { LocaleContentKey } from "@/components/i18n/LocaleContentKey";
 import { LocaleProvider } from "@/components/i18n/LocaleProvider";
 import SignalementAnchorBridge from "@/components/signalement/SignalementAnchorBridge";
 import { SignalementModalProvider } from "@/components/signalement/SignalementModalProvider";
+import ChatWidget from "@/components/chat/ChatWidget";
 import { getSiteSettings } from "@/lib/cms/client";
 import { withDeployedBase } from "@/lib/deployBasePath";
 import TemplateFooter from "@/components/template/Footer";
@@ -34,8 +35,8 @@ const templateCssFiles = [
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const [settingsFr, settingsEn] = await Promise.all([
-    getSiteSettings("fr").catch(() => null),
-    getSiteSettings("en").catch(() => null),
+    getSiteSettings("fr"),
+    getSiteSettings("en"),
   ]);
 
   return (
@@ -50,7 +51,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           crossOrigin="anonymous"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,600;0,700;1,400&family=Barlow+Condensed:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Dancing+Script:wght@400..700&family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:ital,wght@0,400;0,600;0,700;1,400&family=Barlow+Condensed:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Dancing+Script:wght@400..700&family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
           rel="stylesheet"
         />
         <link
@@ -70,7 +71,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         ))}
         <style>{`:root{--primary-color1:#1b4491;--primary-color1-opc:27,68,145;--primary-color3:#065ab0;--primary-color3-opc:6,90,176;--bs-purple:#0560b7;--bs-indigo:#0657ac;--brand-red:#e20405;--brand-yellow:#f6bf0d;}`}</style>
       </head>
-      <body>
+      <body suppressHydrationWarning>
         {ENABLE_LOADER && (
           <div
             id="igm-loader"
@@ -105,6 +106,18 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   var root = document.getElementById("igm-loader");
   if (!root) return;
 
+  var path = (window.location.pathname || "/").replace(/\\/$/, "") || "/";
+  var isHomePath =
+    path === "/" ||
+    path === "/marketing-agency" ||
+    path === "/en";
+
+  if (!isHomePath) {
+    root.classList.add("is-hidden");
+    root.setAttribute("aria-hidden", "true");
+    return;
+  }
+
   root.setAttribute("data-init", "1");
 
   var words = ["Inspection", "Générale", "de Mines", "Bienvenue"];
@@ -112,13 +125,17 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   if (!el) return;
   var progressEl = root.querySelector(".igm-loader-progress .value");
   var loaded = false;
+  var domReady = false;
   var startedAt = Date.now();
+  var MIN_LOADER_MS = 1200;
+  var MAX_LOADER_MS = 3200;
 
   var wordIndex = 0;
   var charIndex = 0;
   var mode = "typing";
   var progressStarted = false;
   var progressValue = 0;
+  var finishing = false;
 
   function rand(min, max) {
     return min + Math.floor(Math.random() * (max - min + 1));
@@ -141,11 +158,11 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         setTimeout(function () {
           mode = "deleting";
           step();
-        }, 420);
+        }, 220);
         return;
       }
 
-      setTimeout(step, rand(22, 44));
+      setTimeout(step, rand(14, 26));
       return;
     }
 
@@ -156,41 +173,48 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       if (charIndex <= 0) {
         wordIndex = Math.min(words.length - 1, wordIndex + 1);
         mode = "typing";
-        setTimeout(step, 160);
+        setTimeout(step, 80);
         return;
       }
 
-      setTimeout(step, rand(16, 28));
+      setTimeout(step, rand(10, 18));
       return;
     }
   }
 
   function hide() {
-    if (!root || root.classList.contains("is-hidden")) return;
+    if (!root || root.classList.contains("is-hidden") || root.classList.contains("is-hiding")) return;
 
-    function removeRoot() {
+    function hideRoot() {
       if (!root) return;
       root.classList.add("is-hidden");
-      if (root && root.parentNode) root.parentNode.removeChild(root);
+      root.setAttribute("aria-hidden", "true");
     }
 
-    var gsap = typeof window !== "undefined" ? window.gsap : null;
-    if (gsap && typeof gsap.timeline === "function") {
-      var inner = root.querySelector(".igm-loader-inner");
+    var elapsed = Date.now() - startedAt;
+    var wait = Math.max(0, MIN_LOADER_MS - elapsed);
+
+    function runHide() {
+      var gsap = typeof window !== "undefined" ? window.gsap : null;
+      if (gsap && typeof gsap.timeline === "function") {
+        var inner = root.querySelector(".igm-loader-inner");
+        root.classList.add("is-hiding");
+        gsap
+          .timeline({
+            defaults: { ease: "power2.out" },
+            onComplete: hideRoot,
+          })
+          .set(root, { pointerEvents: "none" }, 0)
+          .to(inner || root, { y: -10, scale: 0.98, opacity: 0, duration: 0.35 }, 0)
+          .to(root, { opacity: 0, duration: 0.4 }, 0);
+        return;
+      }
+
       root.classList.add("is-hiding");
-      gsap
-        .timeline({
-          defaults: { ease: "power2.out" },
-          onComplete: removeRoot,
-        })
-        .set(root, { pointerEvents: "none" }, 0)
-        .to(inner || root, { y: -10, scale: 0.98, opacity: 0, duration: 0.5 }, 0)
-        .to(root, { opacity: 0, duration: 0.55 }, 0);
-      return;
+      setTimeout(hideRoot, 360);
     }
 
-    root.classList.add("is-hiding");
-    setTimeout(removeRoot, 520);
+    setTimeout(runHide, wait);
   }
 
   function setProgress(value) {
@@ -198,29 +222,35 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     if (progressEl) progressEl.textContent = value + "%";
   }
 
+  function finishLoader() {
+    if (finishing) return;
+    finishing = true;
+    setProgress(100);
+    hide();
+  }
+
   function progressTick() {
     if (!progressStarted) return;
     if (!progressEl) return;
 
-    if (progressValue < 90) {
+    if (progressValue < 88) {
       setProgress(progressValue + 1);
-      setTimeout(progressTick, 18);
+      setTimeout(progressTick, loaded || domReady ? 8 : 12);
       return;
     }
 
     if (progressValue < 99) {
       setProgress(progressValue + 1);
-      setTimeout(progressTick, 60);
+      setTimeout(progressTick, loaded || domReady ? 14 : 22);
       return;
     }
 
-    if (!loaded) {
-      setTimeout(progressTick, 120);
+    if (!loaded && !domReady) {
+      setTimeout(progressTick, 40);
       return;
     }
 
-    setProgress(100);
-    hide();
+    finishLoader();
   }
 
   function startProgress() {
@@ -231,20 +261,29 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       el.textContent = "";
       setProgress(0);
       progressTick();
-    }, 4000);
+    }, 350);
   }
 
   function markLoaded() {
     loaded = true;
   }
 
-  window.addEventListener("load", function () {
-    markLoaded();
-  });
+  function markDomReady() {
+    domReady = true;
+  }
+
+  window.addEventListener("load", markLoaded);
+  document.addEventListener("DOMContentLoaded", markDomReady);
+
+  if (document.readyState === "interactive" || document.readyState === "complete") {
+    markDomReady();
+  }
 
   if (document.readyState === "complete") {
     markLoaded();
   }
+
+  setTimeout(finishLoader, MAX_LOADER_MS);
 
   step();
 })();`,
@@ -707,7 +746,15 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   var header = document.querySelector("header.header-area");
   if (!header) return;
 
+  function syncHeaderHeight() {
+    document.documentElement.style.setProperty(
+      "--igm-sticky-header-height",
+      (header.offsetHeight || 92) + "px"
+    );
+  }
+
   var threshold = header.offsetHeight || 60;
+  syncHeaderHeight();
 
   function onScroll() {
     var shouldStick = window.scrollY > threshold;
@@ -716,7 +763,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   }
 
   window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", syncHeaderHeight, { passive: true });
   onScroll();
+  syncHeaderHeight();
 })();`,
           }}
         />
@@ -729,6 +778,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
               <TemplateHeader />
               <LocaleContentKey>{children}</LocaleContentKey>
               <TemplateFooter />
+              <ChatWidget />
             </SignalementModalProvider>
           </SiteSettingsProvider>
         </LocaleProvider>

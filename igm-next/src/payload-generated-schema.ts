@@ -111,6 +111,34 @@ export const enum_signalements_type_infraction = pgEnum(
     "Autre",
   ],
 );
+export const enum_contact_messages_locale = pgEnum(
+  "enum_contact_messages_locale",
+  ["fr", "en"],
+);
+export const enum_contact_messages_status = pgEnum(
+  "enum_contact_messages_status",
+  ["nouveau", "lu"],
+);
+export const enum_legislation_documents_category = pgEnum(
+  "enum_legislation_documents_category",
+  ["ordinances", "laws", "decrees", "decisions"],
+);
+export const enum_legislation_documents_status = pgEnum(
+  "enum_legislation_documents_status",
+  ["draft", "published"],
+);
+export const enum__legislation_documents_v_version_category = pgEnum(
+  "enum__legislation_documents_v_version_category",
+  ["ordinances", "laws", "decrees", "decisions"],
+);
+export const enum__legislation_documents_v_version_status = pgEnum(
+  "enum__legislation_documents_v_version_status",
+  ["draft", "published"],
+);
+export const enum__legislation_documents_v_published_locale = pgEnum(
+  "enum__legislation_documents_v_published_locale",
+  ["fr", "en"],
+);
 export const enum_site_settings_header_nav_children_sub_items_item_type =
   pgEnum("enum_site_settings_header_nav_children_sub_items_item_type", [
     "link",
@@ -542,6 +570,9 @@ export const pages = pgTable(
     hero_media: integer("hero_media_id").references(() => media.id, {
       onDelete: "set null",
     }),
+    hero_ctaMedia: integer("hero_cta_media_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
     updatedAt: timestamp("updated_at", {
       mode: "string",
       withTimezone: true,
@@ -560,6 +591,7 @@ export const pages = pgTable(
   },
   (columns) => [
     index("pages_hero_hero_media_idx").on(columns.hero_media),
+    index("pages_hero_hero_cta_media_idx").on(columns.hero_ctaMedia),
     index("pages_updated_at_idx").on(columns.updatedAt),
     index("pages_created_at_idx").on(columns.createdAt),
     index("pages__status_idx").on(columns._status),
@@ -612,6 +644,12 @@ export const _pages_v = pgTable(
         onDelete: "set null",
       },
     ),
+    version_hero_ctaMedia: integer("version_hero_cta_media_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
     version_updatedAt: timestamp("version_updated_at", {
       mode: "string",
       withTimezone: true,
@@ -646,6 +684,9 @@ export const _pages_v = pgTable(
     index("_pages_v_parent_idx").on(columns.parent),
     index("_pages_v_version_hero_version_hero_media_idx").on(
       columns.version_hero_media,
+    ),
+    index("_pages_v_version_hero_version_hero_cta_media_idx").on(
+      columns.version_hero_ctaMedia,
     ),
     index("_pages_v_version_version_updated_at_idx").on(
       columns.version_updatedAt,
@@ -917,15 +958,17 @@ export const signalements = pgTable(
   "signalements",
   {
     id: serial("id").primaryKey(),
+    reference: varchar("reference"),
     status: enum_signalements_status("status").default("recu"),
+    estAnonyme: boolean("est_anonyme").default(false),
     alerteur_nom: varchar("alerteur_nom"),
     alerteur_email: varchar("alerteur_email"),
     alerteur_tel: varchar("alerteur_tel"),
     description: varchar("description").notNull(),
     province: enum_signalements_province("province"),
+    typeInfraction: enum_signalements_type_infraction("type_infraction"),
     villeSite: varchar("ville_site"),
     coords: varchar("coords"),
-    typeInfraction: enum_signalements_type_infraction("type_infraction"),
     notesInternes: varchar("notes_internes"),
     updatedAt: timestamp("updated_at", {
       mode: "string",
@@ -943,6 +986,7 @@ export const signalements = pgTable(
       .notNull(),
   },
   (columns) => [
+    uniqueIndex("signalements_reference_idx").on(columns.reference),
     index("signalements_updated_at_idx").on(columns.updatedAt),
     index("signalements_created_at_idx").on(columns.createdAt),
   ],
@@ -973,6 +1017,198 @@ export const signalements_rels = pgTable(
       columns: [columns["signalement-filesID"]],
       foreignColumns: [signalement_files.id],
       name: "signalements_rels_signalement_files_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const contact_messages = pgTable(
+  "contact_messages",
+  {
+    id: serial("id").primaryKey(),
+    name: varchar("name").notNull(),
+    email: varchar("email").notNull(),
+    phone: varchar("phone"),
+    subject: varchar("subject").notNull(),
+    message: varchar("message").notNull(),
+    locale: enum_contact_messages_locale("locale"),
+    status: enum_contact_messages_status("status").default("nouveau"),
+    notesInternes: varchar("notes_internes"),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (columns) => [
+    index("contact_messages_updated_at_idx").on(columns.updatedAt),
+    index("contact_messages_created_at_idx").on(columns.createdAt),
+  ],
+);
+
+export const legislation_documents = pgTable(
+  "legislation_documents",
+  {
+    id: serial("id").primaryKey(),
+    category: enum_legislation_documents_category("category"),
+    reference: varchar("reference"),
+    publishedAt: timestamp("published_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    }),
+    order: numeric("order", { mode: "number" }).default(0),
+    file: integer("file_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    _status: enum_legislation_documents_status("_status").default("draft"),
+  },
+  (columns) => [
+    index("legislation_documents_file_idx").on(columns.file),
+    index("legislation_documents_updated_at_idx").on(columns.updatedAt),
+    index("legislation_documents_created_at_idx").on(columns.createdAt),
+    index("legislation_documents__status_idx").on(columns._status),
+  ],
+);
+
+export const legislation_documents_locales = pgTable(
+  "legislation_documents_locales",
+  {
+    title: varchar("title"),
+    summary: varchar("summary"),
+    id: serial("id").primaryKey(),
+    _locale: enum__locales("_locale").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+  },
+  (columns) => [
+    uniqueIndex("legislation_documents_locales_locale_parent_id_unique").on(
+      columns._locale,
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [legislation_documents.id],
+      name: "legislation_documents_locales_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const _legislation_documents_v = pgTable(
+  "_legislation_documents_v",
+  {
+    id: serial("id").primaryKey(),
+    parent: integer("parent_id").references(() => legislation_documents.id, {
+      onDelete: "set null",
+    }),
+    version_category:
+      enum__legislation_documents_v_version_category("version_category"),
+    version_reference: varchar("version_reference"),
+    version_publishedAt: timestamp("version_published_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    }),
+    version_order: numeric("version_order", { mode: "number" }).default(0),
+    version_file: integer("version_file_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+    version_updatedAt: timestamp("version_updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    }),
+    version_createdAt: timestamp("version_created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    }),
+    version__status:
+      enum__legislation_documents_v_version_status("version__status").default(
+        "draft",
+      ),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    snapshot: boolean("snapshot"),
+    publishedLocale:
+      enum__legislation_documents_v_published_locale("published_locale"),
+    latest: boolean("latest"),
+  },
+  (columns) => [
+    index("_legislation_documents_v_parent_idx").on(columns.parent),
+    index("_legislation_documents_v_version_version_file_idx").on(
+      columns.version_file,
+    ),
+    index("_legislation_documents_v_version_version_updated_at_idx").on(
+      columns.version_updatedAt,
+    ),
+    index("_legislation_documents_v_version_version_created_at_idx").on(
+      columns.version_createdAt,
+    ),
+    index("_legislation_documents_v_version_version__status_idx").on(
+      columns.version__status,
+    ),
+    index("_legislation_documents_v_created_at_idx").on(columns.createdAt),
+    index("_legislation_documents_v_updated_at_idx").on(columns.updatedAt),
+    index("_legislation_documents_v_snapshot_idx").on(columns.snapshot),
+    index("_legislation_documents_v_published_locale_idx").on(
+      columns.publishedLocale,
+    ),
+    index("_legislation_documents_v_latest_idx").on(columns.latest),
+  ],
+);
+
+export const _legislation_documents_v_locales = pgTable(
+  "_legislation_documents_v_locales",
+  {
+    version_title: varchar("version_title"),
+    version_summary: varchar("version_summary"),
+    id: serial("id").primaryKey(),
+    _locale: enum__locales("_locale").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+  },
+  (columns) => [
+    uniqueIndex("_legislation_documents_v_locales_locale_parent_id_unique").on(
+      columns._locale,
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [_legislation_documents_v.id],
+      name: "_legislation_documents_v_locales_parent_id_fk",
     }).onDelete("cascade"),
   ],
 );
@@ -1028,6 +1264,8 @@ export const payload_locked_documents_rels = pgTable(
     newsID: integer("news_id"),
     statsID: integer("stats_id"),
     signalementsID: integer("signalements_id"),
+    "contact-messagesID": integer("contact_messages_id"),
+    "legislation-documentsID": integer("legislation_documents_id"),
   },
   (columns) => [
     index("payload_locked_documents_rels_order_idx").on(columns.order),
@@ -1043,6 +1281,12 @@ export const payload_locked_documents_rels = pgTable(
     index("payload_locked_documents_rels_stats_id_idx").on(columns.statsID),
     index("payload_locked_documents_rels_signalements_id_idx").on(
       columns.signalementsID,
+    ),
+    index("payload_locked_documents_rels_contact_messages_id_idx").on(
+      columns["contact-messagesID"],
+    ),
+    index("payload_locked_documents_rels_legislation_documents_id_idx").on(
+      columns["legislation-documentsID"],
     ),
     foreignKey({
       columns: [columns["parent"]],
@@ -1083,6 +1327,16 @@ export const payload_locked_documents_rels = pgTable(
       columns: [columns["signalementsID"]],
       foreignColumns: [signalements.id],
       name: "payload_locked_documents_rels_signalements_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["contact-messagesID"]],
+      foreignColumns: [contact_messages.id],
+      name: "payload_locked_documents_rels_contact_messages_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["legislation-documentsID"]],
+      foreignColumns: [legislation_documents.id],
+      name: "payload_locked_documents_rels_legislation_documents_fk",
     }).onDelete("cascade"),
   ],
 );
@@ -2026,48 +2280,6 @@ export const home_locales = pgTable(
   ],
 );
 
-export const who_we_are_history_section_milestones = pgTable(
-  "who_we_are_history_section_milestones",
-  {
-    _order: integer("_order").notNull(),
-    _parentID: integer("_parent_id").notNull(),
-    id: varchar("id").primaryKey(),
-    year: varchar("year").notNull(),
-  },
-  (columns) => [
-    index("who_we_are_history_section_milestones_order_idx").on(columns._order),
-    index("who_we_are_history_section_milestones_parent_id_idx").on(
-      columns._parentID,
-    ),
-    foreignKey({
-      columns: [columns["_parentID"]],
-      foreignColumns: [who_we_are.id],
-      name: "who_we_are_history_section_milestones_parent_id_fk",
-    }).onDelete("cascade"),
-  ],
-);
-
-export const who_we_are_history_section_milestones_locales = pgTable(
-  "who_we_are_history_section_milestones_locales",
-  {
-    title: varchar("title").notNull(),
-    text: varchar("text"),
-    id: serial("id").primaryKey(),
-    _locale: enum__locales("_locale").notNull(),
-    _parentID: varchar("_parent_id").notNull(),
-  },
-  (columns) => [
-    uniqueIndex(
-      "who_we_are_history_section_milestones_locales_locale_parent_",
-    ).on(columns._locale, columns._parentID),
-    foreignKey({
-      columns: [columns["_parentID"]],
-      foreignColumns: [who_we_are_history_section_milestones.id],
-      name: "who_we_are_history_section_milestones_locales_parent_id_fk",
-    }).onDelete("cascade"),
-  ],
-);
-
 export const who_we_are_mission_section_statutory_items = pgTable(
   "who_we_are_mission_section_statutory_items",
   {
@@ -2252,6 +2464,33 @@ export const who_we_are = pgTable(
     ).references(() => media.id, {
       onDelete: "set null",
     }),
+    historySection_heroImage: integer(
+      "history_section_hero_image_id",
+    ).references(() => media.id, {
+      onDelete: "set null",
+    }),
+    historySection_ctaImage: integer("history_section_cta_image_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    historySection_teaserImage1: integer(
+      "history_section_teaser_image1_id",
+    ).references(() => media.id, {
+      onDelete: "set null",
+    }),
+    historySection_teaserImage2: integer(
+      "history_section_teaser_image2_id",
+    ).references(() => media.id, {
+      onDelete: "set null",
+    }),
+    missionSection_image: integer("mission_section_image_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
     ctaSection_link_navLink: enum_who_we_are_cta_section_link_nav_link(
       "cta_section_link_nav_link",
     ),
@@ -2291,6 +2530,21 @@ export const who_we_are = pgTable(
     index("who_we_are_about_section_quote_about_section_quote_autho_idx").on(
       columns.aboutSection_quote_authorPhoto,
     ),
+    index("who_we_are_history_section_history_section_hero_image_idx").on(
+      columns.historySection_heroImage,
+    ),
+    index("who_we_are_history_section_history_section_cta_image_idx").on(
+      columns.historySection_ctaImage,
+    ),
+    index("who_we_are_history_section_history_section_teaser_image1_idx").on(
+      columns.historySection_teaserImage1,
+    ),
+    index("who_we_are_history_section_history_section_teaser_image2_idx").on(
+      columns.historySection_teaserImage2,
+    ),
+    index("who_we_are_mission_section_mission_section_image_idx").on(
+      columns.missionSection_image,
+    ),
     index("who_we_are_contact_section_contact_section_image_idx").on(
       columns.contactSection_image,
     ),
@@ -2317,7 +2571,9 @@ export const who_we_are_locales = pgTable(
     historySection_title: varchar("history_section_title").default(
       "Historique",
     ),
+    historySection_headline: varchar("history_section_headline"),
     historySection_lead: varchar("history_section_lead"),
+    historySection_body: varchar("history_section_body"),
     missionSection_title: varchar("mission_section_title").default("Mission"),
     missionSection_lead: varchar("mission_section_lead"),
     missionSection_headline: varchar("mission_section_headline").default(
@@ -2360,6 +2616,166 @@ export const who_we_are_locales = pgTable(
   ],
 );
 
+export const legislation = pgTable(
+  "legislation",
+  {
+    id: serial("id").primaryKey(),
+    ordinancesHeroImage: integer("ordinances_hero_image_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    lawsHeroImage: integer("laws_hero_image_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+    decreesHeroImage: integer("decrees_hero_image_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    decisionsHeroImage: integer("decisions_hero_image_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    }),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    }),
+  },
+  (columns) => [
+    index("legislation_ordinances_hero_image_idx").on(
+      columns.ordinancesHeroImage,
+    ),
+    index("legislation_laws_hero_image_idx").on(columns.lawsHeroImage),
+    index("legislation_decrees_hero_image_idx").on(columns.decreesHeroImage),
+    index("legislation_decisions_hero_image_idx").on(
+      columns.decisionsHeroImage,
+    ),
+  ],
+);
+
+export const page_heroes = pgTable(
+  "page_heroes",
+  {
+    id: serial("id").primaryKey(),
+    orgChartHeroImage: integer("org_chart_hero_image_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    mapHeroImage: integer("map_hero_image_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+    fraudHeroImage: integer("fraud_hero_image_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+    fraudCtaHeroImage: integer("fraud_cta_hero_image_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    smugglingHeroImage: integer("smuggling_hero_image_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    smugglingCtaHeroImage: integer("smuggling_cta_hero_image_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    sanctionsHeroImage: integer("sanctions_hero_image_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    sanctionsCtaHeroImage: integer("sanctions_cta_hero_image_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    reportHeroImage: integer("report_hero_image_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    contactHeroImage: integer("contact_hero_image_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    photosHeroImage: integer("photos_hero_image_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    videosHeroImage: integer("videos_hero_image_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    audiosHeroImage: integer("audios_hero_image_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    }),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    }),
+  },
+  (columns) => [
+    index("page_heroes_org_chart_hero_image_idx").on(columns.orgChartHeroImage),
+    index("page_heroes_map_hero_image_idx").on(columns.mapHeroImage),
+    index("page_heroes_fraud_hero_image_idx").on(columns.fraudHeroImage),
+    index("page_heroes_fraud_cta_hero_image_idx").on(columns.fraudCtaHeroImage),
+    index("page_heroes_smuggling_hero_image_idx").on(
+      columns.smugglingHeroImage,
+    ),
+    index("page_heroes_smuggling_cta_hero_image_idx").on(
+      columns.smugglingCtaHeroImage,
+    ),
+    index("page_heroes_sanctions_hero_image_idx").on(
+      columns.sanctionsHeroImage,
+    ),
+    index("page_heroes_sanctions_cta_hero_image_idx").on(
+      columns.sanctionsCtaHeroImage,
+    ),
+    index("page_heroes_report_hero_image_idx").on(columns.reportHeroImage),
+    index("page_heroes_contact_hero_image_idx").on(columns.contactHeroImage),
+    index("page_heroes_photos_hero_image_idx").on(columns.photosHeroImage),
+    index("page_heroes_videos_hero_image_idx").on(columns.videosHeroImage),
+    index("page_heroes_audios_hero_image_idx").on(columns.audiosHeroImage),
+  ],
+);
+
 export const relations_users_sessions = relations(
   users_sessions,
   ({ one }) => ({
@@ -2393,6 +2809,11 @@ export const relations_pages = relations(pages, ({ one, many }) => ({
     references: [media.id],
     relationName: "hero_media",
   }),
+  hero_ctaMedia: one(media, {
+    fields: [pages.hero_ctaMedia],
+    references: [media.id],
+    relationName: "hero_ctaMedia",
+  }),
   _locales: many(pages_locales, {
     relationName: "_locales",
   }),
@@ -2417,6 +2838,11 @@ export const relations__pages_v = relations(_pages_v, ({ one, many }) => ({
     fields: [_pages_v.version_hero_media],
     references: [media.id],
     relationName: "version_hero_media",
+  }),
+  version_hero_ctaMedia: one(media, {
+    fields: [_pages_v.version_hero_ctaMedia],
+    references: [media.id],
+    relationName: "version_hero_ctaMedia",
   }),
   _locales: many(_pages_v_locales, {
     relationName: "_locales",
@@ -2496,6 +2922,61 @@ export const relations_signalements = relations(signalements, ({ many }) => ({
     relationName: "_rels",
   }),
 }));
+export const relations_contact_messages = relations(
+  contact_messages,
+  () => ({}),
+);
+export const relations_legislation_documents_locales = relations(
+  legislation_documents_locales,
+  ({ one }) => ({
+    _parentID: one(legislation_documents, {
+      fields: [legislation_documents_locales._parentID],
+      references: [legislation_documents.id],
+      relationName: "_locales",
+    }),
+  }),
+);
+export const relations_legislation_documents = relations(
+  legislation_documents,
+  ({ one, many }) => ({
+    file: one(media, {
+      fields: [legislation_documents.file],
+      references: [media.id],
+      relationName: "file",
+    }),
+    _locales: many(legislation_documents_locales, {
+      relationName: "_locales",
+    }),
+  }),
+);
+export const relations__legislation_documents_v_locales = relations(
+  _legislation_documents_v_locales,
+  ({ one }) => ({
+    _parentID: one(_legislation_documents_v, {
+      fields: [_legislation_documents_v_locales._parentID],
+      references: [_legislation_documents_v.id],
+      relationName: "_locales",
+    }),
+  }),
+);
+export const relations__legislation_documents_v = relations(
+  _legislation_documents_v,
+  ({ one, many }) => ({
+    parent: one(legislation_documents, {
+      fields: [_legislation_documents_v.parent],
+      references: [legislation_documents.id],
+      relationName: "parent",
+    }),
+    version_file: one(media, {
+      fields: [_legislation_documents_v.version_file],
+      references: [media.id],
+      relationName: "version_file",
+    }),
+    _locales: many(_legislation_documents_v_locales, {
+      relationName: "_locales",
+    }),
+  }),
+);
 export const relations_payload_kv = relations(payload_kv, () => ({}));
 export const relations_payload_locked_documents_rels = relations(
   payload_locked_documents_rels,
@@ -2539,6 +3020,16 @@ export const relations_payload_locked_documents_rels = relations(
       fields: [payload_locked_documents_rels.signalementsID],
       references: [signalements.id],
       relationName: "signalements",
+    }),
+    "contact-messagesID": one(contact_messages, {
+      fields: [payload_locked_documents_rels["contact-messagesID"]],
+      references: [contact_messages.id],
+      relationName: "contact-messages",
+    }),
+    "legislation-documentsID": one(legislation_documents, {
+      fields: [payload_locked_documents_rels["legislation-documentsID"]],
+      references: [legislation_documents.id],
+      relationName: "legislation-documents",
     }),
   }),
 );
@@ -3037,27 +3528,6 @@ export const relations_home = relations(home, ({ one, many }) => ({
     relationName: "_locales",
   }),
 }));
-export const relations_who_we_are_history_section_milestones_locales =
-  relations(who_we_are_history_section_milestones_locales, ({ one }) => ({
-    _parentID: one(who_we_are_history_section_milestones, {
-      fields: [who_we_are_history_section_milestones_locales._parentID],
-      references: [who_we_are_history_section_milestones.id],
-      relationName: "_locales",
-    }),
-  }));
-export const relations_who_we_are_history_section_milestones = relations(
-  who_we_are_history_section_milestones,
-  ({ one, many }) => ({
-    _parentID: one(who_we_are, {
-      fields: [who_we_are_history_section_milestones._parentID],
-      references: [who_we_are.id],
-      relationName: "historySection_milestones",
-    }),
-    _locales: many(who_we_are_history_section_milestones_locales, {
-      relationName: "_locales",
-    }),
-  }),
-);
 export const relations_who_we_are_mission_section_statutory_items_locales =
   relations(who_we_are_mission_section_statutory_items_locales, ({ one }) => ({
     _parentID: one(who_we_are_mission_section_statutory_items, {
@@ -3177,8 +3647,30 @@ export const relations_who_we_are = relations(who_we_are, ({ one, many }) => ({
     references: [media.id],
     relationName: "aboutSection_quote_authorPhoto",
   }),
-  historySection_milestones: many(who_we_are_history_section_milestones, {
-    relationName: "historySection_milestones",
+  historySection_heroImage: one(media, {
+    fields: [who_we_are.historySection_heroImage],
+    references: [media.id],
+    relationName: "historySection_heroImage",
+  }),
+  historySection_ctaImage: one(media, {
+    fields: [who_we_are.historySection_ctaImage],
+    references: [media.id],
+    relationName: "historySection_ctaImage",
+  }),
+  historySection_teaserImage1: one(media, {
+    fields: [who_we_are.historySection_teaserImage1],
+    references: [media.id],
+    relationName: "historySection_teaserImage1",
+  }),
+  historySection_teaserImage2: one(media, {
+    fields: [who_we_are.historySection_teaserImage2],
+    references: [media.id],
+    relationName: "historySection_teaserImage2",
+  }),
+  missionSection_image: one(media, {
+    fields: [who_we_are.missionSection_image],
+    references: [media.id],
+    relationName: "missionSection_image",
   }),
   missionSection_statutoryItems: many(
     who_we_are_mission_section_statutory_items,
@@ -3204,6 +3696,95 @@ export const relations_who_we_are = relations(who_we_are, ({ one, many }) => ({
     relationName: "_locales",
   }),
 }));
+export const relations_legislation = relations(legislation, ({ one }) => ({
+  ordinancesHeroImage: one(media, {
+    fields: [legislation.ordinancesHeroImage],
+    references: [media.id],
+    relationName: "ordinancesHeroImage",
+  }),
+  lawsHeroImage: one(media, {
+    fields: [legislation.lawsHeroImage],
+    references: [media.id],
+    relationName: "lawsHeroImage",
+  }),
+  decreesHeroImage: one(media, {
+    fields: [legislation.decreesHeroImage],
+    references: [media.id],
+    relationName: "decreesHeroImage",
+  }),
+  decisionsHeroImage: one(media, {
+    fields: [legislation.decisionsHeroImage],
+    references: [media.id],
+    relationName: "decisionsHeroImage",
+  }),
+}));
+export const relations_page_heroes = relations(page_heroes, ({ one }) => ({
+  orgChartHeroImage: one(media, {
+    fields: [page_heroes.orgChartHeroImage],
+    references: [media.id],
+    relationName: "orgChartHeroImage",
+  }),
+  mapHeroImage: one(media, {
+    fields: [page_heroes.mapHeroImage],
+    references: [media.id],
+    relationName: "mapHeroImage",
+  }),
+  fraudHeroImage: one(media, {
+    fields: [page_heroes.fraudHeroImage],
+    references: [media.id],
+    relationName: "fraudHeroImage",
+  }),
+  fraudCtaHeroImage: one(media, {
+    fields: [page_heroes.fraudCtaHeroImage],
+    references: [media.id],
+    relationName: "fraudCtaHeroImage",
+  }),
+  smugglingHeroImage: one(media, {
+    fields: [page_heroes.smugglingHeroImage],
+    references: [media.id],
+    relationName: "smugglingHeroImage",
+  }),
+  smugglingCtaHeroImage: one(media, {
+    fields: [page_heroes.smugglingCtaHeroImage],
+    references: [media.id],
+    relationName: "smugglingCtaHeroImage",
+  }),
+  sanctionsHeroImage: one(media, {
+    fields: [page_heroes.sanctionsHeroImage],
+    references: [media.id],
+    relationName: "sanctionsHeroImage",
+  }),
+  sanctionsCtaHeroImage: one(media, {
+    fields: [page_heroes.sanctionsCtaHeroImage],
+    references: [media.id],
+    relationName: "sanctionsCtaHeroImage",
+  }),
+  reportHeroImage: one(media, {
+    fields: [page_heroes.reportHeroImage],
+    references: [media.id],
+    relationName: "reportHeroImage",
+  }),
+  contactHeroImage: one(media, {
+    fields: [page_heroes.contactHeroImage],
+    references: [media.id],
+    relationName: "contactHeroImage",
+  }),
+  photosHeroImage: one(media, {
+    fields: [page_heroes.photosHeroImage],
+    references: [media.id],
+    relationName: "photosHeroImage",
+  }),
+  videosHeroImage: one(media, {
+    fields: [page_heroes.videosHeroImage],
+    references: [media.id],
+    relationName: "videosHeroImage",
+  }),
+  audiosHeroImage: one(media, {
+    fields: [page_heroes.audiosHeroImage],
+    references: [media.id],
+    relationName: "audiosHeroImage",
+  }),
+}));
 
 type DatabaseSchema = {
   enum__locales: typeof enum__locales;
@@ -3218,6 +3799,13 @@ type DatabaseSchema = {
   enum_signalements_status: typeof enum_signalements_status;
   enum_signalements_province: typeof enum_signalements_province;
   enum_signalements_type_infraction: typeof enum_signalements_type_infraction;
+  enum_contact_messages_locale: typeof enum_contact_messages_locale;
+  enum_contact_messages_status: typeof enum_contact_messages_status;
+  enum_legislation_documents_category: typeof enum_legislation_documents_category;
+  enum_legislation_documents_status: typeof enum_legislation_documents_status;
+  enum__legislation_documents_v_version_category: typeof enum__legislation_documents_v_version_category;
+  enum__legislation_documents_v_version_status: typeof enum__legislation_documents_v_version_status;
+  enum__legislation_documents_v_published_locale: typeof enum__legislation_documents_v_published_locale;
   enum_site_settings_header_nav_children_sub_items_item_type: typeof enum_site_settings_header_nav_children_sub_items_item_type;
   enum_site_settings_header_nav_children_sub_items_nav_link: typeof enum_site_settings_header_nav_children_sub_items_nav_link;
   enum_site_settings_header_nav_children_sub_items_nested_icon: typeof enum_site_settings_header_nav_children_sub_items_nested_icon;
@@ -3252,6 +3840,11 @@ type DatabaseSchema = {
   stats_locales: typeof stats_locales;
   signalements: typeof signalements;
   signalements_rels: typeof signalements_rels;
+  contact_messages: typeof contact_messages;
+  legislation_documents: typeof legislation_documents;
+  legislation_documents_locales: typeof legislation_documents_locales;
+  _legislation_documents_v: typeof _legislation_documents_v;
+  _legislation_documents_v_locales: typeof _legislation_documents_v_locales;
   payload_kv: typeof payload_kv;
   payload_locked_documents: typeof payload_locked_documents;
   payload_locked_documents_rels: typeof payload_locked_documents_rels;
@@ -3291,8 +3884,6 @@ type DatabaseSchema = {
   home_contact_section_gallery_locales: typeof home_contact_section_gallery_locales;
   home: typeof home;
   home_locales: typeof home_locales;
-  who_we_are_history_section_milestones: typeof who_we_are_history_section_milestones;
-  who_we_are_history_section_milestones_locales: typeof who_we_are_history_section_milestones_locales;
   who_we_are_mission_section_statutory_items: typeof who_we_are_mission_section_statutory_items;
   who_we_are_mission_section_statutory_items_locales: typeof who_we_are_mission_section_statutory_items_locales;
   who_we_are_mission_section_priorities: typeof who_we_are_mission_section_priorities;
@@ -3303,6 +3894,8 @@ type DatabaseSchema = {
   who_we_are_team_section_members_locales: typeof who_we_are_team_section_members_locales;
   who_we_are: typeof who_we_are;
   who_we_are_locales: typeof who_we_are_locales;
+  legislation: typeof legislation;
+  page_heroes: typeof page_heroes;
   relations_users_sessions: typeof relations_users_sessions;
   relations_users: typeof relations_users;
   relations_media: typeof relations_media;
@@ -3319,6 +3912,11 @@ type DatabaseSchema = {
   relations_stats: typeof relations_stats;
   relations_signalements_rels: typeof relations_signalements_rels;
   relations_signalements: typeof relations_signalements;
+  relations_contact_messages: typeof relations_contact_messages;
+  relations_legislation_documents_locales: typeof relations_legislation_documents_locales;
+  relations_legislation_documents: typeof relations_legislation_documents;
+  relations__legislation_documents_v_locales: typeof relations__legislation_documents_v_locales;
+  relations__legislation_documents_v: typeof relations__legislation_documents_v;
   relations_payload_kv: typeof relations_payload_kv;
   relations_payload_locked_documents_rels: typeof relations_payload_locked_documents_rels;
   relations_payload_locked_documents: typeof relations_payload_locked_documents;
@@ -3358,8 +3956,6 @@ type DatabaseSchema = {
   relations_home_contact_section_gallery: typeof relations_home_contact_section_gallery;
   relations_home_locales: typeof relations_home_locales;
   relations_home: typeof relations_home;
-  relations_who_we_are_history_section_milestones_locales: typeof relations_who_we_are_history_section_milestones_locales;
-  relations_who_we_are_history_section_milestones: typeof relations_who_we_are_history_section_milestones;
   relations_who_we_are_mission_section_statutory_items_locales: typeof relations_who_we_are_mission_section_statutory_items_locales;
   relations_who_we_are_mission_section_statutory_items: typeof relations_who_we_are_mission_section_statutory_items;
   relations_who_we_are_mission_section_priorities_locales: typeof relations_who_we_are_mission_section_priorities_locales;
@@ -3370,6 +3966,8 @@ type DatabaseSchema = {
   relations_who_we_are_team_section_members: typeof relations_who_we_are_team_section_members;
   relations_who_we_are_locales: typeof relations_who_we_are_locales;
   relations_who_we_are: typeof relations_who_we_are;
+  relations_legislation: typeof relations_legislation;
+  relations_page_heroes: typeof relations_page_heroes;
 };
 
 declare module "@payloadcms/db-postgres" {

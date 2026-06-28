@@ -47,13 +47,19 @@ export type CmsWhoWeAre = {
   historySection?: {
     title?: string | null;
     lead?: string | null;
+    headline?: string | null;
     body?: string | null;
+    heroImage?: CmsMedia | number | null;
+    ctaImage?: CmsMedia | number | null;
+    teaserImage1?: CmsMedia | number | null;
+    teaserImage2?: CmsMedia | number | null;
   } | null;
   missionSection?: {
     title?: string | null;
     lead?: string | null;
     headline?: string | null;
     body?: string | null;
+    image?: CmsMedia | number | null;
     statutoryTitle?: string | null;
     statutoryItems?: CmsWhoWeAreLabelItem[] | null;
     prioritiesTitle?: string | null;

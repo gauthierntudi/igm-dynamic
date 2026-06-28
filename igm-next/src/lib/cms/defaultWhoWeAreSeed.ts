@@ -1,32 +1,33 @@
 import type { CmsWhoWeAre } from "./who-we-are/types";
 
+/** Contenu statique de la page À propos (utilisé tant que WHO_WE_ARE_USE_CMS est false). */
 export const DEFAULT_WHO_WE_ARE_FR: CmsWhoWeAre = {
   seoTitle: "Qui sommes-nous ? — IGM",
   seoDescription:
     "Découvrez l'Inspection Générale des Mines : son rôle, son histoire et sa mission au service de la gouvernance minière en RDC.",
   headline: "Une inspection rigoureuse pour un secteur minier transparent et durable",
-  intro:
-    "L'Inspection Générale des Mines (IGM) est l'organe chargé du contrôle, de la régulation et de la supervision du secteur minier en République Démocratique du Congo.",
-  navAboutLabel: "À propos",
+  intro: "",
+  navAboutLabel: "Qui sommes-nous ?",
   navHistoryLabel: "Historique",
   navMissionLabel: "Mission",
   aboutSection: {
     title: "À propos de l'IGM",
     body: [
-      "Sous l'impulsion de la direction actuelle, en fonction depuis le 12 janvier 2026, l'IGM renforce son déploiement dans les 22 provinces où elle est implantée.",
-      "Nous veillons au respect des dispositions législatives et réglementaires du Code minier, à la traçabilité des ressources naturelles et à une exploitation responsable au profit de la nation.",
-      "Portée par un engagement patriotique fort, l'IGM œuvre à restaurer la dignité et la souveraineté économique de la RDC à travers une gouvernance minière exemplaire.",
+      "Le secteur minier constitue l'un des piliers de l'économie de la République Démocratique du Congo. Soucieux de renforcer la gouvernance de ce secteur, le Président de la République, Félix-Antoine Tshisekedi Tshilombo a impulsé la création d'un organe dédié au contrôle et à l'inspection des activités minières.",
+      "Cette vision s'est concrétisée par l'émission du Décret n°23/19 du 09 juin 2023 portant création, organisation et fonctionnement de l'Inspection Générale des Mines (IGM).",
+      "L'IGM a pour vocation de veiller à l'application rigoureuse de la législation minière, promouvoir les bonnes pratiques et contribuer à une gestion plus transparente, plus responsable et plus sécurisée des ressources minérales de la République Démocratique du Congo.",
     ].join("\n"),
     quote: {
-      text:
-        "Le secteur minier est le cœur stratégique de notre économie. Y apporter de la rigueur, de la transparence et une gouvernance exemplaire est pour moi un devoir national.",
-      authorName: "Rafaël Kabengele",
-      authorRole: "Inspecteur Général de l'IGM",
+      text: "",
+      authorName: "",
+      authorRole: "",
     },
   },
   historySection: {
-    title: "I. Historique de l'Inspection Générale des Mines (IGM)",
-    lead: "",
+    title: "Historique de l'Inspection Générale des Mines (IGM)",
+    headline: "Un acteur central de la gouvernance minière",
+    lead:
+      "Ces réformes ont mis en évidence la nécessité d'un organe indépendant, doté de pouvoirs renforcés, capable d'assurer la transparence, la conformité, la traçabilité et la bonne gouvernance dans un secteur stratégique pour l'économie nationale.",
     body: [
       "L'Inspection Générale des Mines (IGM) est un service public spécialisé de l'État congolais, créé par le Décret n°23/19 du 09 juin 2023. ([Consultez le décret ici](/decrets)) Elle est dotée d'autonomie administrative et financière et placée sous l'autorité du Ministre ayant les Mines dans ses attributions, conformément à l'article 1er dudit Décret.",
       "La création de l'IGM s'inscrit dans la dynamique des grandes réformes du secteur minier initiées par le Gouvernement de la République Démocratique du Congo, notamment celles découlant du Code minier ([Consultez le Code minier ici](/lois)) (Loi n°007/2002 modifiée par la Loi n°18/001 du 09 mars 2018) et du ([Consultez le Règlement minier ici](/decrets)) (Décret n°038/2003 modifié par le Décret Règlement minier n°18/024 du 08 juin 2018).",
@@ -47,12 +48,10 @@ export const DEFAULT_WHO_WE_ARE_FR: CmsWhoWeAre = {
   },
   missionSection: {
     title: "Mission",
-    lead:
-      "L'IGM exerce des missions de contrôle, de prévention et de coordination pour assainir la chaîne de production minière nationale.",
-    headline: "Ensemble, nous renforçons la gouvernance minière",
+    lead: "La mission de l'Inspection Générale des Mines est double :",
+    headline: "Surveiller et protéger.",
     body: [
-      "Notre action vise à maximiser les recettes de l'État tout en garantissant une exploitation responsable au profit de la nation.",
-      "Nous mettons en place des mécanismes de suivi et de contrôle adaptés pour assurer la traçabilité des ressources naturelles et promouvoir une gestion durable du secteur minier.",
+      "Elle veille à l'intégrité de la chaîne de valeur minière par le contrôle, l'inspection et le suivi des activités minières. Elle lutte également contre la fraude, la contrebande et toutes les formes d'exploitation illicite des ressources minérales.",
     ].join("\n"),
     statutoryTitle: "Missions statutaires",
     statutoryItems: [
@@ -113,28 +112,28 @@ export const DEFAULT_WHO_WE_ARE_EN: CmsWhoWeAre = {
   seoDescription:
     "Learn about the General Inspectorate of Mines: its role, history and mission in support of mining governance in the DRC.",
   headline: "Rigorous inspection for a transparent and sustainable mining sector",
-  intro:
-    "The General Inspectorate of Mines (IGM) is responsible for controlling, regulating and supervising the mining sector in the Democratic Republic of Congo.",
-  navAboutLabel: "About",
+  intro: "",
+  navAboutLabel: "Who we are",
   navHistoryLabel: "History",
   navMissionLabel: "Mission",
   aboutSection: {
     title: "About the IGM",
     body: [
-      "Under the current leadership, in office since 12 January 2026, the IGM is strengthening its deployment across the 22 provinces where it operates.",
-      "We ensure compliance with mining legislation and regulations, traceability of natural resources and responsible exploitation for the benefit of the nation.",
-      "Driven by a strong patriotic commitment, the IGM works to restore the dignity and economic sovereignty of the DRC through exemplary mining governance.",
+      "The mining sector is one of the Democratic Republic of the Congo's pillars of the economy. Recognizing the need to strengthen governance in this strategic sector, the President of the Republic, Félix-Antoine Tshisekedi Tshilombo, spearheaded the establishment of a dedicated body responsible for the oversight and inspection of mining activities.",
+      "This vision materialized through the enactment of Decree No. 23/19 of 9 June 2023 establishing, organizing and governing the General Inspectorate of Mines (GIM).",
+      "The GIM is mandated to ensure strict compliance with mining legislation, promote best practices, and contribute to a more transparent, accountable, and secure management of the Democratic Republic of the Congo's mineral resources.",
     ].join("\n"),
     quote: {
-      text:
-        "The mining sector is the strategic heart of our economy. Bringing rigour, transparency and exemplary governance to it is, for me, a national duty.",
-      authorName: "Rafaël Kabengele",
-      authorRole: "Inspector General of the IGM",
+      text: "",
+      authorName: "",
+      authorRole: "",
     },
   },
   historySection: {
-    title: "I. History of the General Inspectorate of Mines (IGM)",
-    lead: "",
+    title: "History of the General Inspectorate of Mines (IGM)",
+    headline: "A central actor in mining governance",
+    lead:
+      "These reforms highlighted the need for an independent body with strengthened powers, capable of ensuring transparency, compliance, traceability and good governance in a sector that is strategic for the national economy.",
     body: [
       "The General Inspectorate of Mines (IGM) is a specialised public service of the Congolese State, created by Decree No. 23/19 of 9 June 2023. ([Consult the decree here](/decrets)) It has administrative and financial autonomy and is placed under the authority of the Minister responsible for Mines, in accordance with Article 1 of the said Decree.",
       "The creation of the IGM is part of the major reforms of the mining sector initiated by the Government of the Democratic Republic of Congo, in particular those arising from the Mining Code ([Consult the Mining Code here](/lois)) (Law No. 007/2002 as amended by Law No. 18/001 of 9 March 2018) and the ([Consult the Mining Regulations here](/decrets)) (Decree No. 038/2003 as amended by Mining Regulations Decree No. 18/024 of 8 June 2018).",

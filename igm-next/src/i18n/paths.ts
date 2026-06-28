@@ -79,6 +79,31 @@ export function hrefForNewsArticle(slug: string, locale: SupportedLocale): strin
   return `${hrefForRoute("news", locale)}/${slug}`;
 }
 
+/** URL d’un album photo pour une locale donnée. */
+export function hrefForPhotoAlbum(slug: string, locale: SupportedLocale): string {
+  return `${hrefForRoute("photos", locale)}/${slug}`;
+}
+
+/** True si le chemin est la page liste photos (`/photos`). */
+export function isPhotosListingPath(
+  pathSegments: string[],
+  locale: SupportedLocale,
+): boolean {
+  if (pathSegments.length !== 1) return false;
+  return findRouteKey(pathSegments[0], locale) === "photos";
+}
+
+/** Slug d’album si l’URL est `photos/{slug}`. */
+export function parsePhotoAlbumSlug(
+  pathSegments: string[],
+  locale: SupportedLocale,
+): string | null {
+  if (pathSegments.length !== 2) return null;
+  const [sectionSlug, albumSlug] = pathSegments;
+  if (findRouteKey(sectionSlug, locale) !== "photos") return null;
+  return albumSlug;
+}
+
 /** True si le chemin est la page liste actualités (`actualites` / `news`). */
 export function isNewsListingPath(
   pathSegments: string[],
@@ -135,6 +160,11 @@ export function switchLocaleHref(pathname: string, targetLocale: SupportedLocale
   const newsSlug = parseNewsArticleSlug(pathSegments, currentLocale);
   if (newsSlug) {
     return hrefForNewsArticle(newsSlug, targetLocale);
+  }
+
+  const photoAlbumSlug = parsePhotoAlbumSlug(pathSegments, currentLocale);
+  if (photoAlbumSlug) {
+    return hrefForPhotoAlbum(photoAlbumSlug, targetLocale);
   }
 
   const slug = pathSegments.join("/");

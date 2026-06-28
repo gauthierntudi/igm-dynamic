@@ -278,6 +278,9 @@ const homePageBundleCacheByLocale = {
   () => Promise<{ stats: CmsStat[]; home: CmsHome | null; news: CmsNews[] }>
 >;
 
+export { getLegislationSettings } from "./legislation/getLegislationSettings";
+export { getPageHeroesSettings } from "./page-heroes/getPageHeroesSettings";
+
 export async function getWhoWeAre(
   locale: SupportedLocale = DEFAULT_LOCALE,
 ): Promise<import("./who-we-are/types").CmsWhoWeAre | null> {
@@ -298,6 +301,9 @@ export async function getStats(locale: SupportedLocale = DEFAULT_LOCALE): Promis
 export async function getSiteSettings(
   locale: SupportedLocale = DEFAULT_LOCALE,
 ): Promise<CmsSiteSettings | null> {
+  if (process.env.NODE_ENV === "development") {
+    return fetchSiteSettings(locale);
+  }
   return siteSettingsCacheByLocale[locale]();
 }
 

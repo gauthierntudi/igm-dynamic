@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CircleChevronRight } from "lucide-react";
 import type { ReactNode } from "react";
 
 export type HistoryBlock =
@@ -52,11 +53,17 @@ function renderInlineText(text: string, keyPrefix: string): ReactNode[] {
     const isExternal = /^https?:\/\//i.test(href);
     nodes.push(
       isExternal ? (
-        <a key={`${keyPrefix}-link-${matchIndex}`} href={href} target="_blank" rel="noopener noreferrer">
+        <a
+          key={`${keyPrefix}-link-${matchIndex}`}
+          href={href}
+          className="about-history-link"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {label}
         </a>
       ) : (
-        <Link key={`${keyPrefix}-link-${matchIndex}`} href={href}>
+        <Link key={`${keyPrefix}-link-${matchIndex}`} href={href} className="about-history-link">
           {label}
         </Link>
       ),
@@ -73,6 +80,12 @@ function renderInlineText(text: string, keyPrefix: string): ReactNode[] {
   return nodes.length ? nodes : [text];
 }
 
+function paragraphClassName(text: string, paragraphIndex: number): string {
+  if (paragraphIndex === 0) return "about-history-lead";
+  if (text.endsWith(":")) return "about-history-subhead";
+  return "about-history-paragraph";
+}
+
 type HistoryContentProps = {
   paragraphs: string[];
 };
@@ -80,21 +93,32 @@ type HistoryContentProps = {
 export function HistoryContent({ paragraphs }: HistoryContentProps) {
   const blocks = parseHistoryBlocks(paragraphs);
 
+  let paragraphIndex = 0;
+
   return (
-    <div className="igm-about-page-prose igm-about-page-history-prose">
+    <div className="about-history-prose">
       {blocks.map((block, index) => {
         if (block.type === "list") {
           return (
-            <ul key={`list-${index}`} className="igm-about-page-history-list">
+            <ul key={`list-${index}`} className="about-history-list">
               {block.items.map((item) => (
-                <li key={item.slice(0, 48)}>{renderInlineText(item, `list-${index}-${item.slice(0, 12)}`)}</li>
+                <li key={item.slice(0, 48)}>
+                  <CircleChevronRight className="about-history-list-icon" size={18} strokeWidth={2} aria-hidden />
+                  <span>{renderInlineText(item, `list-${index}-${item.slice(0, 12)}`)}</span>
+                </li>
               ))}
             </ul>
           );
         }
 
+        const currentParagraphIndex = paragraphIndex;
+        paragraphIndex += 1;
+
         return (
-          <p key={block.text.slice(0, 48)}>
+          <p
+            key={block.text.slice(0, 48)}
+            className={paragraphClassName(block.text, currentParagraphIndex)}
+          >
             {renderInlineText(block.text, `p-${index}`)}
           </p>
         );

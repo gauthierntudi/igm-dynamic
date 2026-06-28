@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 
-const MAX_BODY_HINT = 15 * 1024 * 1024;
+import { submitSignalement } from "@/lib/signalement/submitSignalement";
+
+export const runtime = "nodejs";
+export const maxDuration = 60;
 
 export async function POST(request: Request) {
   const contentType = request.headers.get("content-type") || "";
@@ -21,29 +24,19 @@ export async function POST(request: Request) {
     );
   }
 
-  const description = String(formData.get("description") ?? "").trim();
-  if (!description) {
-    return NextResponse.json(
-      { ok: false, error: "Description obligatoire." },
-      { status: 400 },
-    );
-  }
+  const result = await submitSignalement(formData);
 
-  let totalSize = 0;
-  for (const [, value] of formData.entries()) {
-    if (value instanceof File && value.size > 0) {
-      totalSize += value.size;
-    }
-  }
-  if (totalSize > MAX_BODY_HINT) {
+  if (!result.ok) {
     return NextResponse.json(
-      { ok: false, error: "Pièces jointes trop lourdes." },
-      { status: 400 },
+      { ok: false, error: result.error },
+      { status: result.status },
     );
   }
 
   return NextResponse.json({
     ok: true,
-    message: "Signalement reçu.",
+    message: result.message,
+    reference: result.reference,
+    id: result.id,
   });
 }

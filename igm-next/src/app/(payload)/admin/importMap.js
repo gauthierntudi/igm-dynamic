@@ -23,8 +23,13 @@ import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997e
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { SlugField as SlugField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
+import { SignalementDetailPanel as SignalementDetailPanel_690af1efc3c7706deeb0aa573fa2ff44 } from '@/components/admin/SignalementDetailPanel'
+import { ContactMessageDetailPanel as ContactMessageDetailPanel_e253186454a51d44fe66c9fe0886c186 } from '@/components/admin/ContactMessageDetailPanel'
 import { NavMenuRowLabel as NavMenuRowLabel_ecdf19676b4c67fda96896c939ca488b } from '@/components/admin/NavMenuRowLabel'
 import { BannerSlideRowLabel as BannerSlideRowLabel_f7963e0c18066251d378bf55b98f97cd } from '@/components/admin/BannerSlideRowLabel'
+import { IgmAdminIcon as IgmAdminIcon_54a79d99513d6643891406af19968126 } from '@/components/admin/IgmAdminIcon'
+import { IgmAdminLogo as IgmAdminLogo_12c29ee0cc729abab4b586e51fa1356c } from '@/components/admin/IgmAdminLogo'
+import { IgmLoginIntro as IgmLoginIntro_79d73b313b3c057e06777beb654da469 } from '@/components/admin/IgmLoginIntro'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
@@ -55,8 +60,13 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/next/client#SlugField": SlugField_2b8867833a34864a02ddf429b0728a40,
+  "@/components/admin/SignalementDetailPanel#SignalementDetailPanel": SignalementDetailPanel_690af1efc3c7706deeb0aa573fa2ff44,
+  "@/components/admin/ContactMessageDetailPanel#ContactMessageDetailPanel": ContactMessageDetailPanel_e253186454a51d44fe66c9fe0886c186,
   "@/components/admin/NavMenuRowLabel#NavMenuRowLabel": NavMenuRowLabel_ecdf19676b4c67fda96896c939ca488b,
   "@/components/admin/BannerSlideRowLabel#BannerSlideRowLabel": BannerSlideRowLabel_f7963e0c18066251d378bf55b98f97cd,
+  "@/components/admin/IgmAdminIcon#IgmAdminIcon": IgmAdminIcon_54a79d99513d6643891406af19968126,
+  "@/components/admin/IgmAdminLogo#IgmAdminLogo": IgmAdminLogo_12c29ee0cc729abab4b586e51fa1356c,
+  "@/components/admin/IgmLoginIntro#IgmLoginIntro": IgmLoginIntro_79d73b313b3c057e06777beb654da469,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

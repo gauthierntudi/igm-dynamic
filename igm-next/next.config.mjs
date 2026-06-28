@@ -34,10 +34,15 @@ const basePath = deployedBasePathFromEnv() ?? deployedBasePathFromFile();
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   ...(basePath ? { basePath } : {}),
-  serverExternalPackages: ["ffmpeg-static"],
+  allowedDevOrigins: ["192.168.1.68", "192.168.1.68:3000"],
+  transpilePackages: ["react-pdf", "pdfjs-dist"],
+  serverExternalPackages: ["ffmpeg-static", "pdfkit", "fontkit"],
   outputFileTracingIncludes: {
     "/[[...path]]": ["./html/**/*"],
-    "/api/**": ["./node_modules/ffmpeg-static/**/*"],
+    "/api/**": [
+      "./node_modules/ffmpeg-static/**/*",
+      "./node_modules/pdfkit/js/data/**/*",
+    ],
   },
   images: {
     localPatterns: [
@@ -46,7 +51,7 @@ const nextConfig = {
       },
     ],
   },
-  webpack: (webpackConfig) => {
+  webpack: (webpackConfig, { isServer }) => {
     webpackConfig.resolve.extensionAlias = {
       ".cjs": [".cts", ".cjs"],
       ".js": [".ts", ".tsx", ".js", ".jsx"],
@@ -54,11 +59,21 @@ const nextConfig = {
     };
     webpackConfig.resolve.alias = {
       ...webpackConfig.resolve.alias,
+      canvas: false,
       "@payloadcms/ui/dist/fields/Upload/HasOne/index.js": path.resolve(
         __dirname,
         "src/components/admin/MediaUploadHasOne.tsx",
       ),
+      [path.resolve(__dirname, "node_modules/@payloadcms/next/dist/layouts/Root/index.js")]:
+        path.resolve(__dirname, "src/patches/payloadcms-next-RootLayout.js"),
     };
+    // pdfjs uniquement côté client (évite de polluer le bundle admin Payload).
+    if (!isServer) {
+      webpackConfig.resolve.alias["pdfjs-dist"] = path.resolve(
+        __dirname,
+        "node_modules/react-pdf/node_modules/pdfjs-dist",
+      );
+    }
     return webpackConfig;
   },
   turbopack: {

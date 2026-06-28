@@ -84,7 +84,17 @@ export const Pages: CollectionConfig = {
                   name: "media",
                   type: "upload",
                   relationTo: "media",
-                  label: "Image de fond",
+                  label: "Image de fond (bannière)",
+                },
+                {
+                  name: "ctaMedia",
+                  type: "upload",
+                  relationTo: "media",
+                  label: "Image bandeau bas de page (CTA)",
+                  admin: {
+                    description:
+                      "Fond du bandeau en bas de page (section « acteur central »). Repli : bannière du haut.",
+                  },
                 },
               ],
             },

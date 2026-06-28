@@ -74,6 +74,10 @@ export interface Config {
     news: News;
     stats: Stat;
     signalements: Signalement;
+    'contact-messages': ContactMessage;
+    'legislation-documents': LegislationDocument;
+    'media-gallery-items': MediaGalleryItem;
+    'photo-albums': PhotoAlbum;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -88,6 +92,10 @@ export interface Config {
     news: NewsSelect<false> | NewsSelect<true>;
     stats: StatsSelect<false> | StatsSelect<true>;
     signalements: SignalementsSelect<false> | SignalementsSelect<true>;
+    'contact-messages': ContactMessagesSelect<false> | ContactMessagesSelect<true>;
+    'legislation-documents': LegislationDocumentsSelect<false> | LegislationDocumentsSelect<true>;
+    'media-gallery-items': MediaGalleryItemsSelect<false> | MediaGalleryItemsSelect<true>;
+    'photo-albums': PhotoAlbumsSelect<false> | PhotoAlbumsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -101,11 +109,17 @@ export interface Config {
     'site-settings': SiteSetting;
     home: Home;
     'who-we-are': WhoWeAre;
+    legislation: Legislation;
+    'page-heroes': PageHero;
+    'contact-page': ContactPage;
   };
   globalsSelect: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     home: HomeSelect<false> | HomeSelect<true>;
     'who-we-are': WhoWeAreSelect<false> | WhoWeAreSelect<true>;
+    legislation: LegislationSelect<false> | LegislationSelect<true>;
+    'page-heroes': PageHeroesSelect<false> | PageHeroesSelect<true>;
+    'contact-page': ContactPageSelect<false> | ContactPageSelect<true>;
   };
   locale: 'fr' | 'en';
   widgets: {
@@ -166,7 +180,10 @@ export interface User {
  */
 export interface Media {
   id: number;
-  alt: string;
+  /**
+   * Optionnel lors d’un upload groupé : laissez vide pour génération automatique (nom du fichier). Utilisez « Modifier tout » dans le tiroir d’upload pour appliquer le même texte à tous les fichiers.
+   */
+  alt?: string | null;
   prefix?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -233,6 +250,10 @@ export interface Page {
     ctaLabel?: string | null;
     ctaHref?: string | null;
     media?: (number | null) | Media;
+    /**
+     * Fond du bandeau en bas de page (section « acteur central »). Repli : bannière du haut.
+     */
+    ctaMedia?: (number | null) | Media;
   };
   content?: {
     root: {
@@ -330,12 +351,16 @@ export interface Stat {
   createdAt: string;
 }
 /**
+ * Signalements transmis via le formulaire public. Consultation seule — les données transmises par les utilisateurs ne peuvent pas être modifiées.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "signalements".
  */
 export interface Signalement {
   id: number;
+  reference?: string | null;
   status?: ('recu' | 'en_cours' | 'traite' | 'cloture') | null;
+  estAnonyme?: boolean | null;
   alerteur?: {
     nom?: string | null;
     email?: string | null;
@@ -372,8 +397,6 @@ export interface Signalement {
         | 'Tshuapa'
       )
     | null;
-  villeSite?: string | null;
-  coords?: string | null;
   typeInfraction?:
     | (
         | 'Exploitation illégale'
@@ -384,10 +407,124 @@ export interface Signalement {
         | 'Autre'
       )
     | null;
+  villeSite?: string | null;
+  coords?: string | null;
   pieces?: (number | SignalementFile)[] | null;
   notesInternes?: string | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * Messages transmis via le formulaire de contact public. Les champs soumis ne sont pas modifiables.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact-messages".
+ */
+export interface ContactMessage {
+  id: number;
+  name: string;
+  email: string;
+  phone?: string | null;
+  subject: string;
+  message: string;
+  locale?: ('fr' | 'en') | null;
+  status?: ('nouveau' | 'lu') | null;
+  notesInternes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Textes officiels (PDF) affichés sur les pages Ordonnances, Lois, Décrets et Décisions. Uploadez le PDF dans Médias publics puis liez-le ici.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legislation-documents".
+ */
+export interface LegislationDocument {
+  id: number;
+  title: string;
+  /**
+   * Page sur laquelle le document sera listé.
+   */
+  category: 'ordinances' | 'laws' | 'decrees' | 'decisions';
+  /**
+   * Ex. Loi n°007/2002, Décret n°23/19…
+   */
+  reference?: string | null;
+  summary?: string | null;
+  publishedAt?: string | null;
+  /**
+   * Plus la valeur est basse, plus le document apparaît en haut.
+   */
+  order?: number | null;
+  /**
+   * Le média doit être un PDF (collection Médias publics).
+   */
+  file: number | Media;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Vidéos affichées sur /videos. Uploadez le fichier dans Médias publics puis liez-le ici. Les photos se gèrent dans « Albums photos ».
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media-gallery-items".
+ */
+export interface MediaGalleryItem {
+  id: number;
+  title: string;
+  summary?: string | null;
+  /**
+   * Texte affiché sous la vidéo dans la galerie.
+   */
+  caption?: string | null;
+  publishedAt?: string | null;
+  /**
+   * Plus la valeur est basse, plus la vidéo apparaît en haut.
+   */
+  order?: number | null;
+  /**
+   * Vidéo MP4 (collection Médias publics).
+   */
+  media: number | Media;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Albums affichés sur /photos. Ajoutez une ou plusieurs images par album (Médias publics). Les vidéos se gèrent dans « Vidéos médiathèque ».
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "photo-albums".
+ */
+export interface PhotoAlbum {
+  id: number;
+  title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  /**
+   * URL : /photos/{slug}
+   */
+  slug: string;
+  summary?: string | null;
+  /**
+   * Optionnel. Repli : première photo de l’album.
+   */
+  coverImage?: (number | null) | Media;
+  /**
+   * Sélectionnez une ou plusieurs images (JPEG, PNG, WebP…).
+   */
+  photos: (number | Media)[];
+  publishedAt?: string | null;
+  /**
+   * Plus la valeur est basse, plus l’album apparaît en haut.
+   */
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -440,6 +577,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'signalements';
         value: number | Signalement;
+      } | null)
+    | ({
+        relationTo: 'contact-messages';
+        value: number | ContactMessage;
+      } | null)
+    | ({
+        relationTo: 'legislation-documents';
+        value: number | LegislationDocument;
+      } | null)
+    | ({
+        relationTo: 'media-gallery-items';
+        value: number | MediaGalleryItem;
+      } | null)
+    | ({
+        relationTo: 'photo-albums';
+        value: number | PhotoAlbum;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -573,6 +726,7 @@ export interface PagesSelect<T extends boolean = true> {
         ctaLabel?: T;
         ctaHref?: T;
         media?: T;
+        ctaMedia?: T;
       };
   content?: T;
   contentHtml?: T;
@@ -621,7 +775,9 @@ export interface StatsSelect<T extends boolean = true> {
  * via the `definition` "signalements_select".
  */
 export interface SignalementsSelect<T extends boolean = true> {
+  reference?: T;
   status?: T;
+  estAnonyme?: T;
   alerteur?:
     | T
     | {
@@ -631,13 +787,77 @@ export interface SignalementsSelect<T extends boolean = true> {
       };
   description?: T;
   province?: T;
+  typeInfraction?: T;
   villeSite?: T;
   coords?: T;
-  typeInfraction?: T;
   pieces?: T;
   notesInternes?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact-messages_select".
+ */
+export interface ContactMessagesSelect<T extends boolean = true> {
+  name?: T;
+  email?: T;
+  phone?: T;
+  subject?: T;
+  message?: T;
+  locale?: T;
+  status?: T;
+  notesInternes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legislation-documents_select".
+ */
+export interface LegislationDocumentsSelect<T extends boolean = true> {
+  title?: T;
+  category?: T;
+  reference?: T;
+  summary?: T;
+  publishedAt?: T;
+  order?: T;
+  file?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media-gallery-items_select".
+ */
+export interface MediaGalleryItemsSelect<T extends boolean = true> {
+  title?: T;
+  summary?: T;
+  caption?: T;
+  publishedAt?: T;
+  order?: T;
+  media?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "photo-albums_select".
+ */
+export interface PhotoAlbumsSelect<T extends boolean = true> {
+  title?: T;
+  generateSlug?: T;
+  slug?: T;
+  summary?: T;
+  coverImage?: T;
+  photos?: T;
+  publishedAt?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1190,6 +1410,9 @@ export interface WhoWeAre {
    * Texte d'accroche (colonne droite).
    */
   intro?: string | null;
+  /**
+   * Fond du bandeau principal sur /a-propos (et repli sur /historique si non renseigné).
+   */
   heroImage?: (number | null) | Media;
   navAboutLabel?: string | null;
   navHistoryLabel?: string | null;
@@ -1210,13 +1433,37 @@ export interface WhoWeAre {
   };
   historySection?: {
     title?: string | null;
+    /**
+     * Phrase courte affichée dans le bandeau (max. ~70 caractères).
+     */
+    headline?: string | null;
     lead?: string | null;
     /**
      * Un paragraphe par ligne. Lignes commençant par « • » pour les listes. Liens : [libellé](/chemin).
      */
     body?: string | null;
+    /**
+     * Fond du bandeau en haut de /historique. Repli : bannière Introduction.
+     */
+    heroImage?: (number | null) | Media;
+    /**
+     * Image de fond du bandeau « acteur central » en bas de /historique.
+     */
+    ctaImage?: (number | null) | Media;
+    /**
+     * Première vignette de la section Historique sur /a-propos.
+     */
+    teaserImage1?: (number | null) | Media;
+    /**
+     * Deuxième vignette de la section Historique sur /a-propos.
+     */
+    teaserImage2?: (number | null) | Media;
   };
   missionSection?: {
+    /**
+     * Grande image à gauche du bloc Mission sur /a-propos.
+     */
+    image?: (number | null) | Media;
     title?: string | null;
     lead?: string | null;
     headline?: string | null;
@@ -1341,6 +1588,118 @@ export interface WhoWeAre {
     phoneHref?: string | null;
     image?: (number | null) | Media;
   };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Images de bannière des pages Ordonnances, Lois, Décrets et Décisions (/ordonnances, /lois, etc.).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legislation".
+ */
+export interface Legislation {
+  id: number;
+  /**
+   * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
+   */
+  ordinancesHeroImage?: (number | null) | Media;
+  /**
+   * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
+   */
+  lawsHeroImage?: (number | null) | Media;
+  /**
+   * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
+   */
+  decreesHeroImage?: (number | null) | Media;
+  /**
+   * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
+   */
+  decisionsHeroImage?: (number | null) | Media;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Images de bannière pour les pages Présentation (IGM), LCFCM, Contact et Médiathèque. Les pages Qui sommes-nous ? (À propos, Historique, Mission) se configurent dans « Page À propos ».
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "page-heroes".
+ */
+export interface PageHero {
+  id: number;
+  /**
+   * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
+   */
+  orgChartHeroImage?: (number | null) | Media;
+  /**
+   * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
+   */
+  mapHeroImage?: (number | null) | Media;
+  /**
+   * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
+   */
+  fraudHeroImage?: (number | null) | Media;
+  /**
+   * Image de fond du bandeau « acteur central » en bas de page. Repli : bannière du haut.
+   */
+  fraudCtaHeroImage?: (number | null) | Media;
+  /**
+   * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
+   */
+  smugglingHeroImage?: (number | null) | Media;
+  /**
+   * Image de fond du bandeau « acteur central » en bas de page. Repli : bannière du haut.
+   */
+  smugglingCtaHeroImage?: (number | null) | Media;
+  /**
+   * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
+   */
+  sanctionsHeroImage?: (number | null) | Media;
+  /**
+   * Image de fond du bandeau « acteur central » en bas de page. Repli : bannière du haut.
+   */
+  sanctionsCtaHeroImage?: (number | null) | Media;
+  /**
+   * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
+   */
+  reportHeroImage?: (number | null) | Media;
+  /**
+   * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
+   */
+  contactHeroImage?: (number | null) | Media;
+  /**
+   * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
+   */
+  photosHeroImage?: (number | null) | Media;
+  /**
+   * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
+   */
+  videosHeroImage?: (number | null) | Media;
+  /**
+   * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
+   */
+  audiosHeroImage?: (number | null) | Media;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Textes de la page /contact (bannière, formulaire, bloc coordonnées). L’image de bannière se configure dans « Bannières de pages ». Téléphone, e-mail et adresse : « Paramètres du site ».
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact-page".
+ */
+export interface ContactPage {
+  id: number;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+  heroTitle?: string | null;
+  heroLead?: string | null;
+  eyebrow?: string | null;
+  formTitle?: string | null;
+  infoTitle?: string | null;
+  /**
+   * Repli : texte « Contact » du pied de page (Paramètres du site).
+   */
+  infoLead?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1634,12 +1993,18 @@ export interface WhoWeAreSelect<T extends boolean = true> {
     | T
     | {
         title?: T;
+        headline?: T;
         lead?: T;
         body?: T;
+        heroImage?: T;
+        ctaImage?: T;
+        teaserImage1?: T;
+        teaserImage2?: T;
       };
   missionSection?:
     | T
     | {
+        image?: T;
         title?: T;
         lead?: T;
         headline?: T;
@@ -1713,6 +2078,58 @@ export interface WhoWeAreSelect<T extends boolean = true> {
         phoneHref?: T;
         image?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legislation_select".
+ */
+export interface LegislationSelect<T extends boolean = true> {
+  ordinancesHeroImage?: T;
+  lawsHeroImage?: T;
+  decreesHeroImage?: T;
+  decisionsHeroImage?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "page-heroes_select".
+ */
+export interface PageHeroesSelect<T extends boolean = true> {
+  orgChartHeroImage?: T;
+  mapHeroImage?: T;
+  fraudHeroImage?: T;
+  fraudCtaHeroImage?: T;
+  smugglingHeroImage?: T;
+  smugglingCtaHeroImage?: T;
+  sanctionsHeroImage?: T;
+  sanctionsCtaHeroImage?: T;
+  reportHeroImage?: T;
+  contactHeroImage?: T;
+  photosHeroImage?: T;
+  videosHeroImage?: T;
+  audiosHeroImage?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact-page_select".
+ */
+export interface ContactPageSelect<T extends boolean = true> {
+  seoTitle?: T;
+  seoDescription?: T;
+  heroTitle?: T;
+  heroLead?: T;
+  eyebrow?: T;
+  formTitle?: T;
+  infoTitle?: T;
+  infoLead?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

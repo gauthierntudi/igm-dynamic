@@ -1,0 +1,96 @@
+.igm-plyr-wrap {
+  --plyr-color-main: #3b7dff;
+  --plyr-video-background: #000;
+  --plyr-font-family: var(--about-google-sans, system-ui, sans-serif);
+  --plyr-font-size-base: 15px;
+  --plyr-font-size-small: 13px;
+  --plyr-font-size-time: 13px;
+  --plyr-control-radius: 8px;
+  --plyr-control-icon-size: 18px;
+  --plyr-control-spacing: 10px;
+  --plyr-video-control-color: #fff;
+  --plyr-video-control-color-hover: #fff;
+  --plyr-video-control-background-hover: rgba(59, 125, 255, 0.35);
+  --plyr-video-controls-background: linear-gradient(
+    180deg,
+    rgba(8, 18, 40, 0) 0%,
+    rgba(8, 18, 40, 0.82) 100%
+  );
+  --plyr-menu-background: rgba(12, 22, 44, 0.96);
+  --plyr-menu-color: #fff;
+  --plyr-menu-radius: 10px;
+  --plyr-menu-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  --plyr-range-fill-background: #3b7dff;
+  --plyr-range-track-height: 5px;
+  --plyr-range-thumb-height: 14px;
+  --plyr-range-thumb-background: #fff;
+  --plyr-range-thumb-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  --plyr-progress-loading-background: rgba(255, 255, 255, 0.18);
+  --plyr-progress-buffer-background: rgba(255, 255, 255, 0.28);
+  --plyr-tooltip-background: rgba(12, 22, 44, 0.94);
+  --plyr-tooltip-color: #fff;
+  --plyr-tooltip-radius: 8px;
+
+  width: 100%;
+  max-width: min(1100px, 100%);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+  background: #000;
+}
+
+.igm-plyr-wrap .plyr {
+  border-radius: 0.75rem;
+}
+
+.igm-plyr-wrap .plyr--video .plyr__control.plyr__control--overlaid {
+  background: rgba(27, 68, 145, 0.92);
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.igm-plyr-wrap .plyr--video .plyr__control.plyr__control--overlaid:hover,
+.igm-plyr-wrap .plyr--video .plyr__control.plyr__control--overlaid:focus-visible {
+  background: #1b4491;
+  transform: scale(1.06);
+}
+
+.igm-plyr-wrap .plyr__controls {
+  padding-inline: 0.85rem 0.65rem;
+  padding-bottom: 0.65rem;
+}
+
+.igm-plyr-wrap .plyr__progress__container {
+  margin-inline: 0.35rem;
+}
+
+.igm-plyr-video {
+  display: block;
+  width: 100%;
+  max-height: min(72vh, 680px);
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  background: #000;
+}
+
+.igm-plyr-wrap .plyr__poster {
+  background-size: cover;
+}
+
+.igm-plyr-wrap--loading {
+  min-height: min(56vh, 480px);
+  background: linear-gradient(135deg, #1b4491 0%, #0f2d5c 55%, #081228 100%);
+  animation: igm-plyr-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes igm-plyr-pulse {
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}

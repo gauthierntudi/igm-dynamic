@@ -6,6 +6,10 @@ import { buildConfig } from "payload";
 import { fileURLToPath } from "url";
 import sharp from "sharp";
 
+import { ContactMessages } from "./collections/ContactMessages";
+import { LegislationDocuments } from "./collections/LegislationDocuments";
+import { MediaGalleryItems } from "./collections/MediaGalleryItems";
+import { PhotoAlbums } from "./collections/PhotoAlbums";
 import { Media, mediaS3CollectionConfig } from "./collections/Media";
 import { News } from "./collections/News";
 import { Pages } from "./collections/Pages";
@@ -15,6 +19,9 @@ import { Stats } from "./collections/Stats";
 import { Users } from "./collections/Users";
 import { SiteSettings } from "./globals/SiteSettings";
 import { Home } from "./globals/Home";
+import { ContactPage } from "./globals/ContactPage";
+import { Legislation } from "./globals/Legislation";
+import { PageHeroes } from "./globals/PageHeroes";
 import { WhoWeAre } from "./globals/WhoWeAre";
 import { mediaFilenameVersioningPlugin } from "./plugins/mediaFilenameVersioning";
 import { videoPosterPlugin } from "./plugins/videoPosterPlugin";
@@ -38,17 +45,25 @@ function s3ClientUploadsEnabled(): boolean {
 export default buildConfig({
   admin: {
     user: Users.slug,
+    suppressHydrationWarning: true,
     importMap: {
       baseDir: path.resolve(dirname),
       // Évite la régénération à chaque requête admin en dev (lancer generate:importmap manuellement).
       autoGenerate: process.env.NODE_ENV === "production",
     },
     meta: {
-      titleSuffix: "— IGM",
+      titleSuffix: "— IGM Admin",
+    },
+    components: {
+      beforeLogin: ["@/components/admin/IgmLoginIntro#IgmLoginIntro"],
+      graphics: {
+        Logo: "@/components/admin/IgmAdminLogo#IgmAdminLogo",
+        Icon: "@/components/admin/IgmAdminIcon#IgmAdminIcon",
+      },
     },
   },
-  collections: [Users, Media, SignalementFiles, Pages, News, Stats, Signalements],
-  globals: [SiteSettings, Home, WhoWeAre],
+  collections: [Users, Media, SignalementFiles, Pages, News, Stats, Signalements, ContactMessages, LegislationDocuments, MediaGalleryItems, PhotoAlbums],
+  globals: [SiteSettings, Home, WhoWeAre, Legislation, PageHeroes, ContactPage],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {

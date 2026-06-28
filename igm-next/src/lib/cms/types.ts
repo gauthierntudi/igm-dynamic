@@ -20,10 +20,20 @@ export type CmsSiteSettings = {
 };
 
 export type CmsMedia = {
-  id?: string;
+  id?: string | number;
   url?: string | null;
   filename?: string | null;
+  prefix?: string | null;
   alt?: string | null;
+  mimeType?: string | null;
+  thumbnailURL?: string | null;
+  sizes?: {
+    poster?: {
+      url?: string | null;
+      filename?: string | null;
+      prefix?: string | null;
+    };
+  };
 };
 
 export type CmsPage = {
@@ -38,6 +48,7 @@ export type CmsPage = {
     ctaLabel?: string | null;
     ctaHref?: string | null;
     media?: CmsMedia | string | number | null;
+    ctaMedia?: CmsMedia | string | number | null;
   };
   content?: unknown;
   contentHtml?: string | null;

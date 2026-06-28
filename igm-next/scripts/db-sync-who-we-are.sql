@@ -162,6 +162,7 @@ CREATE INDEX IF NOT EXISTS "who_we_are_contact_section_contact_section_image_idx
 CREATE UNIQUE INDEX IF NOT EXISTS "who_we_are_locales_locale_parent_id_unique" ON "who_we_are_locales" ("_locale","_parent_id");
 
 ALTER TABLE "who_we_are_locales" ADD COLUMN IF NOT EXISTS "history_section_body" varchar;
+ALTER TABLE "who_we_are_locales" ADD COLUMN IF NOT EXISTS "history_section_headline" varchar;
 
 INSERT INTO "who_we_are" ("id", "created_at", "updated_at")
 SELECT 1, NOW(), NOW()

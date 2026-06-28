@@ -171,6 +171,7 @@ export async function createVideoPosterForDoc(
             filesize: posterBuffer.length,
             width: metadata.width ?? POSTER_SIZE.width,
             height: metadata.height ?? POSTER_SIZE.height,
+            prefix,
           },
         },
       },

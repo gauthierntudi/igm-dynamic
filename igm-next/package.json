@@ -19,6 +19,19 @@
     "db:sync-home-orgchart": "node --env-file=.env.local scripts/db-sync-home-orgchart.mjs",
     "db:sync-home-contact": "node --env-file=.env.local scripts/db-sync-home-contact.mjs",
     "db:sync-who-we-are": "node --env-file=.env.local scripts/db-sync-who-we-are.mjs",
+    "db:sync-signalements": "node --env-file=.env.local scripts/db-sync-signalements.mjs",
+    "db:sync-contact-messages": "node --env-file=.env.local scripts/db-sync-contact-messages.mjs",
+    "db:sync-legislation-documents": "node --env-file=.env.local scripts/db-sync-legislation-documents.mjs",
+    "db:sync-legislation": "node --env-file=.env.local scripts/db-sync-legislation.mjs",
+    "db:sync-page-heroes": "node --env-file=.env.local scripts/db-sync-page-heroes.mjs",
+    "db:sync-contact-page": "node --env-file=.env.local scripts/db-sync-contact-page.mjs",
+    "db:sync-media-gallery": "node --env-file=.env.local scripts/db-sync-media-gallery.mjs",
+    "db:sync-photo-albums": "node --env-file=.env.local scripts/db-sync-photo-albums.mjs",
+    "db:sync-globals": "node --env-file=.env.local scripts/db-sync-globals.mjs",
+    "db:sync-page-images": "node --env-file=.env.local scripts/db-sync-page-images.mjs",
+    "db:sync-new-collections": "node --env-file=.env.local scripts/db-sync-new-collections.mjs",
+    "generate:db-schema": "cross-env NODE_OPTIONS=--no-deprecation payload generate:db-schema",
+    "sync:pdf-worker": "cp node_modules/react-pdf/node_modules/pdfjs-dist/build/pdf.worker.min.mjs public/pdf.worker.min.mjs",
     "db:sync-news": "node --env-file=.env.local scripts/db-sync-news.mjs",
     "db:sync-media-poster": "node --env-file=.env.local scripts/db-sync-media-poster.mjs",
     "seed:site-settings": "npx tsx --env-file=.env.local scripts/seed-site-settings.ts",
@@ -35,6 +48,8 @@
     "seed:who-we-are:force": "npx tsx --env-file=.env.local scripts/seed-who-we-are.ts --force",
     "seed:news": "npx tsx --env-file=.env.local scripts/seed-news.ts",
     "seed:news:force": "npx tsx --env-file=.env.local scripts/seed-news.ts --force",
+    "seed:pages": "npx tsx --env-file=.env.local scripts/seed-pages.ts",
+    "seed:pages:force": "npx tsx --env-file=.env.local scripts/seed-pages.ts --force",
     "invalidate:media-cdn": "node --env-file=.env.local scripts/invalidate-media-cdn.mjs",
     "media:version-filename": "npx tsx --env-file=.env.local scripts/version-media-filename.ts",
     "media:generate-video-posters": "npx tsx --env-file=.env.local scripts/generate-video-posters.ts"
@@ -58,11 +73,22 @@
     "graphql": "^16.8.1",
     "lucide-react": "^1.21.0",
     "next": "^16.2.6",
+    "nodemailer": "^9.0.1",
     "payload": "3.85.1",
+    "pdfkit": "^0.19.1",
+    "plyr": "^3.8.4",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "react-pdf": "^10.4.1",
     "react-toastify": "^11.1.0",
     "sharp": "0.34.2",
     "typescript": "^6.0.3"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^8.0.1",
+    "@types/pdfkit": "^0.17.6"
+  },
+  "overrides": {
+    "pdfjs-dist": "5.3.93"
   }
 }

@@ -40,7 +40,11 @@ export type ResolvedWhoWeArePage = {
   history: {
     title: string;
     lead: string;
+    headline: string;
     paragraphs: string[];
+    heroImageSrc: string;
+    ctaImageSrc: string;
+    teaserImages: Array<{ src: string; alt: string }>;
   };
   mission: {
     title: string;
@@ -224,10 +228,15 @@ export function resolveWhoWeArePage(
         ? splitParagraphs(data.aboutSection?.body)
         : splitParagraphs(defaults.aboutSection?.body),
       imageSrc: resolveMediaSrc(
-        data.aboutSection?.image ?? data.heroImage,
+        data.missionSection?.image ??
+          data.aboutSection?.image ??
+          data.heroImage,
         "/assets/img/img-07.jpg",
       ),
-      imageAlt: resolveMediaAlt(data.aboutSection?.image ?? data.heroImage, "IGM"),
+      imageAlt: resolveMediaAlt(
+        data.missionSection?.image ?? data.aboutSection?.image ?? data.heroImage,
+        "IGM",
+      ),
       quote:
         quoteText && quoteAuthor && quoteRole
           ? {
@@ -245,9 +254,39 @@ export function resolveWhoWeArePage(
     history: {
       title: pickText(data.historySection?.title, defaults.historySection!.title!),
       lead: pickText(data.historySection?.lead, defaults.historySection!.lead!),
+      headline: pickText(
+        data.historySection?.headline,
+        defaults.historySection!.headline!,
+      ),
       paragraphs: splitParagraphs(data.historySection?.body).length
         ? splitParagraphs(data.historySection?.body)
         : splitParagraphs(defaults.historySection?.body),
+      heroImageSrc: resolveMediaSrc(
+        data.historySection?.heroImage ?? data.heroImage,
+        "/assets/img/img-07.jpg",
+      ),
+      ctaImageSrc: resolveMediaSrc(
+        data.historySection?.ctaImage ??
+          data.historySection?.heroImage ??
+          data.heroImage,
+        "/assets/img/img-07.jpg",
+      ),
+      teaserImages: [
+        {
+          src: resolveMediaSrc(data.historySection?.teaserImage1, "/assets/img/img-06.jpg"),
+          alt: resolveMediaAlt(
+            data.historySection?.teaserImage1,
+            locale === "en" ? "IGM inspectors on site" : "Inspecteurs IGM sur le terrain",
+          ),
+        },
+        {
+          src: resolveMediaSrc(data.historySection?.teaserImage2, "/assets/img/img-07.jpg"),
+          alt: resolveMediaAlt(
+            data.historySection?.teaserImage2,
+            locale === "en" ? "Mining operations in the DRC" : "Activités minières en RDC",
+          ),
+        },
+      ],
     },
     mission: {
       title: pickText(data.missionSection?.title, defaults.missionSection!.title!),
@@ -319,4 +358,31 @@ export function getWhoWeAreMeta(
 ): { title: string; description: string } {
   const page = resolveWhoWeArePage(cms, locale);
   return { title: page.seoTitle, description: page.seoDescription };
+}
+
+export function getWhoWeAreSectionMeta(
+  section: WhoWeAreSectionId,
+  cms: CmsWhoWeAre | null | undefined,
+  locale: SupportedLocale,
+): { title: string; description: string } {
+  const page = resolveWhoWeArePage(cms, locale);
+
+  if (section === "history") {
+    const excerpt =
+      page.history.paragraphs[0]?.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").slice(0, 155) ??
+      page.seoDescription;
+    return {
+      title: `${page.nav.history} — IGM`,
+      description: excerpt,
+    };
+  }
+
+  if (section === "mission") {
+    return {
+      title: `${page.nav.mission} — IGM`,
+      description: page.mission.lead || page.seoDescription,
+    };
+  }
+
+  return getWhoWeAreMeta(cms, locale);
 }

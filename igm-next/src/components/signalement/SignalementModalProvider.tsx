@@ -102,7 +102,7 @@ function SignalementModalPortal() {
             Transmettez des informations sur des infractions ou pratiques irrégulières dans le
             secteur minier. Les champs marqués d’une astérisque sont obligatoires.
           </p>
-          <SignalementForm />
+          <SignalementForm onSuccess={close} />
         </div>
       </div>
     </div>,

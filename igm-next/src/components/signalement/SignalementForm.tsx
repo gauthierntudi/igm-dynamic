@@ -111,7 +111,34 @@ function formatGeolocationLine(pos: GeolocationPosition): string {
   return core;
 }
 
-export default function SignalementForm() {
+type SignalementFormProps = {
+  onSuccess?: () => void;
+};
+
+function validateNonAnonymousContact(
+  nom: string,
+  email: string,
+  tel: string,
+): string | null {
+  if (!nom.trim()) {
+    return "Indiquez votre nom et prénom.";
+  }
+
+  const emailTrimmed = email.trim();
+  const telTrimmed = tel.trim();
+
+  if (!emailTrimmed && !telTrimmed) {
+    return "Indiquez un e-mail ou un numéro de téléphone.";
+  }
+
+  if (emailTrimmed && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrimmed)) {
+    return "Adresse e-mail invalide.";
+  }
+
+  return null;
+}
+
+export default function SignalementForm({ onSuccess }: SignalementFormProps = {}) {
   const formId = useId();
   const photoInputRef = useRef<HTMLInputElement>(null);
   const audioPickRef = useRef<HTMLInputElement>(null);
@@ -119,6 +146,7 @@ export default function SignalementForm() {
   const [nom, setNom] = useState("");
   const [email, setEmail] = useState("");
   const [tel, setTel] = useState("");
+  const [anonymousMode, setAnonymousMode] = useState(true);
   const [description, setDescription] = useState("");
   const [province, setProvince] = useState("");
   const [villeSite, setVilleSite] = useState("");
@@ -437,14 +465,19 @@ export default function SignalementForm() {
   }, [activeStep, recordingState, stopRecording]);
 
   const goNext = useCallback(() => {
-    setActiveStep((s) => {
-      if (s === 1 && !description.trim()) {
-        toast.error("Décrivez les faits d’abord.");
-        return s;
+    if (activeStep === 0 && !anonymousMode) {
+      const contactError = validateNonAnonymousContact(nom, email, tel);
+      if (contactError) {
+        toast.error(contactError);
+        return;
       }
-      return Math.min(s + 1, LAST_STEP_INDEX);
-    });
-  }, [description]);
+    }
+    if (activeStep === 1 && !description.trim()) {
+      toast.error("Décrivez les faits d’abord.");
+      return;
+    }
+    setActiveStep((s) => Math.min(s + 1, LAST_STEP_INDEX));
+  }, [activeStep, anonymousMode, description, email, nom, tel]);
 
   const goPrev = useCallback(() => {
     setActiveStep((s) => Math.max(0, s - 1));
@@ -511,6 +544,14 @@ export default function SignalementForm() {
       setActiveStep(1);
       return;
     }
+    if (!anonymousMode) {
+      const contactError = validateNonAnonymousContact(nom, email, tel);
+      if (contactError) {
+        toast.error(contactError);
+        setActiveStep(0);
+        return;
+      }
+    }
 
     setSubmitting(true);
     try {
@@ -518,9 +559,13 @@ export default function SignalementForm() {
         (async (): Promise<{ message?: string }> => {
           const fd = new FormData();
           fd.set("description", desc);
-          fd.set("alerteur_nom", nom.trim());
-          fd.set("alerteur_email", email.trim());
-          fd.set("alerteur_tel", tel.trim());
+          if (!anonymousMode) {
+            fd.set("alerteur_nom", nom.trim());
+            const emailTrimmed = email.trim();
+            const telTrimmed = tel.trim();
+            if (emailTrimmed) fd.set("alerteur_email", emailTrimmed);
+            if (telTrimmed) fd.set("alerteur_tel", telTrimmed);
+          }
           fd.set("province", province);
           fd.set("ville_site", villeSite.trim());
           fd.set("coords", coords.trim());
@@ -543,6 +588,7 @@ export default function SignalementForm() {
             throw new Error(data.error || "Échec de l’envoi.");
           }
           setActiveStep(0);
+          setAnonymousMode(true);
           setNom("");
           setEmail("");
           setTel("");
@@ -553,6 +599,7 @@ export default function SignalementForm() {
           setTypeInfraction("");
           attachments.forEach((a) => URL.revokeObjectURL(a.previewUrl));
           setAttachments([]);
+          onSuccess?.();
           return data;
         })(),
         {
@@ -650,28 +697,55 @@ export default function SignalementForm() {
           <h2 className={styles.sectionTitle} id={`${formId}-step-0`}>
             Informations sur le{" "}
             <span className={styles.sectionTitleAccent}>lanceur d’alerte</span>{" "}
-            <span className={styles.optional}>(optionnel)</span>
+            {anonymousMode ? (
+              <span className={styles.optional}>(optionnel)</span>
+            ) : (
+              <span className={styles.requiredMark} title="Obligatoire">
+                *
+              </span>
+            )}
           </h2>
           <p className={styles.sectionHint}>
-            Ces informations ne sont pas obligatoires pour transmettre un signalement.
+            {anonymousMode
+              ? "Vous pouvez passer à l’étape suivante sans renseigner d’identité. Désactivez le switch pour indiquer vos coordonnées."
+              : "Le nom est obligatoire. Indiquez au moins un e-mail ou un numéro de téléphone."}
           </p>
           <div className={`${styles.dictToggleRow} ${styles.dictToggleRowAnon}`}>
-            <span className={`${styles.dictToggleLabel} ${styles.dictToggleLabelSentence}`}>
-              Le signalement peut être effectué de manière totalement anonyme.
-            </span>
             <span
-              className={`${styles.dictSwitch} ${styles.dictSwitchOn} ${styles.dictSwitchStatic}`}
-              aria-hidden
+              className={`${styles.dictToggleLabel} ${styles.dictToggleLabelSentence}`}
+              id={`${formId}-anon-label`}
             >
-              <span className={styles.dictSwitchTrack}>
+              {anonymousMode
+                ? "Le signalement peut être effectué de manière totalement anonyme."
+                : "Je souhaite renseigner mes coordonnées pour un éventuel suivi."}
+            </span>
+            <button
+              type="button"
+              id={`${formId}-anon-toggle`}
+              className={`${styles.dictSwitch} ${anonymousMode ? styles.dictSwitchOn : ""}`}
+              role="switch"
+              aria-checked={anonymousMode}
+              aria-labelledby={`${formId}-anon-label`}
+              onClick={() => {
+                setAnonymousMode((on) => {
+                  if (on) return false;
+                  setNom("");
+                  setEmail("");
+                  setTel("");
+                  return true;
+                });
+              }}
+            >
+              <span className={styles.dictSwitchTrack} aria-hidden>
                 <span className={styles.dictSwitchThumb} />
               </span>
-            </span>
+            </button>
           </div>
+          {!anonymousMode ? (
           <div className={styles.grid2}>
             <div className={styles.pillField}>
               <label className={styles.pillLabel} htmlFor={`${formId}-nom`}>
-                Nom et prénom
+                Nom et prénom <span className={styles.requiredMark}>*</span>
               </label>
               <input
                 id={`${formId}-nom`}
@@ -681,7 +755,7 @@ export default function SignalementForm() {
                 autoComplete="name"
                 value={nom}
                 onChange={(e) => setNom(e.target.value)}
-                placeholder="Facultatif"
+                placeholder="Ex. : Jean Mukendi"
               />
             </div>
             <div className={styles.pillField}>
@@ -696,7 +770,7 @@ export default function SignalementForm() {
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Facultatif"
+                placeholder="exemple@email.com"
               />
             </div>
             <div className={`${styles.pillField} ${styles.span2}`}>
@@ -711,10 +785,14 @@ export default function SignalementForm() {
                 autoComplete="tel"
                 value={tel}
                 onChange={(e) => setTel(e.target.value)}
-                placeholder="Facultatif"
+                placeholder="Ex. : +243 900 000 000"
               />
             </div>
+            <p className={`${styles.dictHintBelow} ${styles.span2}`}>
+              Au moins l’un des deux moyens de contact ci-dessus est requis.
+            </p>
           </div>
+          ) : null}
           {stepNavInCardEl}
         </section>
       </div>
@@ -804,6 +882,10 @@ export default function SignalementForm() {
             <span className={styles.sectionTitleAccent}>Localisation</span>{" "}
             <span className={styles.optional}>(optionnel, recommandé)</span>
           </h2>
+          <p className={styles.sectionHint}>
+            Ces informations facilitent la localisation des faits signalés. Vous pouvez passer à
+            l’étape suivante sans les renseigner.
+          </p>
           <div className={styles.grid2}>
             <div className={styles.pillField}>
               <label className={styles.pillLabel} htmlFor={`${formId}-prov`}>
@@ -816,7 +898,7 @@ export default function SignalementForm() {
                 value={province}
                 onChange={(e) => setProvince(e.target.value)}
               >
-                <option value="">— Choisir —</option>
+                <option value="">Facultatif — choisir une province</option>
                 {PROVINCES_RDC.filter(Boolean).map((p) => (
                   <option key={p} value={p}>
                     {p}
@@ -835,12 +917,12 @@ export default function SignalementForm() {
                 name="ville_site"
                 value={villeSite}
                 onChange={(e) => setVilleSite(e.target.value)}
-                placeholder="Ex. : Kolwezi…"
+                placeholder="Facultatif — ex. : Kolwezi, site minier…"
               />
             </div>
             <div className={`${styles.pillField} ${styles.span2}`}>
               <label className={styles.pillLabel} htmlFor={`${formId}-coords`}>
-                Coordonnées géographiques <span className={styles.optional}>(si dispo.)</span>
+                Coordonnées géographiques
               </label>
               <input
                 id={`${formId}-coords`}
@@ -849,7 +931,7 @@ export default function SignalementForm() {
                 name="coords"
                 value={coords}
                 onChange={(e) => setCoords(e.target.value)}
-                placeholder="Latitude, longitude (ex. : -10.723000, 25.472000)"
+                placeholder="Facultatif — latitude, longitude (ex. : -10.723, 25.472)"
               />
             </div>
           </div>
@@ -882,6 +964,9 @@ export default function SignalementForm() {
             Type <span className={styles.sectionTitleAccent}>d’infraction</span>{" "}
             <span className={styles.optional}>(optionnel)</span>
           </h2>
+          <p className={styles.sectionHint}>
+            Précisez la nature des faits si vous le souhaitez. Ce champ n’est pas obligatoire.
+          </p>
           <div className={styles.grid2}>
             <div className={`${styles.pillField} ${styles.span2}`}>
               <label className={styles.pillLabel} htmlFor={`${formId}-type`}>
@@ -894,7 +979,7 @@ export default function SignalementForm() {
                 value={typeInfraction}
                 onChange={(e) => setTypeInfraction(e.target.value)}
               >
-                <option value="">— Sélectionner —</option>
+                <option value="">Facultatif — sélectionner un type</option>
                 {TYPES_INFRACTION.filter(Boolean).map((t) => (
                   <option key={t} value={t}>
                     {t}

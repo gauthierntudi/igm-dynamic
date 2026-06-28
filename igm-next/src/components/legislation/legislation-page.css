@@ -1,0 +1,215 @@
+.igm-legislation-page {
+  background: #fff;
+}
+
+.igm-legislation-section {
+  padding: clamp(2rem, 4vw, 3rem) 0 clamp(3rem, 5vw, 4rem);
+}
+
+.igm-legislation-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.25rem 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.igm-legislation-intro {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.igm-legislation-header-controls {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-end;
+  gap: 0.65rem;
+}
+
+.igm-legislation-filter {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: min(100%, 150px);
+}
+
+.igm-legislation-filter__label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.igm-legislation-filter__control {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.igm-legislation-filter__select {
+  width: 100%;
+  appearance: none;
+  padding: 0.6rem 1.85rem 0.6rem 0.7rem;
+  border: 1px solid #dde3ec;
+  border-radius: 8px;
+  background: #fff;
+  color: #0c1f3d;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.igm-legislation-filter__select:hover {
+  border-color: #94a3b8;
+}
+
+.igm-legislation-filter__select:focus {
+  outline: none;
+  border-color: #1b4491;
+  box-shadow: 0 0 0 3px rgba(27, 68, 145, 0.15);
+}
+
+.igm-legislation-filter__icon {
+  position: absolute;
+  right: 0.75rem;
+  pointer-events: none;
+  color: #64748b;
+}
+
+.igm-legislation-search {
+  flex: 1 1 220px;
+  width: min(100%, 280px);
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid #dde3ec;
+  border-radius: 8px;
+  background: #fff;
+  color: #64748b;
+  box-sizing: border-box;
+}
+
+.igm-legislation-search input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: #0c1f3d;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.2;
+  outline: none;
+}
+
+.igm-legislation-search:focus-within {
+  border-color: #1b4491;
+  box-shadow: 0 0 0 3px rgba(27, 68, 145, 0.15);
+}
+
+.igm-legislation-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #1b4491;
+}
+
+.igm-legislation-eyebrow::before {
+  content: "";
+  width: 2.5rem;
+  height: 3px;
+  background: #ffba00;
+}
+
+.igm-legislation-heading {
+  margin: 0 0 0.65rem;
+  font-family: "Google Sans", Inter, system-ui, sans-serif;
+  font-size: clamp(1.35rem, 2.5vw, 2rem);
+  font-weight: 700;
+  line-height: 1.2;
+  color: #0c1f3d;
+}
+
+.igm-legislation-lead {
+  margin: 0;
+  max-width: 42rem;
+  color: #5c6b82;
+  line-height: 1.55;
+  font-size: clamp(0.875rem, 1.5vw, 1rem);
+}
+
+.igm-legislation-back {
+  margin: 1.5rem 0 0;
+}
+
+.igm-legislation-back a {
+  color: #1b4491;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.igm-legislation-back a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 991px) {
+  .igm-legislation-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .igm-legislation-header-controls {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .igm-legislation-filter {
+    flex: 0 0 auto;
+    width: min(100%, 150px);
+  }
+
+  .igm-legislation-search {
+    flex: 1 1 200px;
+    width: auto;
+    max-width: none;
+  }
+}
+
+@media (max-width: 575px) {
+  .igm-legislation-header-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .igm-legislation-filter,
+  .igm-legislation-search {
+    flex: none;
+    width: 100%;
+    max-width: none;
+  }
+
+  .igm-legislation-filter__select {
+    font-size: 0.8125rem;
+    padding: 0.55rem 2rem 0.55rem 0.75rem;
+  }
+
+  .igm-legislation-search {
+    padding: 0.55rem 0.75rem;
+  }
+
+  .igm-legislation-search input {
+    font-size: 0.8125rem;
+  }
+}

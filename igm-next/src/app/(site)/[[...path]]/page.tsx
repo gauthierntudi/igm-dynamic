@@ -7,13 +7,47 @@ import { notFound } from "next/navigation";
 
 import dynamic from "next/dynamic";
 
-import { CmsPageView } from "@/components/cms/CmsPageView";
+import { CartographyPageView } from "@/components/cartography/CartographyPageView";
+import { ContactPageView } from "@/components/contact/ContactPageView";
+import { PhotoAlbumPageView } from "@/components/media-gallery/PhotoAlbumPageView";
+import { PhotoAlbumsPageView } from "@/components/media-gallery/PhotoAlbumsPageView";
+import { VideoGalleryPageView } from "@/components/media-gallery/VideoGalleryPageView";
+import { LegislationPageView } from "@/components/legislation/LegislationPageView";
+import { PageHeroPlaceholderView } from "@/components/cms/PageHeroPlaceholderView";
+import { OrgChartPageView } from "@/components/orgchart/OrgChartPageView";
+import { CmsHistoryPageView } from "@/components/cms/CmsHistoryPageView";
 import { CmsNewsArticleView } from "@/components/cms/CmsNewsArticleView";
 import { NewsListingView } from "@/components/cms/news-listing/NewsListingView";
 import { WhoWeArePageView } from "@/components/cms/who-we-are/WhoWeArePageView";
+import { WhoWeAreHistoryPageView } from "@/components/cms/who-we-are/WhoWeAreHistoryPageView";
 import { DenoncerPageContent } from "@/components/signalement/DenoncerPageContent";
 import { applyHomeToHtml } from "@/lib/cms/applyHome";
-import { getWhoWeAre, getHome, getHomePageBundle, getNewsBySlug, getNewsListing, getPageBySlug, getPublishedNews } from "@/lib/cms/client";
+import { getMediaGalleryVideos } from "@/lib/cms/media-gallery/getMediaGalleryItems";
+import { resolveMediaGalleryItems } from "@/lib/cms/media-gallery/resolveMediaGalleryItem";
+import { getPhotoAlbumBySlug, getPhotoAlbums } from "@/lib/cms/photo-albums/getPhotoAlbums";
+import {
+  resolvePhotoAlbumDetail,
+  resolvePhotoAlbumSummaries,
+} from "@/lib/cms/photo-albums/resolvePhotoAlbum";
+import { getContactPageSettings } from "@/lib/cms/contact/getContactPageSettings";
+import { resolveContactPage } from "@/lib/cms/contact/resolveContactPage";
+import { getWhoWeArePageContent } from "@/lib/cms/who-we-are/getWhoWeArePageContent";
+import { getLegislationSettings } from "@/lib/cms/legislation/getLegislationSettings";
+import { getPageHeroesSettings } from "@/lib/cms/page-heroes/getPageHeroesSettings";
+import {
+  getHome,
+  getHomePageBundle,
+  getNewsBySlug,
+  getNewsListing,
+  getPublishedNews,
+  getSiteSettings,
+} from "@/lib/cms/client";
+import { resolvePageCtaHeroImage, resolvePageHeroImage } from "@/lib/cms/page-heroes/resolvePageHero";
+import { getLegislationDocuments } from "@/lib/cms/legislation/getLegislationDocuments";
+import { resolveLegislationHeroImage } from "@/lib/cms/legislation/resolveLegislationHero";
+import { getPageContent } from "@/lib/cms/getPageContent";
+import { isPageHeroCtaRouteKey, isPageHeroRouteKey } from "@/lib/page-heroes/constants";
+import { parseLegislationCategory } from "@/lib/legislation/parseLegislationCategory";
 import { stripAboutSection } from "@/lib/cms/home/stripAboutSection";
 import { stripBannerSection } from "@/lib/cms/home/stripBannerSection";
 import { stripOrgChartSection } from "@/lib/cms/home/stripOrgChartSection";
@@ -28,8 +62,16 @@ import { ARTICLE_RELATED_NEWS_MAX_ITEMS } from "@/lib/newsDisplay";
 import { deployedBasePath } from "@/lib/deployBasePath";
 import { getMessages } from "@/i18n/messages";
 import { parseLocaleFromSegments, type SupportedLocale } from "@/i18n/locales";
-import { findRouteKey, hrefForRoute, isNewsListingPath, parseNewsArticleSlug, parseWhoWeAreSection } from "@/i18n/paths";
-import { getWhoWeAreMeta } from "@/lib/cms/who-we-are/resolveWhoWeArePage";
+import {
+  findRouteKey,
+  hrefForRoute,
+  isNewsListingPath,
+  isPhotosListingPath,
+  parseNewsArticleSlug,
+  parsePhotoAlbumSlug,
+  parseWhoWeAreSection,
+} from "@/i18n/paths";
+import { getWhoWeAreSectionMeta } from "@/lib/cms/who-we-are/resolveWhoWeArePage";
 import {
   NEWS_LISTING_HERO_COUNT,
   NEWS_LISTING_PAGE_SIZE,
@@ -355,16 +397,32 @@ export async function generateMetadata({
 
   const whoWeAreSection = parseWhoWeAreSection(pathSegments, locale);
   if (whoWeAreSection) {
-    const whoWeAre = await getWhoWeAre(locale);
-    const meta = getWhoWeAreMeta(whoWeAre, locale);
+    const whoWeAre = await getWhoWeArePageContent(locale);
+    const meta = getWhoWeAreSectionMeta(whoWeAreSection, whoWeAre, locale);
     return {
       title: meta.title,
       description: meta.description,
     };
   }
 
+  const photoAlbumSlug = parsePhotoAlbumSlug(pathSegments, locale);
+  if (photoAlbumSlug) {
+    const album = await getPhotoAlbumBySlug(photoAlbumSlug, locale);
+    if (album) {
+      return {
+        title: `${album.title} — IGM`,
+        description: album.summary?.trim() || undefined,
+      };
+    }
+  }
+
+  if (isPhotosListingPath(pathSegments, locale)) {
+    const meta = getMessages(locale).mediaGalleryPage.categories.photos;
+    return { title: meta.metaTitle, description: meta.metaDescription };
+  }
+
   const slug = pageSlugFromSegments(pathSegments);
-  const page = await getPageBySlug(slug, locale);
+  const page = await getPageContent(slug, locale);
 
   if (page) {
     return {
@@ -376,6 +434,39 @@ export async function generateMetadata({
   if (findRouteKey(slug, locale) === "report") {
     const m = getMessages(locale).denoncer;
     return { title: m.metaTitle, description: m.metaDescription };
+  }
+
+  if (findRouteKey(slug, locale) === "map") {
+    const m = getMessages(locale).cartography;
+    return { title: m.metaTitle, description: m.metaDescription };
+  }
+
+  if (findRouteKey(slug, locale) === "contact") {
+    const contactCms = await getContactPageSettings(locale);
+    const content = resolveContactPage(contactCms, locale);
+    return { title: content.seoTitle, description: content.seoDescription };
+  }
+
+  const legislationCategory = parseLegislationCategory(slug, locale);
+  if (legislationCategory) {
+    const meta = getMessages(locale).legislationPage.categories[legislationCategory];
+    return { title: meta.metaTitle, description: meta.metaDescription };
+  }
+
+  if (findRouteKey(slug, locale) === "videos") {
+    const meta = getMessages(locale).mediaGalleryPage.categories.videos;
+    return { title: meta.metaTitle, description: meta.metaDescription };
+  }
+
+  if (findRouteKey(slug, locale) === "orgChart") {
+    const home = await getHome(locale);
+    const title = `${getMessages(locale).nav.orgChart} — IGM`;
+    const description =
+      home?.orgChartSection?.lead?.trim() ||
+      (locale === "en"
+        ? "Organizational chart of the General Inspectorate of Mines in the DRC."
+        : "Organigramme de l'Inspection Générale des Mines en RDC.");
+    return { title, description };
   }
 
   return {
@@ -436,27 +527,154 @@ export default async function TemplatePage({
   }
 
   const whoWeAreSection = parseWhoWeAreSection(pathSegments, locale);
+  if (whoWeAreSection === "history") {
+    const whoWeAre = await getWhoWeArePageContent(locale);
+    return <WhoWeAreHistoryPageView locale={locale} content={whoWeAre} />;
+  }
+
   if (whoWeAreSection) {
-    const whoWeAre = await getWhoWeAre(locale);
+    const whoWeAre = await getWhoWeArePageContent(locale);
     return (
       <WhoWeArePageView
         locale={locale}
-        activeSection={whoWeAreSection}
+        activeSection={whoWeAreSection === "about" ? null : whoWeAreSection}
         content={whoWeAre}
       />
     );
   }
 
-  const slug = pageSlugFromSegments(pathSegments);
+  const photoAlbumSlug = parsePhotoAlbumSlug(pathSegments, locale);
+  if (photoAlbumSlug) {
+    const [album, pageHeroes] = await Promise.all([
+      getPhotoAlbumBySlug(photoAlbumSlug, locale),
+      getPageHeroesSettings(locale),
+    ]);
+    const resolved = album ? resolvePhotoAlbumDetail(album) : null;
+    if (!resolved) notFound();
 
-  if (findRouteKey(slug, locale) === "report") {
+    const heroImageSrc =
+      resolved.coverSrc ?? resolvePageHeroImage(pageHeroes, "photos");
+    return (
+      <PhotoAlbumPageView locale={locale} album={resolved} heroImageSrc={heroImageSrc} />
+    );
+  }
+
+  if (isPhotosListingPath(pathSegments, locale)) {
+    const [albums, pageHeroes] = await Promise.all([
+      getPhotoAlbums(locale),
+      getPageHeroesSettings(locale),
+    ]);
+    const heroImageSrc = resolvePageHeroImage(pageHeroes, "photos");
+    return (
+      <PhotoAlbumsPageView
+        locale={locale}
+        albums={resolvePhotoAlbumSummaries(albums)}
+        heroImageSrc={heroImageSrc}
+      />
+    );
+  }
+
+  const slug = pageSlugFromSegments(pathSegments);
+  const routeKey = findRouteKey(slug, locale);
+
+  if (routeKey === "report") {
     return <DenoncerPageContent locale={locale} />;
   }
 
-  const page = await getPageBySlug(slug, locale);
+  if (routeKey === "map") {
+    const pageHeroes = await getPageHeroesSettings(locale);
+    const heroImageSrc = resolvePageHeroImage(pageHeroes, "map");
+    return <CartographyPageView locale={locale} heroImageSrc={heroImageSrc} />;
+  }
+
+  if (routeKey === "contact") {
+    const [settings, pageHeroes, contactCms] = await Promise.all([
+      getSiteSettings(locale),
+      getPageHeroesSettings(locale),
+      getContactPageSettings(locale),
+    ]);
+    const heroImageSrc = resolvePageHeroImage(pageHeroes, "contact");
+    const content = resolveContactPage(contactCms, locale);
+    return (
+      <ContactPageView
+        locale={locale}
+        settings={settings}
+        heroImageSrc={heroImageSrc}
+        content={content}
+      />
+    );
+  }
+
+  const legislationCategory = parseLegislationCategory(slug, locale);
+  if (legislationCategory) {
+    const [documents, legislationSettings] = await Promise.all([
+      getLegislationDocuments(legislationCategory, locale),
+      getLegislationSettings(locale),
+    ]);
+    const heroImageSrc = resolveLegislationHeroImage(legislationSettings, legislationCategory);
+    return (
+      <LegislationPageView
+        locale={locale}
+        category={legislationCategory}
+        documents={documents}
+        heroImageSrc={heroImageSrc}
+      />
+    );
+  }
+
+  if (routeKey === "videos") {
+    const [items, pageHeroes] = await Promise.all([
+      getMediaGalleryVideos(locale),
+      getPageHeroesSettings(locale),
+    ]);
+    const heroImageSrc = resolvePageHeroImage(pageHeroes, "videos");
+    const resolvedItems = resolveMediaGalleryItems(items);
+    return (
+      <VideoGalleryPageView locale={locale} items={resolvedItems} heroImageSrc={heroImageSrc} />
+    );
+  }
+
+  if (routeKey === "orgChart") {
+    const [home, pageHeroes] = await Promise.all([getHome(locale), getPageHeroesSettings(locale)]);
+    const heroImageSrc = resolvePageHeroImage(pageHeroes, "orgChart");
+    return (
+      <OrgChartPageView
+        locale={locale}
+        orgChartSection={home?.orgChartSection}
+        heroImageSrc={heroImageSrc}
+      />
+    );
+  }
+
+  const page = await getPageContent(slug, locale);
 
   if (page) {
-    return <CmsPageView page={page} locale={locale} />;
+    const pageHeroes =
+      routeKey && isPageHeroRouteKey(routeKey) ? await getPageHeroesSettings(locale) : null;
+    const heroImageSrc =
+      routeKey && isPageHeroRouteKey(routeKey)
+        ? resolvePageHeroImage(pageHeroes, routeKey, page)
+        : undefined;
+    const ctaHeroImageSrc =
+      routeKey && isPageHeroCtaRouteKey(routeKey) && heroImageSrc
+        ? resolvePageCtaHeroImage(pageHeroes, routeKey, page, heroImageSrc)
+        : undefined;
+    return (
+      <CmsHistoryPageView
+        page={page}
+        locale={locale}
+        heroImageSrc={heroImageSrc}
+        ctaHeroImageSrc={ctaHeroImageSrc}
+      />
+    );
+  }
+
+  if (routeKey && isPageHeroRouteKey(routeKey)) {
+    const pageHeroes = await getPageHeroesSettings(locale);
+    const heroImageSrc = resolvePageHeroImage(pageHeroes, routeKey);
+    return (
+      <PageHeroPlaceholderView locale={locale} routeKey={routeKey} heroImageSrc={heroImageSrc} />
+    );
   }
 
   return <UnderConstruction locale={locale} />;

@@ -2,6 +2,10 @@ import type { CollectionConfig } from "payload";
 
 import { invalidateMediaCdn } from "../hooks/invalidateMediaCdn";
 import { mediaAdminFileUrl } from "../hooks/mediaAdminFileUrl";
+import {
+  mediaDefaultAltBeforeChange,
+  mediaDefaultAltBeforeValidate,
+} from "../hooks/mediaDefaultAlt";
 import { revalidateFrontCollection } from "../hooks/revalidateFront";
 
 import { mediaUploadConfig, publicPrefix } from "./mediaUploadConfig";
@@ -25,6 +29,8 @@ export const Media: CollectionConfig = {
     },
   },
   hooks: {
+    beforeValidate: [mediaDefaultAltBeforeValidate],
+    beforeChange: [mediaDefaultAltBeforeChange],
     afterChange: [invalidateMediaCdn, revalidateFrontCollection],
     afterRead: [mediaAdminFileUrl],
   },
@@ -33,7 +39,12 @@ export const Media: CollectionConfig = {
       name: "alt",
       type: "text",
       label: "Texte alternatif",
-      required: true,
+      required: false,
+      defaultValue: "",
+      admin: {
+        description:
+          "Optionnel lors d’un upload groupé : laissez vide pour génération automatique (nom du fichier). Utilisez « Modifier tout » dans le tiroir d’upload pour appliquer le même texte à tous les fichiers.",
+      },
     },
   ],
   upload: mediaUploadConfig,
