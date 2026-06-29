@@ -3,7 +3,7 @@ import { createRequire } from "node:module";
 import type { Signalement, SignalementFile } from "@/payload-types";
 
 const require = createRequire(import.meta.url);
-const PDFDocument = require("pdfkit") as typeof import("pdfkit").default;
+const PDFDocument = require("pdfkit") as typeof import("pdfkit");
 
 type PdfDoc = InstanceType<typeof PDFDocument>;
 

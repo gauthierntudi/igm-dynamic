@@ -1,5 +1,5 @@
 import { lexicalHTMLField } from "@payloadcms/richtext-lexical";
-import type { CollectionConfig } from "payload";
+import type { CollectionConfig, Field } from "payload";
 import { slugField } from "payload";
 
 import { isAdmin, publishedRead } from "../access/isAdmin";
@@ -116,7 +116,7 @@ export const News: CollectionConfig = {
                 storeInDB: true,
               }),
               ...LOCALIZED,
-            },
+            } as Field,
           ],
         },
         {

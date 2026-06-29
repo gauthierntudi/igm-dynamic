@@ -41,9 +41,9 @@ export function resolveMediaThumbnailSrc(
   let src: string | undefined;
   if (value.url) src = toAbsoluteUrl(value.url, serverURL);
 
-  if (isImage(value.mimeType)) {
+  if (value.mimeType && isImage(value.mimeType) && src) {
     return getBestFitFromSizes({
-      sizes: value.sizes,
+      sizes: value.sizes as Record<string, { url?: string; width?: number }> | undefined,
       thumbnailURL: undefined,
       url: src,
       width: value.width ?? undefined,

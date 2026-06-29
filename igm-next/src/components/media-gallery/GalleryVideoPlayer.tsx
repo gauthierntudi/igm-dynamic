@@ -50,7 +50,7 @@ export function GalleryVideoPlayer({ src, posterSrc, title }: Props) {
 
       const onReady = () => {
         setIsReady(true);
-        void player?.play().catch(() => undefined);
+        void Promise.resolve(player?.play()).catch(() => undefined);
       };
 
       player.on("ready", onReady);

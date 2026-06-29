@@ -13,16 +13,12 @@ type SwiperInstance = {
   activeIndex: number;
 };
 
-type SwiperConstructor = new (
-  element: HTMLElement,
-  options: Record<string, unknown>,
-) => SwiperInstance;
-
-declare global {
-  interface Window {
-    Swiper?: SwiperConstructor;
-  }
-}
+type SwiperWindow = Window & {
+  Swiper?: new (
+    element: HTMLElement,
+    options: Record<string, unknown>,
+  ) => SwiperInstance;
+};
 
 type Props = {
   slides: CmsHomeBannerSlide[];
@@ -50,7 +46,7 @@ export function HomeBannerSlider({ slides, locale }: Props) {
     const init = () => {
       if (cancelled || !rootRef.current) return;
 
-      const SwiperCtor = window.Swiper;
+      const SwiperCtor = (window as SwiperWindow).Swiper;
       if (typeof SwiperCtor !== "function") {
         if (attempts < 40) {
           attempts += 1;

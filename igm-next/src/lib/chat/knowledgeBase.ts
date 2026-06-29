@@ -96,13 +96,14 @@ async function buildKnowledgeBaseUncached(locale: SupportedLocale): Promise<Know
 
   if (home) {
     const homeParts: string[] = [];
-    collectTextFields(home.banner, homeParts);
+    collectTextFields(home.bannerSlides, homeParts);
     collectTextFields(home.about, homeParts);
     collectTextFields(home.strategy, homeParts);
-    collectTextFields(home.action, homeParts);
-    collectTextFields(home.orgChart, homeParts);
-    collectTextFields(home.contact, homeParts);
-    collectTextFields(home.partners, homeParts);
+    collectTextFields(home.statsSection, homeParts);
+    collectTextFields(home.actionSection, homeParts);
+    collectTextFields(home.orgChartSection, homeParts);
+    collectTextFields(home.contactSection, homeParts);
+    collectTextFields(home.partnersSection, homeParts);
     collectTextFields(home.newsSection, homeParts);
 
     const homeChunk = chunk(

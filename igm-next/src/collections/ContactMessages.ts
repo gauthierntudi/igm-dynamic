@@ -14,8 +14,6 @@ export const ContactMessages: CollectionConfig = {
     listSearchableFields: ["name", "email", "phone", "subject", "message"],
     description:
       "Messages transmis via le formulaire de contact public. Les champs soumis ne sont pas modifiables.",
-    disableDuplicate: true,
-    disableBulkEdit: true,
   },
   access: {
     create: () => false,

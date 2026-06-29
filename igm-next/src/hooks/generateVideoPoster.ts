@@ -172,7 +172,7 @@ export async function createVideoPosterForDoc(
             width: metadata.width ?? POSTER_SIZE.width,
             height: metadata.height ?? POSTER_SIZE.height,
             prefix,
-          },
+          } as Record<string, unknown>,
         },
       },
       req: options?.req,

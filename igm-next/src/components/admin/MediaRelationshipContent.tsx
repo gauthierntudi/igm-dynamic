@@ -62,8 +62,14 @@ export function MediaRelationshipContent(props: Props) {
       ? config.collections.find((collection) => collection.slug === collectionSlug)
       : undefined;
 
+  const documentId = (() => {
+    if (id === undefined || id === "") return undefined;
+    const parsed = Number(id);
+    return Number.isFinite(parsed) ? parsed : undefined;
+  })();
+
   const [DocumentDrawer, , { openDrawer }] = useDocumentDrawer({
-    id: id ?? undefined,
+    id: documentId,
     collectionSlug,
   });
 

@@ -1,0 +1,8 @@
+{
+  "name": "igm-dynamic",
+  "private": true,
+  "description": "Repo racine. Sur Vercel : Root Directory = igm-next (obligatoire).",
+  "scripts": {
+    "vercel-build": "cd igm-next && npm ci && npm run build"
+  }
+}

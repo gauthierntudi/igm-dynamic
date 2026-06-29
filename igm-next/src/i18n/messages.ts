@@ -496,7 +496,13 @@ const en = {
   },
 } as const;
 
-export type Messages = typeof fr;
+type DeepString<T> = T extends string
+  ? string
+  : T extends object
+    ? { [K in keyof T]: DeepString<T[K]> }
+    : T;
+
+export type Messages = DeepString<typeof fr>;
 
 export const MESSAGES: Record<SupportedLocale, Messages> = { fr, en };
 

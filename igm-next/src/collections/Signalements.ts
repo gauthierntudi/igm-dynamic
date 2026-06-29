@@ -33,8 +33,6 @@ export const Signalements: CollectionConfig = {
     ],
     description:
       "Signalements transmis via le formulaire public. Consultation seule — les données transmises par les utilisateurs ne peuvent pas être modifiées.",
-    disableDuplicate: true,
-    disableBulkEdit: true,
   },
   access: {
     // Création réservée au formulaire public (Local API serveur, overrideAccess).

@@ -336,7 +336,7 @@ export function defaultPageToCmsPage(seed: DefaultPageSeed): CmsPage {
     slug: seed.slug,
     title: seed.title,
     summary: seed.summary ?? null,
-    hero: seed.hero ?? null,
+    hero: seed.hero ?? undefined,
     contentHtml: seed.contentHtml,
     seoTitle: seed.seoTitle ?? null,
     seoDescription: seed.seoDescription ?? null,

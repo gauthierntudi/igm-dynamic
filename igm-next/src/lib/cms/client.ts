@@ -1,4 +1,5 @@
 import { unstable_cache } from "next/cache";
+import type { Where } from "payload";
 
 import { DEFAULT_LOCALE, type SupportedLocale } from "@/i18n/locales";
 
@@ -67,10 +68,10 @@ async function fetchPublishedNewsPage(
 
   try {
     const payload = await getPayloadClient();
-    const where = q
+    const where: Where = q
       ? {
           and: [
-            { _status: { equals: "published" as const } },
+            { _status: { equals: "published" } },
             {
               or: [
                 { title: { contains: q } },
@@ -80,7 +81,7 @@ async function fetchPublishedNewsPage(
             },
           ],
         }
-      : { _status: { equals: "published" as const } };
+      : { _status: { equals: "published" } };
 
     const result = await payload.find({
       collection: "news",

@@ -1,4 +1,4 @@
-import type { AllowList } from "payload";
+import type { AllowList, UploadConfig } from "payload";
 
 const publicPrefix = process.env.S3_PUBLIC_PREFIX || "public";
 
@@ -19,7 +19,7 @@ function cdnSkipSafeFetchAllowList(): AllowList | undefined {
   }
 }
 
-export const mediaUploadConfig = {
+export const mediaUploadConfig: UploadConfig = {
   staticDir: "media",
   mimeTypes: ["image/*", "video/*", "application/pdf"],
   crop: true,
@@ -35,6 +35,6 @@ export const mediaUploadConfig = {
       position: "centre",
     },
   ],
-} as const;
+};
 
 export { publicPrefix };

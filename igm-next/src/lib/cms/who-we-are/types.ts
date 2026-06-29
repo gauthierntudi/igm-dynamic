@@ -1,4 +1,4 @@
-import type { CmsMedia } from "./types";
+import type { CmsMedia } from "../types";
 
 export type CmsWhoWeAreLabelItem = {
   label?: string | null;

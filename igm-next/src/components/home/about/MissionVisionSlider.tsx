@@ -11,16 +11,12 @@ type SwiperInstance = {
   destroy: (deleteInstance?: boolean, cleanStyles?: boolean) => void;
 };
 
-type SwiperConstructor = new (
-  element: HTMLElement,
-  options: Record<string, unknown>,
-) => SwiperInstance;
-
-declare global {
-  interface Window {
-    Swiper?: SwiperConstructor;
-  }
-}
+type SwiperWindow = Window & {
+  Swiper?: new (
+    element: HTMLElement,
+    options: Record<string, unknown>,
+  ) => SwiperInstance;
+};
 
 type Card = {
   key: string;
@@ -81,7 +77,7 @@ export function MissionVisionSlider({ mission, vision, locale }: Props) {
     const init = () => {
       if (cancelled || !rootRef.current) return;
 
-      const SwiperCtor = window.Swiper;
+      const SwiperCtor = (window as SwiperWindow).Swiper;
       if (typeof SwiperCtor !== "function") {
         if (attempts < 40) {
           attempts += 1;

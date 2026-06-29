@@ -223,7 +223,7 @@ export function renderStrategySection(
       })
       .join("") ?? "";
 
-  const counterLabel = strategy.counterLabel?.trim() || "Provinces de <br /> présence.";
+  const counterLabel = "Provinces de <br /> présence.";
   const ctaLabel = strategy.ctaLabel?.trim();
   const ctaHref = escapeHtml(localizeHref(strategy.ctaHref?.trim() || "/contact", locale));
   const cta = ctaLabel
