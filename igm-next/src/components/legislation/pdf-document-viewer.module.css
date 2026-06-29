@@ -8,6 +8,17 @@
   border-radius: 8px;
   background: #f4f6f9;
   overflow: hidden;
+  position: relative;
+}
+
+.shellFullscreen,
+.shell:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+  border: none;
+  border-radius: 0;
+  background: #0c1f3d;
 }
 
 .toolbar {
@@ -19,6 +30,7 @@
   padding: 0.75rem 1rem;
   background: #0c1f3d;
   color: #fff;
+  flex-shrink: 0;
 }
 
 .toolbarTitle {
@@ -35,6 +47,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .toolbarActions button,
@@ -63,6 +77,11 @@
   cursor: not-allowed;
 }
 
+.toolbarBtnActive {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+}
+
 .pageIndicator,
 .zoomLabel {
   min-width: 3.5rem;
@@ -87,6 +106,11 @@
   justify-content: center;
   align-items: flex-start;
   background: #e8eef4;
+}
+
+.shellFullscreen .viewport,
+.shell:fullscreen .viewport {
+  background: #1a2d4a;
 }
 
 .page {
@@ -114,8 +138,127 @@
   background: #fff;
 }
 
+.summaryLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  pointer-events: none;
+}
+
+.summaryBackdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: rgba(12, 31, 61, 0.55);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.summaryPanel {
+  position: relative;
+  z-index: 1;
+  width: min(520px, 100%);
+  max-height: min(70vh, 520px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.28);
+  pointer-events: auto;
+  animation: igmPdfSummaryIn 0.2s ease-out;
+}
+
+.summaryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1rem 0.75rem;
+  border-bottom: 1px solid #e8eef4;
+}
+
+.summaryTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0c1f3d;
+}
+
+.summaryClose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #dde3ec;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #475569;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.summaryClose:hover {
+  background: #eef3fa;
+  color: #1b4491;
+}
+
+.summaryReference {
+  margin: 0;
+  padding: 0.75rem 1rem 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #1b4491;
+}
+
+.summaryBody {
+  padding: 0.75rem 1rem 1rem;
+  overflow: auto;
+}
+
+.summaryText {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: #334155;
+  white-space: pre-wrap;
+}
+
+.summaryEmpty {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: #64748b;
+  font-style: italic;
+}
+
+@keyframes igmPdfSummaryIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @media (max-width: 767px) {
   .viewport {
     padding: 0.75rem;
+  }
+
+  .toolbarActions {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .summaryPanel {
+    max-height: min(80vh, 640px);
   }
 }

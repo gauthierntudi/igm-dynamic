@@ -11,6 +11,8 @@ import { getMessages } from "@/i18n/messages";
 import type { CmsLegislationDocument } from "@/lib/cms/legislation/types";
 import { mediaPdfViewUrl, mediaUrl } from "@/lib/cdnUrl";
 
+import type { PdfViewerLabels } from "@/components/legislation/PdfDocumentViewer";
+
 import styles from "./legislation-documents-panel.module.css";
 
 const PAGE_SIZE = 12;
@@ -39,7 +41,29 @@ type OpenDocument = {
   title: string;
   viewUrl: string;
   downloadUrl: string;
+  summary?: string | null;
+  reference?: string | null;
 };
+
+function buildViewerLabels(t: ReturnType<typeof getMessages>["legislationPage"]): PdfViewerLabels {
+  return {
+    previousPage: t.viewerPreviousPage,
+    nextPage: t.viewerNextPage,
+    zoomOut: t.viewerZoomOut,
+    zoomIn: t.viewerZoomIn,
+    download: t.viewerDownload,
+    openNewTab: t.viewerOpenNewTab,
+    close: t.closeModal,
+    fullscreen: t.viewerFullscreen,
+    exitFullscreen: t.viewerExitFullscreen,
+    summary: t.viewerSummary,
+    closeSummary: t.viewerCloseSummary,
+    noSummary: t.viewerNoSummary,
+    loading: t.viewerLoading,
+    loadError: t.viewerLoadError,
+    openPdf: t.viewerOpenPdf,
+  };
+}
 
 function formatDate(value: string | null | undefined, locale: SupportedLocale): string | null {
   if (!value) return null;
@@ -85,6 +109,7 @@ function pageItems(current: number, total: number): (number | "ellipsis")[] {
 
 export function LegislationDocumentsPanel({ locale, documents, query }: Props) {
   const t = getMessages(locale).legislationPage;
+  const viewerLabels = useMemo(() => buildViewerLabels(t), [t]);
   const [page, setPage] = useState(1);
   const [openDocument, setOpenDocument] = useState<OpenDocument | null>(null);
   const gridRef = useRef<HTMLUListElement>(null);
@@ -127,7 +152,14 @@ export function LegislationDocumentsPanel({ locale, documents, query }: Props) {
   const openModal = useCallback((doc: CmsLegislationDocument) => {
     const { viewUrl, downloadUrl } = resolvePdfUrls(doc);
     if (!viewUrl) return;
-    setOpenDocument({ id: doc.id, title: doc.title, viewUrl, downloadUrl });
+    setOpenDocument({
+      id: doc.id,
+      title: doc.title,
+      viewUrl,
+      downloadUrl,
+      summary: doc.summary,
+      reference: doc.reference,
+    });
   }, []);
 
   useEffect(() => {
@@ -285,6 +317,9 @@ export function LegislationDocumentsPanel({ locale, documents, query }: Props) {
               url={openDocument.viewUrl}
               downloadUrl={openDocument.downloadUrl}
               title={openDocument.title}
+              summary={openDocument.summary}
+              reference={openDocument.reference}
+              labels={viewerLabels}
               onClose={closeModal}
             />
           </div>
