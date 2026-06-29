@@ -145,13 +145,14 @@ function cmsFooterColumnsToRuntime(
 
   return columns
     .map((col) => {
-      const title = col.title?.trim();
+      const rawTitle = col.title?.trim();
       const links =
         col.links
           ?.map((link) => cmsFooterLinkToRuntime(link, locale))
           .filter((l): l is RuntimeFooterLink => l !== null) ?? [];
 
-      if (!title || !links.length) return null;
+      if (!rawTitle || !links.length) return null;
+      const title = resolveFooterColumnTitle(rawTitle, locale);
       return { title, links };
     })
     .filter((c): c is RuntimeFooterColumn => c !== null);
@@ -171,12 +172,35 @@ const DEFAULT_SOCIAL: CmsFooterSocial[] = [
   { network: "x", url: "https://www.x.com/" },
 ];
 
+/** Payload renvoie le fallback FR quand la traduction EN est absente — repasser sur i18n dans ce cas. */
+function resolveLocalizedFooterText(
+  cmsValue: string | null | undefined,
+  localizedFallback: string,
+  frenchReference: string,
+): string {
+  const trimmed = cmsValue?.trim();
+  if (!trimmed || trimmed === frenchReference) {
+    return localizedFallback;
+  }
+  return trimmed;
+}
+
+function resolveFooterColumnTitle(title: string, locale: SupportedLocale): string {
+  const fr = getMessages("fr").footer;
+  const localized = getMessages(locale).footer;
+
+  if (title === fr.organs) return localized.organs;
+  if (title === fr.usefulLinks) return localized.usefulLinks;
+  return title;
+}
+
 export function buildSiteNavigation(
   settings: CmsSiteSettings | null | undefined,
   locale: SupportedLocale,
 ): SiteNavigationBundle {
   const messages = getMessages(locale);
   const f = messages.footer;
+  const frFooter = getMessages("fr").footer;
 
   const headerNav =
     settings?.headerNav?.length
@@ -216,15 +240,33 @@ export function buildSiteNavigation(
     locale,
     headerNav,
     footerColumns,
-    footerHqHeading: settings?.footerHqHeading?.trim() || f.hqAddress,
-    footerHqText:
-      settings?.footerHqText?.trim() ||
-      (locale === "en" ? DEFAULT_HQ_EN : DEFAULT_HQ_FR),
-    footerContactTitle: settings?.footerContactTitle?.trim() || f.contactTitle,
-    footerContactLead: settings?.footerContactLead?.trim() || f.contactLead,
+    footerHqHeading: resolveLocalizedFooterText(
+      settings?.footerHqHeading,
+      f.hqAddress,
+      frFooter.hqAddress,
+    ),
+    footerHqText: resolveLocalizedFooterText(
+      settings?.footerHqText,
+      locale === "en" ? DEFAULT_HQ_EN : DEFAULT_HQ_FR,
+      DEFAULT_HQ_FR,
+    ),
+    footerContactTitle: resolveLocalizedFooterText(
+      settings?.footerContactTitle,
+      f.contactTitle,
+      frFooter.contactTitle,
+    ),
+    footerContactLead: resolveLocalizedFooterText(
+      settings?.footerContactLead,
+      f.contactLead,
+      frFooter.contactLead,
+    ),
     footerContactPhone: settings?.footerContactPhone?.trim() || "+243 900 030 005",
     footerContactEmail: settings?.footerContactEmail?.trim() || settings?.email?.trim() || "info@igm.cd",
-    footerSocialTitle: settings?.footerSocialTitle?.trim() || f.social,
+    footerSocialTitle: resolveLocalizedFooterText(
+      settings?.footerSocialTitle,
+      f.social,
+      frFooter.social,
+    ),
     footerSocial,
     footerLegalLinks,
     footerCopyright: settings?.footerCopyright?.trim() || `${f.copyright} IGM | ${f.rights}`,

@@ -34,8 +34,8 @@ Repo GitHub : `gauthierntudi/igm-dynamic` — branche `main`.
 
 Le code Next.js est dans **`igm-next/`**. Sans ce réglage, Vercel déploie la racine du repo en ~5 s et affiche **404 NOT_FOUND**.
 
-1. Vercel → **Project → Settings → General**
-2. **Root Directory** → **Edit** → saisir : `igm-next`
+1. Vercel → **Project → Settings → Build and Deployment**
+2. Descendre jusqu'à **Root Directory** → **Edit** → saisir : `igm-next`
 3. **Save** → **Deployments** → **Redeploy**
 
 Le build doit durer **2–5 minutes** (Next.js + Payload), pas 5 secondes.
