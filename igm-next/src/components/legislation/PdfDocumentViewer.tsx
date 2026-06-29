@@ -13,6 +13,7 @@ import {
 import { Document, Page, pdfjs } from "react-pdf";
 
 import { withDeployedBase } from "@/lib/deployBasePath";
+import { pdfViewSource } from "@/lib/pdfViewSource";
 
 import styles from "./pdf-document-viewer.module.css";
 
@@ -20,15 +21,19 @@ pdfjs.GlobalWorkerOptions.workerSrc = withDeployedBase("/pdf.worker.min.mjs");
 
 type Props = {
   url: string;
+  downloadUrl?: string;
   title: string;
   onClose?: () => void;
 };
 
-export function PdfDocumentViewer({ url, title, onClose }: Props) {
+export function PdfDocumentViewer({ url, downloadUrl, title, onClose }: Props) {
   const [numPages, setNumPages] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
   const [scale, setScale] = useState(1);
   const [loadError, setLoadError] = useState(false);
+
+  const fileSource = useMemo(() => pdfViewSource(url), [url]);
+  const fileDownloadUrl = downloadUrl ?? url;
 
   useEffect(() => {
     setPageNumber(1);
@@ -83,10 +88,10 @@ export function PdfDocumentViewer({ url, title, onClose }: Props) {
             <Plus size={18} />
           </button>
           <span className={styles.divider} aria-hidden />
-          <a href={url} download target="_blank" rel="noopener noreferrer" aria-label="Télécharger">
+          <a href={fileDownloadUrl} download target="_blank" rel="noopener noreferrer" aria-label="Télécharger">
             <Download size={18} />
           </a>
-          <a href={url} target="_blank" rel="noopener noreferrer" aria-label="Ouvrir dans un nouvel onglet">
+          <a href={fileDownloadUrl} target="_blank" rel="noopener noreferrer" aria-label="Ouvrir dans un nouvel onglet">
             <ExternalLink size={18} />
           </a>
           {onClose ? (
@@ -99,15 +104,15 @@ export function PdfDocumentViewer({ url, title, onClose }: Props) {
 
       <div className={styles.viewport}>
         {loadError ? (
-          <iframe title={title} src={url} className={styles.fallbackFrame} />
+          <iframe title={title} src={fileDownloadUrl} className={styles.fallbackFrame} />
         ) : (
           <Document
-            file={url}
+            file={fileSource}
             loading={<p className={styles.loading}>Chargement du document…</p>}
             error={
               <div className={styles.error}>
                 <p>Impossible d’afficher l’aperçu intégré.</p>
-                <a href={url} target="_blank" rel="noopener noreferrer">
+                <a href={fileDownloadUrl} target="_blank" rel="noopener noreferrer">
                   Ouvrir le PDF
                 </a>
               </div>

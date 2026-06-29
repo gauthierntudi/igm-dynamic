@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 
 import { withDeployedBase } from "@/lib/deployBasePath";
+import { pdfViewSource } from "@/lib/pdfViewSource";
 
 import styles from "./pdf-thumbnail.module.css";
 
@@ -45,7 +46,7 @@ export function PdfThumbnailCanvas({ url }: Props) {
     >
       {pageWidth ? (
         <Document
-          file={url}
+          file={pdfViewSource(url)}
           loading={null}
           onLoadSuccess={() => setReady(true)}
           onLoadError={() => setFailed(true)}

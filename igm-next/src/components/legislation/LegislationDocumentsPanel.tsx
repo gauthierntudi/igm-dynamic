@@ -9,7 +9,7 @@ import { PdfFileTypeIcon } from "@/components/legislation/PdfFileTypeIcon";
 import type { SupportedLocale } from "@/i18n/locales";
 import { getMessages } from "@/i18n/messages";
 import type { CmsLegislationDocument } from "@/lib/cms/legislation/types";
-import { mediaUrl } from "@/lib/cdnUrl";
+import { mediaPdfViewUrl, mediaUrl } from "@/lib/cdnUrl";
 
 import styles from "./legislation-documents-panel.module.css";
 
@@ -37,7 +37,8 @@ type Props = {
 type OpenDocument = {
   id: number;
   title: string;
-  url: string;
+  viewUrl: string;
+  downloadUrl: string;
 };
 
 function formatDate(value: string | null | undefined, locale: SupportedLocale): string | null {
@@ -51,9 +52,15 @@ function formatDate(value: string | null | undefined, locale: SupportedLocale): 
   }).format(date);
 }
 
-function resolvePdfUrl(doc: CmsLegislationDocument): string {
-  if (!doc.file || typeof doc.file !== "object") return "";
-  return mediaUrl(doc.file);
+function resolvePdfUrls(doc: CmsLegislationDocument): { viewUrl: string; downloadUrl: string } {
+  if (!doc.file || typeof doc.file !== "object") {
+    return { viewUrl: "", downloadUrl: "" };
+  }
+
+  return {
+    viewUrl: mediaPdfViewUrl(doc.file),
+    downloadUrl: mediaUrl(doc.file),
+  };
 }
 
 function pageItems(current: number, total: number): (number | "ellipsis")[] {
@@ -118,9 +125,9 @@ export function LegislationDocumentsPanel({ locale, documents, query }: Props) {
   const closeModal = useCallback(() => setOpenDocument(null), []);
 
   const openModal = useCallback((doc: CmsLegislationDocument) => {
-    const url = resolvePdfUrl(doc);
-    if (!url) return;
-    setOpenDocument({ id: doc.id, title: doc.title, url });
+    const { viewUrl, downloadUrl } = resolvePdfUrls(doc);
+    if (!viewUrl) return;
+    setOpenDocument({ id: doc.id, title: doc.title, viewUrl, downloadUrl });
   }, []);
 
   useEffect(() => {
@@ -156,8 +163,8 @@ export function LegislationDocumentsPanel({ locale, documents, query }: Props) {
             <ul ref={gridRef} className={styles.grid}>
               {paginated.map((doc) => {
               const dateLabel = formatDate(doc.publishedAt, locale);
-              const pdfUrl = resolvePdfUrl(doc);
-              const disabled = !pdfUrl;
+              const { viewUrl } = resolvePdfUrls(doc);
+              const disabled = !viewUrl;
 
               return (
                 <li key={doc.id}>
@@ -168,8 +175,8 @@ export function LegislationDocumentsPanel({ locale, documents, query }: Props) {
                     onClick={() => openModal(doc)}
                   >
                     <div className={styles.thumbWrap}>
-                      {pdfUrl ? (
-                        <PdfThumbnail url={pdfUrl} title={doc.title} />
+                      {viewUrl ? (
+                        <PdfThumbnail url={viewUrl} title={doc.title} />
                       ) : (
                         <div className={styles.thumbFallback} aria-hidden />
                       )}
@@ -275,7 +282,8 @@ export function LegislationDocumentsPanel({ locale, documents, query }: Props) {
               {openDocument.title}
             </h2>
             <PdfDocumentViewer
-              url={openDocument.url}
+              url={openDocument.viewUrl}
+              downloadUrl={openDocument.downloadUrl}
               title={openDocument.title}
               onClose={closeModal}
             />

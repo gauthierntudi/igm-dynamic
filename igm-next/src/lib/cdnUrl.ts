@@ -39,3 +39,29 @@ export function mediaUrl(media: MediaLike | null | undefined): string {
 
   return "";
 }
+
+/**
+ * URL same-origin pour react-pdf (évite le blocage CORS CloudFront/S3 en prod).
+ * Téléchargement / lien direct : préférer {@link mediaUrl}.
+ */
+export function mediaPdfViewUrl(
+  media: MediaLike | null | undefined,
+  apiBase = "/api",
+): string {
+  if (!media) return "";
+
+  const stored = media.url?.trim();
+  if (stored && !/^https?:\/\//i.test(stored) && stored.includes("/media/file/")) {
+    return stored;
+  }
+
+  if (!media.filename) return "";
+
+  const prefix =
+    typeof media.prefix === "string" && media.prefix.trim()
+      ? media.prefix.trim()
+      : undefined;
+  const qs = prefix ? `?prefix=${encodeURIComponent(prefix)}` : "";
+
+  return `${apiBase.replace(/\/$/, "")}/media/file/${encodeURIComponent(media.filename)}${qs}`;
+}
