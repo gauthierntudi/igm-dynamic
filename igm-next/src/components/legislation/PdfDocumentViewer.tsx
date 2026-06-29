@@ -229,8 +229,8 @@ export function PdfDocumentViewer({
             <Page
               pageNumber={pageNumber}
               scale={scale}
-              renderAnnotationLayer
-              renderTextLayer
+              renderTextLayer={false}
+              renderAnnotationLayer={false}
               className={styles.page}
             />
           </Document>

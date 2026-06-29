@@ -116,6 +116,16 @@
 .page {
   box-shadow: 0 8px 28px rgba(15, 23, 42, 0.18);
   background: #fff;
+  line-height: 0;
+}
+
+.page :global(.react-pdf__Page) {
+  position: relative;
+  line-height: 0;
+}
+
+.page :global(.react-pdf__Page__canvas) {
+  display: block;
 }
 
 .loading,
