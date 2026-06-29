@@ -12,6 +12,7 @@ import { SignalementModalProvider } from "@/components/signalement/SignalementMo
 import ChatWidget from "@/components/chat/ChatWidget";
 import { getSiteSettings } from "@/lib/cms/client";
 import { withDeployedBase } from "@/lib/deployBasePath";
+import { getSiteOrigin } from "@/lib/seo/siteOrigin";
 import TemplateFooter from "@/components/template/Footer";
 import TemplateHeader from "@/components/template/Header";
 
@@ -20,7 +21,18 @@ import "./globals.css";
 const ENABLE_LOADER = true;
 
 export const metadata: Metadata = {
-  title: "IGM",
+  metadataBase: new URL(getSiteOrigin()),
+  title: {
+    default: "IGM — Inspection Générale des Mines",
+    template: "%s",
+  },
+  openGraph: {
+    siteName: "IGM",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 const templateCssFiles = [

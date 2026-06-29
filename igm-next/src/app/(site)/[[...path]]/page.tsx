@@ -60,6 +60,8 @@ import { stripStrategySection } from "@/lib/cms/home/stripStrategySection";
 import { loadHomeHtmlFile } from "@/lib/cms/homeHtmlCache";
 import { ARTICLE_RELATED_NEWS_MAX_ITEMS } from "@/lib/newsDisplay";
 import { deployedBasePath } from "@/lib/deployBasePath";
+import { tryResolveHeroMediaSrc } from "@/lib/cms/resolveHeroMediaSrc";
+import { buildPathname, buildSiteMetadata } from "@/lib/seo/buildSiteMetadata";
 import { getMessages } from "@/i18n/messages";
 import { parseLocaleFromSegments, type SupportedLocale } from "@/i18n/locales";
 import {
@@ -121,6 +123,26 @@ const HomeNewsSection = dynamic(
   () => import("@/components/home/news/HomeNewsSection"),
   { ssr: true },
 );
+
+type SiteMetaInput = Omit<Parameters<typeof buildSiteMetadata>[0], "pathname" | "locale">;
+
+function cmsMediaForOg(
+  media: { filename?: string | null; url?: string | null; prefix?: string | null } | string | number | null | undefined,
+) {
+  return media && typeof media === "object" ? media : null;
+}
+
+function siteMeta(
+  locale: SupportedLocale,
+  pathSegments: string[],
+  input: SiteMetaInput,
+): Metadata {
+  return buildSiteMetadata({
+    ...input,
+    locale,
+    pathname: buildPathname(locale, pathSegments),
+  });
+}
 
 /** Seules ces routes servent le template d’accueil ; le reste = CMS ou page en construction. */
 const PUBLISHED_HOME_FILE = "marketing-agency.html";
@@ -370,92 +392,140 @@ export async function generateMetadata({
 
   if (isPublishedHomePage(pathSegments)) {
     const home = await getHome(locale);
-    return {
+    const firstBannerImage = home?.bannerSlides?.find(
+      (slide) => slide.image && typeof slide.image === "object",
+    )?.image;
+    return siteMeta(locale, pathSegments, {
       title: home?.seoTitle?.trim() || "IGM — Inspection Générale des Mines",
-      description: home?.seoDescription?.trim() || undefined,
-    };
+      description: home?.seoDescription?.trim(),
+      image: tryResolveHeroMediaSrc(firstBannerImage),
+    });
   }
 
   const newsArticleSlug = parseNewsArticleSlug(pathSegments, locale);
   if (newsArticleSlug) {
     const article = await getNewsBySlug(newsArticleSlug, locale);
     if (article) {
-      return {
+      return siteMeta(locale, pathSegments, {
         title: article.seoTitle?.trim() || `${article.title} — IGM`,
-        description: article.seoDescription?.trim() || article.excerpt?.trim() || undefined,
-      };
+        description: article.seoDescription?.trim() || article.excerpt?.trim(),
+        type: "article",
+        publishedTime: article.publishedAt,
+        image: tryResolveHeroMediaSrc(cmsMediaForOg(article.cover)),
+        imageAlt: article.title,
+      });
     }
   }
 
   if (isNewsListingPath(pathSegments, locale)) {
     const m = getMessages(locale).newsListing;
-    return {
+    return siteMeta(locale, pathSegments, {
       title: m.metaTitle,
       description: m.metaDescription,
-    };
+    });
   }
 
   const whoWeAreSection = parseWhoWeAreSection(pathSegments, locale);
   if (whoWeAreSection) {
     const whoWeAre = await getWhoWeArePageContent(locale);
     const meta = getWhoWeAreSectionMeta(whoWeAreSection, whoWeAre, locale);
-    return {
+    const sectionImage =
+      whoWeAreSection === "about"
+        ? whoWeAre?.aboutSection?.image
+        : whoWeAreSection === "history"
+          ? whoWeAre?.historySection?.heroImage
+          : whoWeAre?.missionSection?.image;
+    return siteMeta(locale, pathSegments, {
       title: meta.title,
       description: meta.description,
-    };
+      image: tryResolveHeroMediaSrc(sectionImage),
+    });
   }
 
   const photoAlbumSlug = parsePhotoAlbumSlug(pathSegments, locale);
   if (photoAlbumSlug) {
     const album = await getPhotoAlbumBySlug(photoAlbumSlug, locale);
     if (album) {
-      return {
+      return siteMeta(locale, pathSegments, {
         title: `${album.title} — IGM`,
-        description: album.summary?.trim() || undefined,
-      };
+        description: album.summary?.trim(),
+        image: tryResolveHeroMediaSrc(cmsMediaForOg(album.coverImage)),
+        imageAlt: album.title,
+      });
     }
   }
 
   if (isPhotosListingPath(pathSegments, locale)) {
     const meta = getMessages(locale).mediaGalleryPage.categories.photos;
-    return { title: meta.metaTitle, description: meta.metaDescription };
+    return siteMeta(locale, pathSegments, {
+      title: meta.metaTitle,
+      description: meta.metaDescription,
+    });
   }
 
   const slug = pageSlugFromSegments(pathSegments);
   const page = await getPageContent(slug, locale);
 
   if (page) {
-    return {
+    return siteMeta(locale, pathSegments, {
       title: page.seoTitle?.trim() || `${page.title} — IGM`,
-      description: page.seoDescription?.trim() || page.summary?.trim() || undefined,
-    };
+      description: page.seoDescription?.trim() || page.summary?.trim(),
+      image: tryResolveHeroMediaSrc(cmsMediaForOg(page.hero?.media)),
+      imageAlt: page.title,
+    });
   }
 
   if (findRouteKey(slug, locale) === "report") {
     const m = getMessages(locale).denoncer;
-    return { title: m.metaTitle, description: m.metaDescription };
+    return siteMeta(locale, pathSegments, {
+      title: m.metaTitle,
+      description: m.metaDescription,
+    });
   }
 
   if (findRouteKey(slug, locale) === "map") {
     const m = getMessages(locale).cartography;
-    return { title: m.metaTitle, description: m.metaDescription };
+    return siteMeta(locale, pathSegments, {
+      title: m.metaTitle,
+      description: m.metaDescription,
+    });
   }
 
   if (findRouteKey(slug, locale) === "contact") {
     const contactCms = await getContactPageSettings(locale);
     const content = resolveContactPage(contactCms, locale);
-    return { title: content.seoTitle, description: content.seoDescription };
+    return siteMeta(locale, pathSegments, {
+      title: content.seoTitle,
+      description: content.seoDescription,
+    });
   }
 
   const legislationCategory = parseLegislationCategory(slug, locale);
   if (legislationCategory) {
     const meta = getMessages(locale).legislationPage.categories[legislationCategory];
-    return { title: meta.metaTitle, description: meta.metaDescription };
+    const legislationSettings = await getLegislationSettings(locale);
+    const heroField = {
+      ordinances: "ordinancesHeroImage",
+      laws: "lawsHeroImage",
+      decrees: "decreesHeroImage",
+      decisions: "decisionsHeroImage",
+    } as const;
+    const heroMedia = legislationSettings?.[heroField[legislationCategory]];
+    return siteMeta(locale, pathSegments, {
+      title: meta.metaTitle,
+      description: meta.metaDescription,
+      image: tryResolveHeroMediaSrc(
+        heroMedia && typeof heroMedia === "object" ? heroMedia : null,
+      ),
+    });
   }
 
   if (findRouteKey(slug, locale) === "videos") {
     const meta = getMessages(locale).mediaGalleryPage.categories.videos;
-    return { title: meta.metaTitle, description: meta.metaDescription };
+    return siteMeta(locale, pathSegments, {
+      title: meta.metaTitle,
+      description: meta.metaDescription,
+    });
   }
 
   if (findRouteKey(slug, locale) === "orgChart") {
@@ -466,12 +536,12 @@ export async function generateMetadata({
       (locale === "en"
         ? "Organizational chart of the General Inspectorate of Mines in the DRC."
         : "Organigramme de l'Inspection Générale des Mines en RDC.");
-    return { title, description };
+    return siteMeta(locale, pathSegments, { title, description });
   }
 
-  return {
+  return siteMeta(locale, pathSegments, {
     title: getMessages(locale).underConstruction.metaTitle,
-  };
+  });
 }
 
 export default async function TemplatePage({
