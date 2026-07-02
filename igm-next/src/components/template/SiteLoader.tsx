@@ -24,10 +24,12 @@ export function SiteLoader({ locale }: Props) {
           alt="IGM"
         />
         <div className="igm-loader-typewriter" aria-label={m.ariaLabel}>
-          <div className="line is-typing" />
+          <div className="line is-typing" suppressHydrationWarning />
         </div>
         <div className="igm-loader-progress" aria-label={m.loading}>
-          <span className="value">0%</span>
+          <span className="value" suppressHydrationWarning>
+            0%
+          </span>
         </div>
       </div>
     </div>
