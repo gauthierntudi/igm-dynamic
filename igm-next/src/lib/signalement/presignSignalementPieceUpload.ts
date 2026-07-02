@@ -30,7 +30,7 @@ export type PresignSignalementPieceResult =
       filename: string;
       prefix: string;
       completeToken: string;
-      headers: { "Content-Type": string; "Content-Length": string };
+      headers: { "Content-Type": string };
     }
   | { ok: false; error: string; status: number };
 
@@ -73,11 +73,9 @@ export async function presignSignalementPieceUpload(
         Bucket: bucket,
         Key: fileKey,
         ContentType: input.mimeType,
-        ContentLength: input.filesize,
       }),
       {
         expiresIn: PRESIGN_EXPIRES_SECONDS,
-        signableHeaders: new Set(["content-length"]),
       },
     );
 
@@ -89,7 +87,6 @@ export async function presignSignalementPieceUpload(
       completeToken,
       headers: {
         "Content-Type": input.mimeType,
-        "Content-Length": String(input.filesize),
       },
     };
   } catch (error) {
@@ -113,7 +110,6 @@ export async function completeSignalementPieceUpload(
     return { ok: false, error: "Upload direct indisponible.", status: 503 };
   }
 
-  const { verifySignalementPiecePresignToken } = await import("./signalementPiecePresignToken");
   const token = verifySignalementPiecePresignToken(input.completeToken);
   if (!token) {
     return { ok: false, error: "Jeton d’upload invalide ou expiré.", status: 400 };
@@ -145,10 +141,14 @@ export async function completeSignalementPieceUpload(
         filesize: token.filesize,
         ...(token.prefix ? { prefix: token.prefix } : {}),
       },
-      overrideAccess: true,
-      context: {
-        skipCloudStorage: true,
+      file: {
+        data: Buffer.alloc(0),
+        mimetype: token.mimeType,
+        name: token.filename,
+        size: token.filesize,
+        clientUploadContext: { directS3: true },
       },
+      overrideAccess: true,
     });
 
     return { ok: true, id: created.id };

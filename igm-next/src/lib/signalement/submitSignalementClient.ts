@@ -43,16 +43,7 @@ export function formatSignalementUploadProgressLabel(progress: UploadProgress): 
   return `Envoi du fichier ${progress.fileIndex} / ${progress.fileTotal}`;
 }
 
-const MAX_UPLOAD_ATTEMPTS = 3;
-const RETRY_BASE_DELAY_MS = 800;
-
 type JsonResult = { ok?: boolean; error?: string; message?: string; id?: number };
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
 
 function parseJsonResponse(xhr: XMLHttpRequest): JsonResult {
   try {
@@ -60,35 +51,6 @@ function parseJsonResponse(xhr: XMLHttpRequest): JsonResult {
   } catch {
     return {};
   }
-}
-
-function uploadPieceWithProgress(
-  file: File,
-  onProgress: (percent: number) => void,
-): Promise<number> {
-  return uploadSignalementPieceWithProgress(file, onProgress);
-}
-
-async function uploadPieceWithRetry(
-  file: File,
-  onProgress: (percent: number) => void,
-  onAttempt: (attempt: number, maxAttempts: number) => void,
-): Promise<number> {
-  let lastError: Error | null = null;
-
-  for (let attempt = 1; attempt <= MAX_UPLOAD_ATTEMPTS; attempt += 1) {
-    onAttempt(attempt, MAX_UPLOAD_ATTEMPTS);
-    try {
-      return await uploadPieceWithProgress(file, onProgress);
-    } catch (error) {
-      lastError = error instanceof Error ? error : new Error("Échec de l’envoi du fichier.");
-      if (attempt < MAX_UPLOAD_ATTEMPTS) {
-        await sleep(RETRY_BASE_DELAY_MS * attempt);
-      }
-    }
-  }
-
-  throw lastError ?? new Error("Échec de l’envoi du fichier.");
 }
 
 function submitMetadataWithProgress(
@@ -179,7 +141,7 @@ export async function submitSignalementWithProgress(
   for (let index = 0; index < preparedFiles.length; index += 1) {
     const file = preparedFiles[index]!;
 
-    const id = await uploadPieceWithRetry(
+    const id = await uploadSignalementPieceWithProgress(
       file,
       (filePercent) => {
         onProgress({

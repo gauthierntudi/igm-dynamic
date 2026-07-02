@@ -1,6 +1,18 @@
 import { withDeployedBase } from "@/lib/deployBasePath";
 import { isSignalementS3DirectUploadEnabledClient } from "@/lib/signalement/signalementS3DirectUpload";
 
+const MAX_ATTEMPTS = 3;
+const RETRY_BASE_DELAY_MS = 800;
+
+/** En-têtes interdits manuellement par XMLHttpRequest (le navigateur les gère). */
+const FORBIDDEN_REQUEST_HEADERS = new Set([
+  "content-length",
+  "connection",
+  "host",
+  "origin",
+  "referer",
+]);
+
 type PresignResponse = {
   ok?: boolean;
   error?: string;
@@ -14,6 +26,12 @@ type CompleteResponse = {
   error?: string;
   id?: number;
 };
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
 
 function parseJson<T>(xhr: XMLHttpRequest): T {
   try {
@@ -58,6 +76,9 @@ function putFileToS3WithProgress(
     xhr.responseType = "text";
 
     Object.entries(headers).forEach(([key, value]) => {
+      if (FORBIDDEN_REQUEST_HEADERS.has(key.toLowerCase())) {
+        return;
+      }
       xhr.setRequestHeader(key, value);
     });
 
@@ -84,50 +105,116 @@ function putFileToS3WithProgress(
 export async function uploadSignalementPieceWithProgress(
   file: File,
   onProgress: (percent: number) => void,
+  onAttempt?: (attempt: number, maxAttempts: number) => void,
 ): Promise<number> {
   if (!isSignalementS3DirectUploadEnabledClient()) {
-    return uploadSignalementPieceViaServer(file, onProgress);
+    return uploadWithRetry(
+      () => uploadSignalementPieceViaServer(file, onProgress),
+      onAttempt,
+    );
   }
 
   try {
-    return await uploadSignalementPieceViaS3Presign(file, onProgress);
+    return await uploadSignalementPieceViaS3Presign(file, onProgress, onAttempt);
   } catch (error) {
     if (error instanceof Error && error.message.includes("indisponible")) {
-      return uploadSignalementPieceViaServer(file, onProgress);
+      return uploadWithRetry(
+        () => uploadSignalementPieceViaServer(file, onProgress),
+        onAttempt,
+      );
     }
     throw error;
   }
 }
 
+async function uploadWithRetry(
+  upload: () => Promise<number>,
+  onAttempt?: (attempt: number, maxAttempts: number) => void,
+): Promise<number> {
+  let lastError: Error | null = null;
+
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
+    onAttempt?.(attempt, MAX_ATTEMPTS);
+    try {
+      return await upload();
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error("Échec de l’envoi du fichier.");
+      if (attempt < MAX_ATTEMPTS) {
+        await sleep(RETRY_BASE_DELAY_MS * attempt);
+      }
+    }
+  }
+
+  throw lastError ?? new Error("Échec de l’envoi du fichier.");
+}
+
 async function uploadSignalementPieceViaS3Presign(
   file: File,
   onProgress: (percent: number) => void,
+  onAttempt?: (attempt: number, maxAttempts: number) => void,
 ): Promise<number> {
-  const presign = await postJson<PresignResponse>(
-    withDeployedBase("/api/signalement/piece/presign"),
-    {
-      filename: file.name,
-      mimeType: file.type || "application/octet-stream",
-      filesize: file.size,
-    },
-  );
+  let presign: PresignResponse | null = null;
+  let lastPutError: Error | null = null;
 
-  if (!presign.ok || !presign.uploadUrl || !presign.completeToken || !presign.headers) {
-    throw new Error(presign.error || "Impossible de préparer l’envoi.");
+  for (let putAttempt = 1; putAttempt <= MAX_ATTEMPTS; putAttempt += 1) {
+    onAttempt?.(putAttempt, MAX_ATTEMPTS);
+    try {
+      presign = await postJson<PresignResponse>(
+        withDeployedBase("/api/signalement/piece/presign"),
+        {
+          filename: file.name,
+          mimeType: file.type || "application/octet-stream",
+          filesize: file.size,
+        },
+      );
+
+      if (!presign.ok || !presign.uploadUrl || !presign.completeToken || !presign.headers) {
+        throw new Error(presign.error || "Impossible de préparer l’envoi.");
+      }
+
+      await putFileToS3WithProgress(presign.uploadUrl, file, presign.headers, onProgress);
+      lastPutError = null;
+      break;
+    } catch (error) {
+      lastPutError = error instanceof Error ? error : new Error("Échec de l’envoi du fichier.");
+      presign = null;
+      if (putAttempt < MAX_ATTEMPTS) {
+        await sleep(RETRY_BASE_DELAY_MS * putAttempt);
+      }
+    }
   }
 
-  await putFileToS3WithProgress(presign.uploadUrl, file, presign.headers, onProgress);
-
-  const complete = await postJson<CompleteResponse>(
-    withDeployedBase("/api/signalement/piece/complete"),
-    { completeToken: presign.completeToken },
-  );
-
-  if (!complete.ok || typeof complete.id !== "number") {
-    throw new Error(complete.error || "Échec de l’enregistrement du fichier.");
+  if (lastPutError || !presign?.completeToken) {
+    throw lastPutError ?? new Error("Échec de l’envoi du fichier.");
   }
 
-  return complete.id;
+  let lastCompleteError: Error | null = null;
+  for (let completeAttempt = 1; completeAttempt <= MAX_ATTEMPTS; completeAttempt += 1) {
+    if (completeAttempt > 1) {
+      onAttempt?.(completeAttempt, MAX_ATTEMPTS);
+    }
+
+    try {
+      const complete = await postJson<CompleteResponse>(
+        withDeployedBase("/api/signalement/piece/complete"),
+        { completeToken: presign.completeToken },
+      );
+
+      if (!complete.ok || typeof complete.id !== "number") {
+        throw new Error(complete.error || "Échec de l’enregistrement du fichier.");
+      }
+
+      return complete.id;
+    } catch (error) {
+      lastCompleteError =
+        error instanceof Error ? error : new Error("Échec de l’enregistrement du fichier.");
+      if (completeAttempt < MAX_ATTEMPTS) {
+        await sleep(RETRY_BASE_DELAY_MS * completeAttempt);
+      }
+    }
+  }
+
+  throw lastCompleteError ?? new Error("Échec de l’enregistrement du fichier.");
 }
 
 function uploadSignalementPieceViaServer(
