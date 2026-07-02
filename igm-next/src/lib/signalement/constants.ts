@@ -51,11 +51,24 @@ export function isTypeInfraction(value: string): value is TypeInfraction {
   return (TYPES_INFRACTION as readonly string[]).includes(value);
 }
 
+export function isSignalementVideoMime(mime: string, filename: string): boolean {
+  const normalized = mime.toLowerCase();
+  if (normalized.startsWith("video/")) return true;
+  return /\.(mp4|mov|m4v|avi|mkv)$/i.test(filename);
+}
+
+export function isSignalementAudioMime(mime: string, filename: string): boolean {
+  if (isSignalementVideoMime(mime, filename)) return false;
+  const normalized = mime.toLowerCase();
+  if (normalized.startsWith("audio/")) return true;
+  return /\.(webm|mp3|wav|m4a|ogg)$/i.test(filename);
+}
+
 export function isAllowedSignalementMime(mime: string, filename: string): boolean {
   const normalized = mime.toLowerCase();
   if (normalized === "image/jpeg" || normalized === "image/png") return true;
-  if (normalized.startsWith("audio/")) return true;
-  if (/\.(webm|mp3|wav|m4a|ogg)$/i.test(filename)) return true;
+  if (isSignalementAudioMime(mime, filename)) return true;
+  if (isSignalementVideoMime(mime, filename)) return true;
   return false;
 }
 

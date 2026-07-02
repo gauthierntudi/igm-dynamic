@@ -9,6 +9,7 @@ import {
 } from "@/components/security/TurnstileWidget";
 import { isTurnstileClientEnabled, turnstileSiteKey } from "@/lib/security/turnstileConfig";
 import { TURNSTILE_FORM_FIELD } from "@/lib/security/turnstile";
+import { isAllowedSignalementMime, isSignalementAudioMime, isSignalementVideoMime } from "@/lib/signalement/constants";
 
 import styles from "./SignalementForm.module.css";
 
@@ -16,6 +17,7 @@ const MAX_FILE_BYTES = 5 * 1024 * 1024;
 const MAX_FILES = 12;
 const ACCEPT_IMAGES = "image/jpeg,image/png";
 const ACCEPT_AUDIO = "audio/*,.webm,.mp3,.wav,.m4a,.ogg";
+const ACCEPT_VIDEO = "video/*,.mp4,.mov,.m4v,.avi,.mkv,.webm";
 
 const PROVINCES_RDC = [
   "",
@@ -149,6 +151,7 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
   const formId = useId();
   const photoInputRef = useRef<HTMLInputElement>(null);
   const audioPickRef = useRef<HTMLInputElement>(null);
+  const videoPickRef = useRef<HTMLInputElement>(null);
   const turnstileRef = useRef<TurnstileWidgetHandle>(null);
   const turnstileEnabled = isTurnstileClientEnabled();
   const turnstileSiteKeyValue = turnstileSiteKey();
@@ -228,6 +231,11 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
         for (const f of list) {
           if (f.size > MAX_FILE_BYTES) {
             err = `Fichier trop lourd (max ${formatBytes(MAX_FILE_BYTES)}).`;
+            break;
+          }
+          const mime = f.type || "application/octet-stream";
+          if (!isAllowedSignalementMime(mime, f.name)) {
+            err = "Type de fichier non autorisé (photos, audio ou vidéo).";
             break;
           }
         }
@@ -1037,7 +1045,7 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
             <span className={styles.optional}>(optionnel)</span>
           </h2>
           <p className={styles.sectionHint}>
-            JPG ou PNG, audio importé ou enregistrement micro. Aperçu avant envoi.
+            Photos JPG/PNG, audio (import ou micro) ou vidéos. Aperçu avant envoi.
           </p>
           <p className={styles.limits}>
             <strong>{formatBytes(MAX_FILE_BYTES)}</strong> / fichier · <strong>{MAX_FILES}</strong> fichiers max.
@@ -1095,6 +1103,31 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
                 e.target.value = "";
               }}
             />
+            <button
+              type="button"
+              className={styles.attachmentAction}
+              onClick={() => videoPickRef.current?.click()}
+            >
+              <span className={styles.attachmentActionIcon} aria-hidden>
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="6" width="18" height="12" rx="2" ry="2" />
+                  <path d="M10 9.5v5l4.5-2.5L10 9.5z" fill="currentColor" stroke="none" />
+                </svg>
+              </span>
+              <span className={styles.attachmentActionLabel}>Vidéo fichier</span>
+              <span className={styles.attachmentActionHint}>MP4 · MOV…</span>
+            </button>
+            <input
+              ref={videoPickRef}
+              type="file"
+              accept={ACCEPT_VIDEO}
+              multiple
+              hidden
+              onChange={(e) => {
+                if (e.target.files?.length) addAttachments(e.target.files);
+                e.target.value = "";
+              }}
+            />
             {recordingState === "recording" ? (
               <button
                 type="button"
@@ -1128,7 +1161,8 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
               {attachments.map((a) => {
                 void previewAudioUiTick;
                 const isImg = a.file.type.startsWith("image/");
-                const isAud = a.file.type.startsWith("audio/") || /\.webm$/i.test(a.file.name);
+                const isVid = isSignalementVideoMime(a.file.type, a.file.name);
+                const isAud = isSignalementAudioMime(a.file.type, a.file.name);
                 const audioNode = isAud ? previewAudioRefs.current[a.id] : null;
                 const audioDur =
                   audioNode && Number.isFinite(audioNode.duration) && audioNode.duration > 0
@@ -1144,6 +1178,15 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
                     <div className={styles.previewMedia}>
                       {isImg ? (
                         <img src={a.previewUrl} alt={a.file.name} />
+                      ) : isVid ? (
+                        <video
+                          src={a.previewUrl}
+                          controls
+                          playsInline
+                          preload="metadata"
+                          className={styles.previewVideo}
+                          aria-label={`Aperçu vidéo ${a.file.name}`}
+                        />
                       ) : isAud ? (
                         <>
                           <audio

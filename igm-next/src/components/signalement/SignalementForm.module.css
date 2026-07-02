@@ -160,6 +160,10 @@
 .turnstileWrap {
   margin-top: 16px;
   min-height: 65px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Navigation étapes — dans la carte (séparateur type ui .divider) */
@@ -717,11 +721,16 @@
   flex-shrink: 0;
 }
 
-.previewItem img {
+.previewItem img,
+.previewItem video {
   width: 100%;
   height: 64px;
   object-fit: cover;
   display: block;
+}
+
+.previewVideo {
+  background: #111;
 }
 
 /* Lecteur audio hors écran (play/pause via UI custom) */
