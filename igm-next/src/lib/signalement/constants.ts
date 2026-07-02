@@ -1,7 +1,7 @@
 export const MAX_SIGNALEMENT_FILE_BYTES = 5 * 1024 * 1024;
-export const MAX_SIGNALEMENT_VIDEO_FILE_BYTES = 20 * 1024 * 1024;
+export const MAX_SIGNALEMENT_VIDEO_FILE_BYTES = 50 * 1024 * 1024;
 export const MAX_SIGNALEMENT_FILES = 12;
-export const MAX_SIGNALEMENT_TOTAL_BYTES = 50 * 1024 * 1024;
+export const MAX_SIGNALEMENT_TOTAL_BYTES = 100 * 1024 * 1024;
 /** Fenêtre pendant laquelle une pièce uploadée peut être liée à un signalement. */
 export const SIGNALEMENT_ORPHAN_MAX_AGE_MS = 60 * 60 * 1000;
 

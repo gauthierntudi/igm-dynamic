@@ -151,8 +151,8 @@ async function prepareUploadFiles(files: File[]): Promise<File[]> {
   for (const file of prepared) {
     const maxBytes = maxSignalementFileBytes(file.type, file.name);
     if (file.size > maxBytes) {
-      const limitLabel = maxBytes > 5 * 1024 * 1024 ? "20 Mo" : "5 Mo";
-      throw new Error(`Après compression, un fichier dépasse ${limitLabel}.`);
+      const limitMb = Math.round(maxBytes / (1024 * 1024));
+      throw new Error(`Après compression, un fichier dépasse ${limitMb} Mo.`);
     }
     totalSize += file.size;
   }

@@ -1,8 +1,4 @@
-import {
-  isAllowedSignalementMime,
-  MAX_SIGNALEMENT_FILE_BYTES,
-  maxSignalementFileBytes,
-} from "./constants";
+import { isAllowedSignalementMime, maxSignalementFileBytes } from "./constants";
 
 export type ValidateSignalementFileResult =
   | { ok: true }
@@ -19,8 +15,8 @@ export function validateSignalementFile(file: FileLike): ValidateSignalementFile
   const maxBytes = maxSignalementFileBytes(mime, file.name);
 
   if (file.size > maxBytes) {
-    const limitLabel = maxBytes > MAX_SIGNALEMENT_FILE_BYTES ? "20 Mo" : "5 Mo";
-    return { ok: false, error: `Fichier trop lourd (max ${limitLabel}).` };
+    const limitMb = Math.round(maxBytes / (1024 * 1024));
+    return { ok: false, error: `Fichier trop lourd (max ${limitMb} Mo).` };
   }
 
   if (!isAllowedSignalementMime(mime, file.name)) {
