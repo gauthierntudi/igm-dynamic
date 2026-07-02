@@ -1,7 +1,7 @@
 /**
  * Patch de @payloadcms/next/dist/layouts/Root/index.js
  * Ajoute suppressHydrationWarning sur <body> (extensions navigateur ex. Grammarly).
- * Routé via alias webpack dans next.config.mjs — revoir à la mise à jour Payload.
+ * Alias bundler : nextPayloadPatches.mjs (webpack + Turbopack) — revoir à la mise à jour Payload.
  */
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { rtlLanguages } from "@payloadcms/translations";

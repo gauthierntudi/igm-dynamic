@@ -10,6 +10,7 @@ import {
 
 import { useSignalementModal } from "@/components/signalement/SignalementModalProvider";
 import { useLocale } from "@/components/i18n/LocaleProvider";
+import { DEFAULT_LOCALE } from "@/i18n/locales";
 import { hrefForRoute } from "@/i18n/paths";
 
 function PrimaryButtonContent({ label }: { label: string }) {
@@ -56,13 +57,13 @@ function DenoncerOpenTriggerImpl({ variant, className, style, children }: Props)
   const { locale, messages } = useLocale();
   const { open } = useSignalementModal();
   const reportHref = hrefForRoute("report", locale);
-  const onDenoncerPage = pathname === reportHref || pathname === "/denoncer";
+  const onReportPage = pathname === reportHref;
   const label = messages.common.report;
 
-  const href = onDenoncerPage ? "#igm-signalement" : reportHref;
+  const href = onReportPage ? "#igm-signalement" : reportHref;
 
   const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
-    if (onDenoncerPage) return;
+    if (onReportPage) return;
     e.preventDefault();
     open();
   };
@@ -83,14 +84,16 @@ function DenoncerOpenTriggerImpl({ variant, className, style, children }: Props)
 }
 
 function DenoncerOpenTriggerFallback({ variant, className, style, children }: Props) {
+  const reportHref = hrefForRoute("report", DEFAULT_LOCALE);
+
   if (variant === "primary") {
     return (
-      <a href="/denoncer" className={className} style={style}>
+      <a href={reportHref} className={className} style={style}>
         {children ?? <PrimaryButtonContent label="Dénoncer" />}
       </a>
     );
   }
-  return <a href="/denoncer">{children ?? "Dénoncer"}</a>;
+  return <a href={reportHref}>{children ?? "Dénoncer"}</a>;
 }
 
 export function DenoncerOpenTrigger(props: Props) {

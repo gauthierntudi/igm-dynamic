@@ -5,7 +5,7 @@ import { getMessages } from "@/i18n/messages";
 import type { SupportedLocale } from "@/i18n/locales";
 import { hrefForRoute } from "@/i18n/paths";
 
-import styles from "@/app/(site)/denoncer/denoncer.module.css";
+import styles from "@/components/signalement/signalement-page.module.css";
 
 type Props = {
   locale: SupportedLocale;

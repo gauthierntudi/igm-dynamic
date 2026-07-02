@@ -19,7 +19,6 @@ const ROUTE_NAV_LABEL: Record<PageHeroRouteKey, keyof ReturnType<typeof getMessa
   contact: "contact",
   photos: "photos",
   videos: "videos",
-  audios: "audios",
 };
 
 type Props = {

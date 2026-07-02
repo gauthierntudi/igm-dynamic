@@ -4,9 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev --webpack",
-    "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build --webpack",
-    "build:cpanel": "BASE_PATH=/igm cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build --webpack",
+    "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
+    "dev:webpack": "cross-env NODE_OPTIONS=--no-deprecation next dev --webpack",
+    "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
+    "build:webpack": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build --webpack",
+    "build:cpanel": "BASE_PATH=/igm cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
+    "build:cpanel:webpack": "BASE_PATH=/igm cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build --webpack",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "start:cpanel": "node server.js",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
@@ -52,7 +55,9 @@
     "seed:pages:force": "npx tsx --env-file=.env.local scripts/seed-pages.ts --force",
     "invalidate:media-cdn": "node --env-file=.env.local scripts/invalidate-media-cdn.mjs",
     "media:version-filename": "npx tsx --env-file=.env.local scripts/version-media-filename.ts",
-    "media:generate-video-posters": "npx tsx --env-file=.env.local scripts/generate-video-posters.ts"
+    "media:generate-video-posters": "npx tsx --env-file=.env.local scripts/generate-video-posters.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "engines": {
     "node": ">=20.9.0"
@@ -86,7 +91,8 @@
   },
   "devDependencies": {
     "@types/nodemailer": "^8.0.1",
-    "@types/pdfkit": "^0.17.6"
+    "@types/pdfkit": "^0.17.6",
+    "vitest": "^4.1.9"
   },
   "overrides": {
     "pdfjs-dist": "5.3.93"

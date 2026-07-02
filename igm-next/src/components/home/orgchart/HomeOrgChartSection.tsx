@@ -1,7 +1,6 @@
 import type { SupportedLocale } from "@/i18n/locales";
 import { hrefForRoute, localizeHref } from "@/i18n/paths";
-import { isHomeOrgChartUnitsVisible } from "@/lib/featureFlags";
-import type { CmsHomeOrgChartSection, CmsHomeOrgChartUnit } from "@/lib/cms/home/types";
+import type { CmsHomeOrgChartSection } from "@/lib/cms/home/types";
 
 import { PrimaryBtn4Content } from "../banner/PrimaryBtn4Content";
 import { OrgChartDecreeDiagram } from "./OrgChartDecreeDiagram";
@@ -9,41 +8,13 @@ import {
   resolveOrgChartImageAlt,
   resolveOrgChartImageSrc,
 } from "./resolveOrgChartMedia";
-import { TeamCardDivider, TeamSectionArrow } from "./TeamSectionArrow";
+import { TeamSectionArrow } from "./TeamSectionArrow";
 
 type Props = {
   orgChartSection?: CmsHomeOrgChartSection | null;
   locale: SupportedLocale;
   variant?: "home" | "page";
 };
-
-type ResolvedUnit = {
-  id: string;
-  name: string;
-  role: string;
-  imageSrc: string | null;
-  imageAlt: string;
-};
-
-function resolveUnits(units: CmsHomeOrgChartUnit[] | null | undefined): ResolvedUnit[] {
-  if (!units?.length) return [];
-
-  return units
-    .map((unit, index) => {
-      const name = unit.name?.trim();
-      const role = unit.role?.trim();
-      if (!name || !role) return null;
-
-      return {
-        id: unit.id ?? `org-unit-${index}`,
-        name,
-        role,
-        imageSrc: resolveOrgChartImageSrc(unit.image),
-        imageAlt: resolveOrgChartImageAlt(unit.image, name),
-      };
-    })
-    .filter((unit): unit is ResolvedUnit => unit !== null);
-}
 
 export function hasOrgChartContent(
   orgChartSection: CmsHomeOrgChartSection | null | undefined,
@@ -56,37 +27,13 @@ export function hasOrgChartContent(
       orgChartSection.titleSuffix?.trim() ||
       orgChartSection.lead?.trim(),
   );
-  const hasUnits =
-    isHomeOrgChartUnitsVisible() &&
-    orgChartSection.units?.some((unit) => unit.name?.trim() && unit.role?.trim());
   const hasDiagram = Boolean(resolveOrgChartImageSrc(orgChartSection.diagram));
   const hasCta = Boolean(
     orgChartSection.ctaSidebarTitle?.trim() ||
       (orgChartSection.ctaLabel?.trim() && orgChartSection.ctaHref?.trim()),
   );
 
-  return Boolean(hasHeader || hasUnits || hasDiagram || hasCta);
-}
-
-function OrgChartUnitCard({ unit }: { unit: ResolvedUnit }) {
-  return (
-    <div className="team-card igm-orgchart-card">
-      <div className="team-img">
-        {unit.imageSrc ? (
-          <img src={unit.imageSrc} alt={unit.imageAlt} loading="lazy" decoding="async" />
-        ) : (
-          <div className="igm-orgchart-placeholder" aria-hidden>
-            <span>{unit.name.charAt(0)}</span>
-          </div>
-        )}
-      </div>
-      <div className="team-content">
-        <h5>{unit.name}</h5>
-        <span>{unit.role}</span>
-        <TeamCardDivider />
-      </div>
-    </div>
-  );
+  return Boolean(hasHeader || hasDiagram || hasCta);
 }
 
 export function HomeOrgChartSection({
@@ -98,12 +45,10 @@ export function HomeOrgChartSection({
 
   if (!isPage && !hasOrgChartContent(orgChartSection)) return null;
 
-  const showUnits = isHomeOrgChartUnitsVisible();
   const titlePrefix = orgChartSection?.titlePrefix?.trim();
   const titleHighlight = orgChartSection?.titleHighlight?.trim();
   const titleSuffix = orgChartSection?.titleSuffix?.trim();
   const lead = orgChartSection?.lead?.trim();
-  const units = showUnits ? resolveUnits(orgChartSection?.units) : [];
   const diagramSrc = resolveOrgChartImageSrc(orgChartSection?.diagram);
   const diagramAlt = resolveOrgChartImageAlt(
     orgChartSection?.diagram,
@@ -203,28 +148,6 @@ export function HomeOrgChartSection({
           </div>
         )}
 
-        {showUnits && units.length > 0 ? (
-          <>
-            <div className="row mb-50 mt-50">
-              <div className="col-lg-12">
-                <div className="swiper home4-team-slider">
-                  <div className="swiper-wrapper">
-                    {units.map((unit) => (
-                      <div key={unit.id} className="swiper-slide">
-                        <OrgChartUnitCard unit={unit} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-lg-12 d-flex justify-content-center">
-                <div className="swiper-pagination1" />
-              </div>
-            </div>
-          </>
-        ) : null}
       </div>
     </div>
   );

@@ -939,7 +939,6 @@ export interface SiteSetting {
               | '/decisions'
               | '/photos'
               | '/videos'
-              | '/audios'
               | '/contact'
               | '__custom__'
             )
@@ -980,7 +979,6 @@ export interface SiteSetting {
                     | '/decisions'
                     | '/photos'
                     | '/videos'
-                    | '/audios'
                     | '/contact'
                     | '__custom__'
                   )
@@ -1021,7 +1019,6 @@ export interface SiteSetting {
                           | '/decisions'
                           | '/photos'
                           | '/videos'
-                          | '/audios'
                           | '/contact'
                           | '__custom__'
                         )
@@ -1075,7 +1072,6 @@ export interface SiteSetting {
                     | '/decisions'
                     | '/photos'
                     | '/videos'
-                    | '/audios'
                     | '/contact'
                     | '__custom__'
                   )
@@ -1126,7 +1122,6 @@ export interface SiteSetting {
               | '/decisions'
               | '/photos'
               | '/videos'
-              | '/audios'
               | '/contact'
               | '__custom__'
             )
@@ -1196,7 +1191,6 @@ export interface Home {
                 | '/decisions'
                 | '/photos'
                 | '/videos'
-                | '/audios'
                 | '/contact'
                 | '__custom__'
               )
@@ -1231,7 +1225,6 @@ export interface Home {
                 | '/decisions'
                 | '/photos'
                 | '/videos'
-                | '/audios'
                 | '/contact'
                 | '__custom__'
               )
@@ -1535,7 +1528,6 @@ export interface WhoWeAre {
             | '/decisions'
             | '/photos'
             | '/videos'
-            | '/audios'
             | '/contact'
             | '__custom__'
           )
@@ -1574,7 +1566,6 @@ export interface WhoWeAre {
             | '/decisions'
             | '/photos'
             | '/videos'
-            | '/audios'
             | '/contact'
             | '__custom__'
           )
@@ -1674,10 +1665,6 @@ export interface PageHero {
    * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
    */
   videosHeroImage?: (number | null) | Media;
-  /**
-   * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
-   */
-  audiosHeroImage?: (number | null) | Media;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2112,7 +2099,6 @@ export interface PageHeroesSelect<T extends boolean = true> {
   contactHeroImage?: T;
   photosHeroImage?: T;
   videosHeroImage?: T;
-  audiosHeroImage?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

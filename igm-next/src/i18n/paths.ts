@@ -20,7 +20,6 @@ export const ROUTE_KEYS = {
   decisions: { fr: "decisions", en: "decisions" },
   photos: { fr: "photos", en: "photos" },
   videos: { fr: "videos", en: "videos" },
-  audios: { fr: "audios", en: "audios" },
   contact: { fr: "contact", en: "contact" },
 } as const;
 

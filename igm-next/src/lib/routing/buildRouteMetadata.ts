@@ -1,0 +1,1 @@
+export { buildRouteMetadata } from "./handlers";

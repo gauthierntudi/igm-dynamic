@@ -18,7 +18,6 @@ export const SITE_NAV_LINKS = [
   { label: "Législation — Décisions", value: "/decisions" },
   { label: "Médiathèque — Photos", value: "/photos" },
   { label: "Médiathèque — Vidéos", value: "/videos" },
-  { label: "Médiathèque — Audios", value: "/audios" },
   { label: "Contact", value: "/contact" },
 ] as const;
 

@@ -157,6 +157,11 @@
   }
 }
 
+.turnstileWrap {
+  margin-top: 16px;
+  min-height: 65px;
+}
+
 /* Navigation étapes — dans la carte (séparateur type ui .divider) */
 .stepNavInCard {
   margin-top: 20px;

@@ -3,17 +3,21 @@
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
+import { useLocale } from "@/components/i18n/LocaleProvider";
 import { useSignalementModal } from "@/components/signalement/SignalementModalProvider";
+import { hrefForRoute } from "@/i18n/paths";
 
 const ATTR = "data-igm-open-signalement";
 
 /**
- * Ouvre la modale signalement pour les liens HTML statiques (ex. marketing-agency.html)
- * portant {@link ATTR}, avec repli sur navigation normale (Ctrl-clic, etc.).
+ * Ouvre la modale signalement pour les liens portant {@link ATTR},
+ * avec repli sur navigation normale (Ctrl-clic, etc.).
  */
 export default function SignalementAnchorBridge() {
   const pathname = usePathname();
+  const { locale } = useLocale();
   const { open } = useSignalementModal();
+  const reportHref = hrefForRoute("report", locale);
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
@@ -23,7 +27,7 @@ export default function SignalementAnchorBridge() {
       const el = (e.target as HTMLElement | null)?.closest(`a[${ATTR}]`);
       if (!el || !(el instanceof HTMLAnchorElement)) return;
 
-      if (pathname === "/denoncer") {
+      if (pathname === reportHref) {
         e.preventDefault();
         document.getElementById("igm-signalement")?.scrollIntoView({
           behavior: "smooth",
@@ -38,7 +42,7 @@ export default function SignalementAnchorBridge() {
 
     document.addEventListener("click", onClick);
     return () => document.removeEventListener("click", onClick);
-  }, [pathname, open]);
+  }, [pathname, open, reportHref]);
 
   return null;
 }

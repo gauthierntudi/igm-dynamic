@@ -5,6 +5,13 @@ import { submitSignalement } from "@/lib/signalement/submitSignalement";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
+function clientIpFromRequest(request: Request): string | undefined {
+  const cf = request.headers.get("cf-connecting-ip")?.trim();
+  if (cf) return cf;
+  const forwarded = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  return forwarded || undefined;
+}
+
 export async function POST(request: Request) {
   const contentType = request.headers.get("content-type") || "";
   if (!contentType.includes("multipart/form-data")) {
@@ -24,7 +31,9 @@ export async function POST(request: Request) {
     );
   }
 
-  const result = await submitSignalement(formData);
+  const result = await submitSignalement(formData, {
+    remoteIp: clientIpFromRequest(request),
+  });
 
   if (!result.ok) {
     return NextResponse.json(

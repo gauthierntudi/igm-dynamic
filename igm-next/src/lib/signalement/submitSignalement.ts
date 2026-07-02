@@ -1,6 +1,7 @@
 import type { File as PayloadUploadFile } from "payload";
 
 import { getPayloadClient } from "@/lib/cms/payload";
+import { TURNSTILE_FORM_FIELD, verifyTurnstileToken } from "@/lib/security/turnstile";
 
 import {
   buildSignalementReference,
@@ -37,7 +38,16 @@ async function fileToPayloadUpload(file: File): Promise<PayloadUploadFile> {
 
 export async function submitSignalement(
   formData: FormData,
+  options: { remoteIp?: string | null } = {},
 ): Promise<SubmitSignalementResult> {
+  const captcha = await verifyTurnstileToken(
+    String(formData.get(TURNSTILE_FORM_FIELD) ?? ""),
+    options.remoteIp,
+  );
+  if (!captcha.ok) {
+    return { ok: false, error: captcha.error, status: 400 };
+  }
+
   const description = String(formData.get("description") ?? "").trim();
   if (!description) {
     return { ok: false, error: "Description obligatoire.", status: 400 };

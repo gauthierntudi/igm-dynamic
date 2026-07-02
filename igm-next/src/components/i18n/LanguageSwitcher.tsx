@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import { withDeployedBase } from "@/lib/deployBasePath";
+import { LOCALE_COOKIE_MAX_AGE, LOCALE_COOKIE_NAME, localeCookiePath } from "@/lib/i18n/localeCookie";
 import { SUPPORTED_LOCALES, type SupportedLocale } from "@/i18n/locales";
 import { switchLocaleHref } from "@/i18n/paths";
 
@@ -10,6 +11,15 @@ const SHORT_LABELS: Record<SupportedLocale, string> = {
   fr: "FR",
   en: "EN",
 };
+
+function setLocaleCookie(locale: SupportedLocale) {
+  const basePath = localeCookiePath(
+    typeof process.env.NEXT_PUBLIC_BASE_PATH === "string"
+      ? process.env.NEXT_PUBLIC_BASE_PATH
+      : "",
+  );
+  document.cookie = `${LOCALE_COOKIE_NAME}=${locale}; path=${basePath}; max-age=${LOCALE_COOKIE_MAX_AGE}; samesite=lax`;
+}
 
 function defaultHrefByLocale(pathname: string): Record<SupportedLocale, string> {
   return Object.fromEntries(
@@ -63,6 +73,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
               className="igm-lang-switch-link"
               hrefLang={code}
               lang={code}
+              onClick={() => setLocaleCookie(code)}
             >
               {SHORT_LABELS[code]}
             </a>

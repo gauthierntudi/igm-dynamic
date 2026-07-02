@@ -10,8 +10,3 @@ export function envFlag(name: string, defaultValue: boolean): boolean {
 export function isHomeStatsSectionVisible(): boolean {
   return envFlag("HOME_STATS_SECTION_VISIBLE", false);
 }
-
-/** Carrousel de cartes sous l’organigramme (désactivé — mélange personnes / départements). */
-export function isHomeOrgChartUnitsVisible(): boolean {
-  return envFlag("HOME_ORG_CHART_UNITS_VISIBLE", false);
-}

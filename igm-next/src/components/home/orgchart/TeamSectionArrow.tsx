@@ -5,11 +5,3 @@ export function TeamSectionArrow() {
     </svg>
   );
 }
-
-export function TeamCardDivider() {
-  return (
-    <svg className="divider" height="6" viewBox="0 0 312 6" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-      <path d="M5 2.5L0 0.113249V5.88675L5 3.5V2.5ZM307 3.5L312 5.88675V0.113249L307 2.5V3.5ZM4.5 3.5H307.5V2.5H4.5V3.5Z" />
-    </svg>
-  );
-}

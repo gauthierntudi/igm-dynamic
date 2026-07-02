@@ -57,7 +57,6 @@ export const MAIN_NAV: NavItem[] = [
     items: [
       { kind: "route", routeKey: "photos", labelKey: "photos" },
       { kind: "route", routeKey: "videos", labelKey: "videos" },
-      { kind: "route", routeKey: "audios", labelKey: "audios" },
     ],
   },
   {
@@ -82,7 +81,6 @@ export const MAIN_NAV: NavItem[] = [
         items: [
           { kind: "route", routeKey: "photos", labelKey: "photos" },
           { kind: "route", routeKey: "videos", labelKey: "videos" },
-          { kind: "route", routeKey: "audios", labelKey: "audios" },
         ],
       },
       { kind: "route", routeKey: "contact", labelKey: "contact" },

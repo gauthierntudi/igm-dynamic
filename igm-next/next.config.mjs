@@ -4,8 +4,15 @@ import { fileURLToPath } from "node:url";
 
 import { withPayload } from "@payloadcms/next/withPayload";
 
+import {
+  createPayloadPatchPaths,
+  turbopackPayloadAliases,
+  webpackPayloadAliases,
+} from "./nextPayloadPatches.mjs";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const payloadPatchPaths = createPayloadPatchPaths(__dirname);
 
 function deployedBasePathFromEnv() {
   const raw = process.env.BASE_PATH?.trim();
@@ -51,6 +58,7 @@ const nextConfig = {
       },
     ],
   },
+  // Secours si un patch Payload casse sous Turbopack : npm run dev:webpack / build:webpack
   webpack: (webpackConfig, { isServer }) => {
     webpackConfig.resolve.extensionAlias = {
       ".cjs": [".cts", ".cjs"],
@@ -59,25 +67,13 @@ const nextConfig = {
     };
     webpackConfig.resolve.alias = {
       ...webpackConfig.resolve.alias,
-      canvas: false,
-      "@payloadcms/ui/dist/fields/Upload/HasOne/index.js": path.resolve(
-        __dirname,
-        "src/components/admin/MediaUploadHasOne.tsx",
-      ),
-      [path.resolve(__dirname, "node_modules/@payloadcms/next/dist/layouts/Root/index.js")]:
-        path.resolve(__dirname, "src/patches/payloadcms-next-RootLayout.js"),
+      ...webpackPayloadAliases(payloadPatchPaths, { isServer }),
     };
-    // pdfjs uniquement côté client (évite de polluer le bundle admin Payload).
-    if (!isServer) {
-      webpackConfig.resolve.alias["pdfjs-dist"] = path.resolve(
-        __dirname,
-        "node_modules/react-pdf/node_modules/pdfjs-dist",
-      );
-    }
     return webpackConfig;
   },
   turbopack: {
     root: path.resolve(__dirname),
+    resolveAlias: turbopackPayloadAliases(),
   },
 };
 

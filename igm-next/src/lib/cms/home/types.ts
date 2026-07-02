@@ -1,5 +1,4 @@
-import type { CmsMedia, CmsNews } from "../types";
-import type { SupportedLocale } from "@/i18n/locales";
+import type { CmsMedia } from "../types";
 
 export type CmsHomeCta = {
   label?: string | null;
@@ -138,10 +137,4 @@ export type CmsHome = {
   orgChartSection?: CmsHomeOrgChartSection | null;
   newsSection?: CmsHomeNewsSection | null;
   contactSection?: CmsHomeContactSection | null;
-};
-
-export type HomeRenderContext = {
-  home: CmsHome;
-  news: CmsNews[];
-  locale?: SupportedLocale;
 };

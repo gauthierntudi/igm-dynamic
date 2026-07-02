@@ -3,6 +3,13 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
+import {
+  TurnstileWidget,
+  type TurnstileWidgetHandle,
+} from "@/components/security/TurnstileWidget";
+import { isTurnstileClientEnabled, turnstileSiteKey } from "@/lib/security/turnstileConfig";
+import { TURNSTILE_FORM_FIELD } from "@/lib/security/turnstile";
+
 import styles from "./SignalementForm.module.css";
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
@@ -142,6 +149,9 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
   const formId = useId();
   const photoInputRef = useRef<HTMLInputElement>(null);
   const audioPickRef = useRef<HTMLInputElement>(null);
+  const turnstileRef = useRef<TurnstileWidgetHandle>(null);
+  const turnstileEnabled = isTurnstileClientEnabled();
+  const turnstileSiteKeyValue = turnstileSiteKey();
 
   const [nom, setNom] = useState("");
   const [email, setEmail] = useState("");
@@ -169,12 +179,22 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
   const chunksRef = useRef<Blob[]>([]);
 
   const [submitting, setSubmitting] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [activeStep, setActiveStep] = useState(0);
   const [geoLoading, setGeoLoading] = useState(false);
   const autoGeoStep2Ref = useRef(false);
 
   useEffect(() => {
     setDictationSupported(!!getSpeechRecognitionCtor());
+  }, []);
+
+  const handleTurnstileExpire = useCallback(() => {
+    setTurnstileToken(null);
+  }, []);
+
+  const handleTurnstileError = useCallback(() => {
+    setTurnstileToken(null);
+    toast.error("Contrôle de sécurité indisponible. Réessayez.");
   }, []);
 
   const stopStream = useCallback(() => {
@@ -553,6 +573,11 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
       }
     }
 
+    if (turnstileEnabled && !turnstileToken) {
+      toast.error("Veuillez valider le contrôle de sécurité.");
+      return;
+    }
+
     setSubmitting(true);
     try {
       await toast.promise(
@@ -570,6 +595,9 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
           fd.set("ville_site", villeSite.trim());
           fd.set("coords", coords.trim());
           fd.set("type_infraction", typeInfraction);
+          if (turnstileToken) {
+            fd.set(TURNSTILE_FORM_FIELD, turnstileToken);
+          }
           attachments.forEach((a) => {
             fd.append("pieces", a.file, a.file.name);
           });
@@ -585,6 +613,8 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
             throw new Error("Réponse illisible.");
           }
           if (!res.ok || !data.ok) {
+            turnstileRef.current?.reset();
+            setTurnstileToken(null);
             throw new Error(data.error || "Échec de l’envoi.");
           }
           setActiveStep(0);
@@ -597,6 +627,8 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
           setVilleSite("");
           setCoords("");
           setTypeInfraction("");
+          setTurnstileToken(null);
+          turnstileRef.current?.reset();
           attachments.forEach((a) => URL.revokeObjectURL(a.previewUrl));
           setAttachments([]);
           onSuccess?.();
@@ -1190,6 +1222,18 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
               })}
             </div>
           ) : null}
+          {turnstileEnabled && turnstileSiteKeyValue ? (
+            <div className={styles.turnstileWrap}>
+              <TurnstileWidget
+                ref={turnstileRef}
+                siteKey={turnstileSiteKeyValue}
+                onToken={setTurnstileToken}
+                onExpire={handleTurnstileExpire}
+                onError={handleTurnstileError}
+                theme="auto"
+              />
+            </div>
+          ) : null}
           <div className={styles.stepNavInCard}>
             <div className={styles.stepNavActions}>
               <button type="button" className={`${styles.btn} ${styles.stepBtnGhost}`} onClick={goPrev}>
@@ -1198,7 +1242,7 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
               <button
                 type="submit"
                 className={`${styles.btn} ${styles.stepBtnNext}`}
-                disabled={submitting}
+                disabled={submitting || (turnstileEnabled && !turnstileToken)}
               >
                 {submitting ? "Envoi…" : "Envoyer"}
               </button>
