@@ -1,5 +1,6 @@
 import { HeadObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { createLocalReq } from "payload";
 
 import { getPayloadClient } from "@/lib/cms/payload";
 import { s3MediaBucket, s3MediaClient } from "@/lib/s3MediaClient";
@@ -133,7 +134,8 @@ export async function completeSignalementPieceUpload(
     }
 
     const payload = await getPayloadClient();
-    const created = await payload.create({
+    const req = await createLocalReq({ context: { skipCloudStorage: true } }, payload);
+    const created = await payload.db.create({
       collection: "signalement-files",
       data: {
         filename: token.filename,
@@ -141,19 +143,10 @@ export async function completeSignalementPieceUpload(
         filesize: token.filesize,
         ...(token.prefix ? { prefix: token.prefix } : {}),
       },
-      file: {
-        data: Buffer.alloc(0),
-        mimetype: token.mimeType,
-        name: token.filename,
-        size: token.filesize,
-      },
-      overrideAccess: true,
-      context: {
-        skipCloudStorage: true,
-      },
+      req,
     });
 
-    return { ok: true, id: created.id };
+    return { ok: true, id: created.id as number };
   } catch (error) {
     if (
       error &&
