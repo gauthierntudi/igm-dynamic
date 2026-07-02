@@ -146,9 +146,11 @@ export async function completeSignalementPieceUpload(
         mimetype: token.mimeType,
         name: token.filename,
         size: token.filesize,
-        clientUploadContext: { directS3: true },
       },
       overrideAccess: true,
+      context: {
+        skipCloudStorage: true,
+      },
     });
 
     return { ok: true, id: created.id };
