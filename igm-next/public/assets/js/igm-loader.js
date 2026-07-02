@@ -4,7 +4,7 @@
 
   root.setAttribute("data-init", "1");
 
-  var words = ["Inspection", "Générale", "de Mines", "Bienvenue"];
+  var words = ["Inspection", "Générale", "des Mines", "Bienvenue"];
   var wordsRaw = root.getAttribute("data-loader-words");
   if (wordsRaw) {
     try {

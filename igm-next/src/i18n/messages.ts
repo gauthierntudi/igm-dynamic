@@ -257,9 +257,9 @@ const fr = {
     legendFootnote: "RDC — découpage provincial (2015).",
   },
   loader: {
-    ariaLabel: "Inspection Générale de Mines — Bienvenue",
+    ariaLabel: "Inspection Générale des Mines — Bienvenue",
     loading: "Chargement",
-    words: ["Inspection", "Générale", "de Mines", "Bienvenue"],
+    words: ["Inspection", "Générale", "des Mines", "Bienvenue"],
   },
 } as const;
 
@@ -520,9 +520,9 @@ const en = {
     legendFootnote: "DRC — provincial boundaries (2015).",
   },
   loader: {
-    ariaLabel: "General Mine Inspectorate — Welcome",
+    ariaLabel: "General Inspectorate of Mines — Welcome",
     loading: "Loading",
-    words: ["General", "Mine", "Inspectorate", "Welcome"],
+    words: ["General", "Inspectorate", "of Mines", "Welcome"],
   },
 } as const;
 

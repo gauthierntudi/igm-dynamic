@@ -73,9 +73,6 @@ export const Signalements: CollectionConfig = {
       label: "Statut",
       defaultValue: "recu",
       options: [...SIGNALEMENT_STATUS_OPTIONS],
-      access: {
-        update: isAdmin,
-      },
       admin: {
         hidden: true,
       },
@@ -176,9 +173,6 @@ export const Signalements: CollectionConfig = {
       name: "notesInternes",
       type: "textarea",
       label: "Notes internes",
-      access: {
-        update: isAdmin,
-      },
       admin: {
         hidden: true,
       },
