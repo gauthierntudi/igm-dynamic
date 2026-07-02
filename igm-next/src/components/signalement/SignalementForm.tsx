@@ -8,16 +8,27 @@ import {
   type TurnstileWidgetHandle,
 } from "@/components/security/TurnstileWidget";
 import { isTurnstileClientEnabled, turnstileSiteKey } from "@/lib/security/turnstileConfig";
-import { TURNSTILE_FORM_FIELD } from "@/lib/security/turnstile";
-import { isAllowedSignalementMime, isSignalementAudioMime, isSignalementVideoMime } from "@/lib/signalement/constants";
+import {
+  formatSignalementUploadProgressLabel,
+  submitSignalementWithProgress,
+  type UploadProgress,
+} from "@/lib/signalement/submitSignalementClient";
+import {
+  isAllowedSignalementMime,
+  isSignalementAudioMime,
+  isSignalementVideoMime,
+  MAX_SIGNALEMENT_FILE_BYTES,
+  MAX_SIGNALEMENT_FILES,
+  MAX_SIGNALEMENT_TOTAL_BYTES,
+  MAX_SIGNALEMENT_VIDEO_FILE_BYTES,
+  maxSignalementFileBytes,
+} from "@/lib/signalement/constants";
 
 import styles from "./SignalementForm.module.css";
 
-const MAX_FILE_BYTES = 5 * 1024 * 1024;
-const MAX_FILES = 12;
-const ACCEPT_IMAGES = "image/jpeg,image/png";
+const MAX_FILES = MAX_SIGNALEMENT_FILES;
+const ACCEPT_PHOTOS_VIDEOS = "image/jpeg,image/png,video/*,.mp4,.mov,.m4v,.avi,.mkv,.webm";
 const ACCEPT_AUDIO = "audio/*,.webm,.mp3,.wav,.m4a,.ogg";
-const ACCEPT_VIDEO = "video/*,.mp4,.mov,.m4v,.avi,.mkv,.webm";
 
 const PROVINCES_RDC = [
   "",
@@ -149,9 +160,8 @@ function validateNonAnonymousContact(
 
 export default function SignalementForm({ onSuccess }: SignalementFormProps = {}) {
   const formId = useId();
-  const photoInputRef = useRef<HTMLInputElement>(null);
+  const mediaInputRef = useRef<HTMLInputElement>(null);
   const audioPickRef = useRef<HTMLInputElement>(null);
-  const videoPickRef = useRef<HTMLInputElement>(null);
   const turnstileRef = useRef<TurnstileWidgetHandle>(null);
   const turnstileEnabled = isTurnstileClientEnabled();
   const turnstileSiteKeyValue = turnstileSiteKey();
@@ -182,6 +192,7 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
   const chunksRef = useRef<Blob[]>([]);
 
   const [submitting, setSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [activeStep, setActiveStep] = useState(0);
   const [geoLoading, setGeoLoading] = useState(false);
@@ -229,11 +240,12 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
         err = `Max. ${MAX_FILES} fichiers.`;
       } else {
         for (const f of list) {
-          if (f.size > MAX_FILE_BYTES) {
-            err = `Fichier trop lourd (max ${formatBytes(MAX_FILE_BYTES)}).`;
+          const mime = f.type || "application/octet-stream";
+          const maxBytes = maxSignalementFileBytes(mime, f.name);
+          if (f.size > maxBytes) {
+            err = `Fichier trop lourd (max ${formatBytes(maxBytes)}).`;
             break;
           }
-          const mime = f.type || "application/octet-stream";
           if (!isAllowedSignalementMime(mime, f.name)) {
             err = "Type de fichier non autorisé (photos, audio ou vidéo).";
             break;
@@ -587,44 +599,28 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
     }
 
     setSubmitting(true);
+    setUploadProgress(null);
     try {
       await toast.promise(
         (async (): Promise<{ message?: string }> => {
-          const fd = new FormData();
-          fd.set("description", desc);
-          if (!anonymousMode) {
-            fd.set("alerteur_nom", nom.trim());
-            const emailTrimmed = email.trim();
-            const telTrimmed = tel.trim();
-            if (emailTrimmed) fd.set("alerteur_email", emailTrimmed);
-            if (telTrimmed) fd.set("alerteur_tel", telTrimmed);
-          }
-          fd.set("province", province);
-          fd.set("ville_site", villeSite.trim());
-          fd.set("coords", coords.trim());
-          fd.set("type_infraction", typeInfraction);
-          if (turnstileToken) {
-            fd.set(TURNSTILE_FORM_FIELD, turnstileToken);
-          }
-          attachments.forEach((a) => {
-            fd.append("pieces", a.file, a.file.name);
-          });
+          const files = attachments.map((a) => a.file);
+          const data = await submitSignalementWithProgress(
+            files,
+            {
+              description: desc,
+              anonymousMode,
+              nom,
+              email,
+              tel,
+              province,
+              villeSite,
+              coords,
+              typeInfraction,
+              turnstileToken,
+            },
+            setUploadProgress,
+          );
 
-          const res = await fetch("/api/signalement", {
-            method: "POST",
-            body: fd,
-          });
-          let data: { ok?: boolean; error?: string; message?: string };
-          try {
-            data = (await res.json()) as typeof data;
-          } catch {
-            throw new Error("Réponse illisible.");
-          }
-          if (!res.ok || !data.ok) {
-            turnstileRef.current?.reset();
-            setTurnstileToken(null);
-            throw new Error(data.error || "Échec de l’envoi.");
-          }
           setActiveStep(0);
           setAnonymousMode(true);
           setNom("");
@@ -643,7 +639,9 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
           return data;
         })(),
         {
-          pending: "Envoi…",
+          pending: uploadProgress
+            ? formatSignalementUploadProgressLabel(uploadProgress)
+            : "Envoi…",
           success: {
             render({ data }) {
               const m = data?.message?.trim();
@@ -664,8 +662,12 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
         },
         { theme: "dark" },
       );
+    } catch {
+      turnstileRef.current?.reset();
+      setTurnstileToken(null);
     } finally {
       setSubmitting(false);
+      setUploadProgress(null);
     }
   }
 
@@ -1045,17 +1047,20 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
             <span className={styles.optional}>(optionnel)</span>
           </h2>
           <p className={styles.sectionHint}>
-            Photos JPG/PNG, audio (import ou micro) ou vidéos. Aperçu avant envoi.
+            Photos et vidéos (import), ou audio (fichier ou micro). Aperçu avant envoi.
           </p>
           <p className={styles.limits}>
-            <strong>{formatBytes(MAX_FILE_BYTES)}</strong> / fichier · <strong>{MAX_FILES}</strong> fichiers max.
+            <strong>{formatBytes(MAX_SIGNALEMENT_FILE_BYTES)}</strong> (photos/audio) ·{" "}
+            <strong>{formatBytes(MAX_SIGNALEMENT_VIDEO_FILE_BYTES)}</strong> (vidéos) ·{" "}
+            <strong>{MAX_FILES}</strong> fichiers max ·{" "}
+            <strong>{formatBytes(MAX_SIGNALEMENT_TOTAL_BYTES)}</strong> au total
           </p>
 
           <div className={styles.attachmentActions} role="group" aria-label="Ajouter des pièces jointes">
             <button
               type="button"
               className={styles.attachmentAction}
-              onClick={() => photoInputRef.current?.click()}
+              onClick={() => mediaInputRef.current?.click()}
             >
               <span className={styles.attachmentActionIcon} aria-hidden>
                 <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -1064,13 +1069,13 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
                   <path d="M21 15l-4-4-3.5 3.5L11 11l-5 5" />
                 </svg>
               </span>
-              <span className={styles.attachmentActionLabel}>Photos</span>
-              <span className={styles.attachmentActionHint}>JPG · PNG</span>
+              <span className={styles.attachmentActionLabel}>Photos &amp; vidéos</span>
+              <span className={styles.attachmentActionHint}>JPG · PNG · MP4…</span>
             </button>
             <input
-              ref={photoInputRef}
+              ref={mediaInputRef}
               type="file"
-              accept={ACCEPT_IMAGES}
+              accept={ACCEPT_PHOTOS_VIDEOS}
               multiple
               hidden
               onChange={(e) => {
@@ -1097,31 +1102,6 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
               ref={audioPickRef}
               type="file"
               accept={ACCEPT_AUDIO}
-              hidden
-              onChange={(e) => {
-                if (e.target.files?.length) addAttachments(e.target.files);
-                e.target.value = "";
-              }}
-            />
-            <button
-              type="button"
-              className={styles.attachmentAction}
-              onClick={() => videoPickRef.current?.click()}
-            >
-              <span className={styles.attachmentActionIcon} aria-hidden>
-                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="6" width="18" height="12" rx="2" ry="2" />
-                  <path d="M10 9.5v5l4.5-2.5L10 9.5z" fill="currentColor" stroke="none" />
-                </svg>
-              </span>
-              <span className={styles.attachmentActionLabel}>Vidéo fichier</span>
-              <span className={styles.attachmentActionHint}>MP4 · MOV…</span>
-            </button>
-            <input
-              ref={videoPickRef}
-              type="file"
-              accept={ACCEPT_VIDEO}
-              multiple
               hidden
               onChange={(e) => {
                 if (e.target.files?.length) addAttachments(e.target.files);
@@ -1277,6 +1257,19 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
               />
             </div>
           ) : null}
+          {uploadProgress ? (
+            <div className={styles.uploadProgress} aria-live="polite">
+              <div className={styles.uploadProgressLabel}>
+                {formatSignalementUploadProgressLabel(uploadProgress)}
+              </div>
+              <div className={styles.uploadProgressTrack} aria-hidden>
+                <div
+                  className={styles.uploadProgressFill}
+                  style={{ width: `${uploadProgress.filePercent}%` }}
+                />
+              </div>
+            </div>
+          ) : null}
           <div className={styles.stepNavInCard}>
             <div className={styles.stepNavActions}>
               <button type="button" className={`${styles.btn} ${styles.stepBtnGhost}`} onClick={goPrev}>
@@ -1298,8 +1291,8 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
         <div className={styles.formFooter}>
           <div className={styles.footerLeft}>
             <p className={styles.footerNote}>
-              Accusé possible si e-mail renseigné. PJ : {formatBytes(MAX_FILE_BYTES)} / fichier,{" "}
-              {MAX_FILES} max.
+              Accusé possible si e-mail renseigné. PJ : {formatBytes(MAX_SIGNALEMENT_FILE_BYTES)} (photos/audio),{" "}
+              {formatBytes(MAX_SIGNALEMENT_VIDEO_FILE_BYTES)} (vidéos), {MAX_FILES} max.
             </p>
             <p className={styles.footerLegal}>
               Envoyer = vous confirmez le contenu. <a href="/">Politique données</a> (bientôt).

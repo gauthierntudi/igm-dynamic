@@ -166,6 +166,33 @@
   align-items: center;
 }
 
+.uploadProgress {
+  margin-top: 14px;
+  width: 100%;
+}
+
+.uploadProgressLabel {
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-muted, #6b6460);
+}
+
+.uploadProgressTrack {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--border-light);
+  overflow: hidden;
+}
+
+.uploadProgressFill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  transition: width 180ms ease;
+}
+
 /* Navigation étapes — dans la carte (séparateur type ui .divider) */
 .stepNavInCard {
   margin-top: 20px;

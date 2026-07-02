@@ -3,15 +3,15 @@ import type { File as PayloadUploadFile } from "payload";
 import { getPayloadClient } from "@/lib/cms/payload";
 import { TURNSTILE_FORM_FIELD, verifyTurnstileToken } from "@/lib/security/turnstile";
 
+import { assertOrphanSignalementPieces } from "./assertOrphanSignalementPieces";
 import {
   buildSignalementReference,
-  isAllowedSignalementMime,
   isProvinceRdc,
   isTypeInfraction,
-  MAX_SIGNALEMENT_FILE_BYTES,
   MAX_SIGNALEMENT_FILES,
   MAX_SIGNALEMENT_TOTAL_BYTES,
 } from "./constants";
+import { validateSignalementFile } from "./validateSignalementFile";
 
 export type SubmitSignalementResult =
   | { ok: true; message: string; reference: string; id: number }
@@ -26,6 +26,13 @@ function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+function parsePieceIds(formData: FormData): number[] {
+  return formData
+    .getAll("piece_ids")
+    .map((value) => Number(String(value)))
+    .filter((id) => Number.isInteger(id) && id > 0);
+}
+
 async function fileToPayloadUpload(file: File): Promise<PayloadUploadFile> {
   const buffer = Buffer.from(await file.arrayBuffer());
   return {
@@ -34,6 +41,64 @@ async function fileToPayloadUpload(file: File): Promise<PayloadUploadFile> {
     name: file.name,
     size: file.size,
   };
+}
+
+async function uploadPiecesFromFormData(files: File[]): Promise<
+  | { ok: true; ids: number[] }
+  | { ok: false; error: string; status: number }
+> {
+  if (files.length > MAX_SIGNALEMENT_FILES) {
+    return {
+      ok: false,
+      error: `Maximum ${MAX_SIGNALEMENT_FILES} fichiers.`,
+      status: 400,
+    };
+  }
+
+  let totalSize = 0;
+  for (const file of files) {
+    const validation = validateSignalementFile(file);
+    if (!validation.ok) {
+      return { ok: false, error: validation.error, status: 400 };
+    }
+    totalSize += file.size;
+  }
+
+  if (totalSize > MAX_SIGNALEMENT_TOTAL_BYTES) {
+    return { ok: false, error: "Pièces jointes trop lourdes.", status: 400 };
+  }
+
+  const payload = await getPayloadClient();
+  const uploadedFileIds: number[] = [];
+
+  try {
+    const created = await Promise.all(
+      files.map(async (file) =>
+        payload.create({
+          collection: "signalement-files",
+          data: {},
+          file: await fileToPayloadUpload(file),
+          overrideAccess: true,
+        }),
+      ),
+    );
+    uploadedFileIds.push(...created.map((doc) => doc.id));
+    return { ok: true, ids: uploadedFileIds };
+  } catch (error) {
+    for (const fileId of uploadedFileIds) {
+      try {
+        await payload.delete({ collection: "signalement-files", id: fileId, overrideAccess: true });
+      } catch {
+        /* ignore rollback errors */
+      }
+    }
+    console.error("[signalement] legacy piece upload failed", error);
+    return {
+      ok: false,
+      error: "Impossible d’enregistrer les fichiers. Réessayez.",
+      status: 500,
+    };
+  }
 }
 
 export async function submitSignalement(
@@ -71,49 +136,46 @@ export async function submitSignalement(
   const typeInfraction =
     typeRaw && isTypeInfraction(typeRaw) ? typeRaw : undefined;
 
-  const files = formData
+  const pieceIds = parsePieceIds(formData);
+  const inlineFiles = formData
     .getAll("pieces")
     .filter((value): value is File => value instanceof File && value.size > 0);
 
-  if (files.length > MAX_SIGNALEMENT_FILES) {
+  if (pieceIds.length > 0 && inlineFiles.length > 0) {
     return {
       ok: false,
-      error: `Maximum ${MAX_SIGNALEMENT_FILES} fichiers.`,
+      error: "Envoi invalide : fichiers en double.",
       status: 400,
     };
   }
 
-  let totalSize = 0;
-  for (const file of files) {
-    if (file.size > MAX_SIGNALEMENT_FILE_BYTES) {
-      return { ok: false, error: "Fichier trop lourd (max 5 Mo).", status: 400 };
-    }
-
-    const mime = file.type || "application/octet-stream";
-    if (!isAllowedSignalementMime(mime, file.name)) {
-      return { ok: false, error: "Type de fichier non autorisé.", status: 400 };
-    }
-
-    totalSize += file.size;
-  }
-
-  if (totalSize > MAX_SIGNALEMENT_TOTAL_BYTES) {
-    return { ok: false, error: "Pièces jointes trop lourdes.", status: 400 };
-  }
-
   const payload = await getPayloadClient();
-  const uploadedFileIds: number[] = [];
+  let uploadedFileIds: number[] = [];
+
+  if (pieceIds.length > 0) {
+    if (pieceIds.length > MAX_SIGNALEMENT_FILES) {
+      return {
+        ok: false,
+        error: `Maximum ${MAX_SIGNALEMENT_FILES} fichiers.`,
+        status: 400,
+      };
+    }
+
+    const orphanCheck = await assertOrphanSignalementPieces(payload, pieceIds);
+    if (!orphanCheck.ok) {
+      return { ok: false, error: orphanCheck.error, status: 400 };
+    }
+
+    uploadedFileIds = pieceIds;
+  } else if (inlineFiles.length > 0) {
+    const upload = await uploadPiecesFromFormData(inlineFiles);
+    if (!upload.ok) {
+      return upload;
+    }
+    uploadedFileIds = upload.ids;
+  }
 
   try {
-    for (const file of files) {
-      const created = await payload.create({
-        collection: "signalement-files",
-        data: {},
-        file: await fileToPayloadUpload(file),
-      });
-      uploadedFileIds.push(created.id);
-    }
-
     const estAnonyme = !alerteurNom && !alerteurEmail && !alerteurTel;
     const reference = buildSignalementReference();
 
@@ -139,6 +201,7 @@ export async function submitSignalement(
           : {}),
         ...(uploadedFileIds.length ? { pieces: uploadedFileIds } : {}),
       },
+      overrideAccess: true,
     });
 
     return {
@@ -148,11 +211,13 @@ export async function submitSignalement(
       id: signalement.id,
     };
   } catch (error) {
-    for (const fileId of uploadedFileIds) {
-      try {
-        await payload.delete({ collection: "signalement-files", id: fileId });
-      } catch {
-        /* ignore rollback errors */
+    if (inlineFiles.length > 0) {
+      for (const fileId of uploadedFileIds) {
+        try {
+          await payload.delete({ collection: "signalement-files", id: fileId, overrideAccess: true });
+        } catch {
+          /* ignore rollback errors */
+        }
       }
     }
 

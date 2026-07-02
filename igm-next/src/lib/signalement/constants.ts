@@ -1,6 +1,9 @@
 export const MAX_SIGNALEMENT_FILE_BYTES = 5 * 1024 * 1024;
+export const MAX_SIGNALEMENT_VIDEO_FILE_BYTES = 20 * 1024 * 1024;
 export const MAX_SIGNALEMENT_FILES = 12;
-export const MAX_SIGNALEMENT_TOTAL_BYTES = 15 * 1024 * 1024;
+export const MAX_SIGNALEMENT_TOTAL_BYTES = 50 * 1024 * 1024;
+/** Fenêtre pendant laquelle une pièce uploadée peut être liée à un signalement. */
+export const SIGNALEMENT_ORPHAN_MAX_AGE_MS = 60 * 60 * 1000;
 
 export const PROVINCES_RDC = [
   "Bas-Uele",
@@ -70,6 +73,13 @@ export function isAllowedSignalementMime(mime: string, filename: string): boolea
   if (isSignalementAudioMime(mime, filename)) return true;
   if (isSignalementVideoMime(mime, filename)) return true;
   return false;
+}
+
+export function maxSignalementFileBytes(mime: string, filename: string): number {
+  if (isSignalementVideoMime(mime, filename)) {
+    return MAX_SIGNALEMENT_VIDEO_FILE_BYTES;
+  }
+  return MAX_SIGNALEMENT_FILE_BYTES;
 }
 
 export function buildSignalementReference(): string {

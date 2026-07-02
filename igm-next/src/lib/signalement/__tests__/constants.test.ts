@@ -4,6 +4,7 @@ import {
   isAllowedSignalementMime,
   isSignalementAudioMime,
   isSignalementVideoMime,
+  maxSignalementFileBytes,
 } from "../constants";
 
 describe("signalement attachment mime helpers", () => {
@@ -23,5 +24,10 @@ describe("signalement attachment mime helpers", () => {
   it("rejects unsupported types", () => {
     expect(isAllowedSignalementMime("application/pdf", "doc.pdf")).toBe(false);
     expect(isAllowedSignalementMime("text/plain", "notes.txt")).toBe(false);
+  });
+
+  it("applies per-type file size limits", () => {
+    expect(maxSignalementFileBytes("image/png", "photo.png")).toBe(5 * 1024 * 1024);
+    expect(maxSignalementFileBytes("video/mp4", "clip.mp4")).toBe(20 * 1024 * 1024);
   });
 });

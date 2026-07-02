@@ -4,7 +4,16 @@
   "installCommand": "npm ci",
   "buildCommand": "npm run build",
   "regions": ["iad1"],
+  "crons": [
+    {
+      "path": "/api/cron/cleanup-signalement-pieces",
+      "schedule": "0 * * * *"
+    }
+  ],
   "functions": {
+    "src/app/api/signalement/piece/route.ts": {
+      "maxDuration": 120
+    },
     "src/app/api/**/*.ts": {
       "maxDuration": 60
     },
