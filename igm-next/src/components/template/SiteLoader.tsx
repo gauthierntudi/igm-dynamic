@@ -16,6 +16,7 @@ export function SiteLoader({ locale }: Props) {
       role="status"
       aria-live="polite"
       data-loader-words={JSON.stringify(m.words)}
+      suppressHydrationWarning
     >
       <div className="igm-loader-inner">
         <img

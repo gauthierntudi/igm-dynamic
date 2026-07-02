@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
+    "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev --webpack",
+    "dev:turbo": "cross-env NODE_OPTIONS=--no-deprecation next dev",
     "dev:webpack": "cross-env NODE_OPTIONS=--no-deprecation next dev --webpack",
     "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
     "build:webpack": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build --webpack",
@@ -87,7 +88,7 @@
     "react-pdf": "^10.4.1",
     "react-toastify": "^11.1.0",
     "sharp": "0.34.2",
-    "typescript": "^6.0.3"
+    "typescript": "^5.9.2"
   },
   "devDependencies": {
     "@types/nodemailer": "^8.0.1",

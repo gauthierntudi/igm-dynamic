@@ -1,6 +1,27 @@
-import { getFileKey } from "@payloadcms/plugin-cloud-storage/utilities";
+import path from "path";
 
 const privatePrefix = process.env.S3_PRIVATE_PREFIX || "private/signalements";
+
+function sanitizeStoragePrefix(prefix: string): string {
+  let decodedPrefix: string;
+  try {
+    decodedPrefix = decodeURIComponent(prefix);
+  } catch {
+    return "";
+  }
+
+  if (/%[0-9a-f]{2}/i.test(decodedPrefix)) {
+    return "";
+  }
+
+  return decodedPrefix
+    .replace(/\\/g, "/")
+    .split("/")
+    .filter((segment) => segment !== ".." && segment !== ".")
+    .join("/")
+    .replace(/^\/+/, "")
+    .replace(/[\x00-\x1f\x80-\x9f]/g, "");
+}
 
 export function signalementS3CollectionPrefix(): string {
   return privatePrefix;
@@ -37,24 +58,10 @@ export function isSignalementS3DirectUploadEnabled(): boolean {
   return process.env.NODE_ENV === "production";
 }
 
-export function isSignalementS3DirectUploadEnabledClient(): boolean {
-  if (process.env.NEXT_PUBLIC_SIGNALEMENT_S3_DIRECT_UPLOAD === "true") {
-    return true;
-  }
-  if (process.env.NEXT_PUBLIC_SIGNALEMENT_S3_DIRECT_UPLOAD === "false") {
-    return false;
-  }
-
-  return process.env.NEXT_PUBLIC_SIGNALEMENT_S3_DIRECT_UPLOAD === undefined
-    ? process.env.NODE_ENV === "production"
-    : false;
-}
-
+/** Clé S3 alignée sur @payloadcms/plugin-cloud-storage (sans import Payload). */
 export function buildSignalementS3ObjectKey(filename: string, docPrefix = ""): string {
-  const { fileKey } = getFileKey({
-    collectionPrefix: signalementS3CollectionPrefix(),
-    docPrefix,
-    filename,
-  });
-  return fileKey;
+  const collectionPrefix = sanitizeStoragePrefix(signalementS3CollectionPrefix());
+  const safeDocPrefix = sanitizeStoragePrefix(docPrefix);
+  const safeFilename = filename.replace(/[/\\]/g, "_");
+  return path.posix.join(safeDocPrefix || collectionPrefix, safeFilename);
 }

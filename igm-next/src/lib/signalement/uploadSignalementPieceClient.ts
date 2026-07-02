@@ -1,5 +1,5 @@
 import { withDeployedBase } from "@/lib/deployBasePath";
-import { isSignalementS3DirectUploadEnabledClient } from "@/lib/signalement/signalementS3DirectUpload";
+import { isSignalementS3DirectUploadEnabledClient } from "@/lib/signalement/signalementS3DirectUploadClient";
 
 const MAX_ATTEMPTS = 3;
 const RETRY_BASE_DELAY_MS = 800;

@@ -181,15 +181,5 @@
 
   setTimeout(finishLoader, MAX_LOADER_MS);
 
-  function startTypewriter() {
-    step();
-  }
-
-  if (typeof requestAnimationFrame === "function") {
-    requestAnimationFrame(function () {
-      requestAnimationFrame(startTypewriter);
-    });
-  } else {
-    setTimeout(startTypewriter, 0);
-  }
+  step();
 })();
