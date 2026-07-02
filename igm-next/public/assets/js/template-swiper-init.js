@@ -71,9 +71,19 @@
     });
   }
 
+  function scheduleInit() {
+    if (typeof requestAnimationFrame === "function") {
+      requestAnimationFrame(function () {
+        requestAnimationFrame(initCounterUp);
+      });
+      return;
+    }
+    setTimeout(initCounterUp, 0);
+  }
+
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initCounterUp);
+    document.addEventListener("DOMContentLoaded", scheduleInit);
   } else {
-    initCounterUp();
+    scheduleInit();
   }
 })();

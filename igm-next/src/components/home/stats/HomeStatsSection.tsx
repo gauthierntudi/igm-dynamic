@@ -89,6 +89,7 @@ export function HomeStatsSection({ statsSection, stats }: Props) {
                           className="counter"
                           data-stat-key={stat.key}
                           data-target={stat.value}
+                          suppressHydrationWarning
                         >
                           0
                         </span>

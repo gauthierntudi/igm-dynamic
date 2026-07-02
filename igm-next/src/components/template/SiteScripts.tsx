@@ -1,21 +1,11 @@
 import Script from "next/script";
 
 import { withDeployedBase } from "@/lib/deployBasePath";
-import { shouldShowSiteLoader } from "@/lib/template/shouldShowSiteLoader";
 import { SITE_SCRIPT_FILES } from "@/lib/template/siteAssets";
 
-export async function SiteScripts() {
-  const showLoader = await shouldShowSiteLoader();
-
+export function SiteScripts() {
   return (
     <>
-      {showLoader ? (
-        <Script
-          id="igm-loader-script"
-          src={withDeployedBase(SITE_SCRIPT_FILES.loader)}
-          strategy="afterInteractive"
-        />
-      ) : null}
       <Script
         src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"
         strategy="afterInteractive"

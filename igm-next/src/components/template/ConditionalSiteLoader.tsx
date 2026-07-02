@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 
-import { SiteLoader } from "@/components/template/SiteLoader";
+import { SiteLoaderMount } from "@/components/template/SiteLoaderMount";
 import { isSupportedLocale, type SupportedLocale } from "@/i18n/locales";
 import { shouldShowSiteLoader } from "@/lib/template/shouldShowSiteLoader";
 
@@ -13,5 +13,5 @@ export async function ConditionalSiteLoader() {
   if (!(await shouldShowSiteLoader())) return null;
 
   const locale = resolveLoaderLocale((await headers()).get("x-igm-locale"));
-  return <SiteLoader locale={locale} />;
+  return <SiteLoaderMount locale={locale} />;
 }
