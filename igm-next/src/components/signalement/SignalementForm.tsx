@@ -9,6 +9,12 @@ import {
 } from "@/components/security/TurnstileWidget";
 import { isTurnstileClientEnabled, turnstileSiteKey } from "@/lib/security/turnstileConfig";
 import {
+  clearSignalementFormDraft,
+  loadSignalementFormDraft,
+  saveSignalementFormDraft,
+} from "@/lib/signalement/signalementFormDraft";
+import {
+  computeSignalementUploadOverallPercent,
   formatSignalementUploadProgressLabel,
   submitSignalementWithProgress,
   type UploadProgress,
@@ -133,6 +139,7 @@ function formatGeolocationLine(pos: GeolocationPosition): string {
 
 type SignalementFormProps = {
   onSuccess?: () => void;
+  onSubmittingChange?: (submitting: boolean) => void;
 };
 
 function validateNonAnonymousContact(
@@ -158,7 +165,7 @@ function validateNonAnonymousContact(
   return null;
 }
 
-export default function SignalementForm({ onSuccess }: SignalementFormProps = {}) {
+export default function SignalementForm({ onSuccess, onSubmittingChange }: SignalementFormProps = {}) {
   const formId = useId();
   const mediaInputRef = useRef<HTMLInputElement>(null);
   const audioPickRef = useRef<HTMLInputElement>(null);
@@ -197,6 +204,72 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
   const [activeStep, setActiveStep] = useState(0);
   const [geoLoading, setGeoLoading] = useState(false);
   const autoGeoStep2Ref = useRef(false);
+  const draftHydratedRef = useRef(false);
+  const draftSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const draft = loadSignalementFormDraft();
+    if (draft) {
+      setNom(draft.nom);
+      setEmail(draft.email);
+      setTel(draft.tel);
+      setAnonymousMode(draft.anonymousMode);
+      setDescription(draft.description);
+      setProvince(draft.province);
+      setVilleSite(draft.villeSite);
+      setCoords(draft.coords);
+      setTypeInfraction(draft.typeInfraction);
+      setActiveStep(Math.min(draft.activeStep, LAST_STEP_INDEX));
+    }
+    draftHydratedRef.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (!draftHydratedRef.current || submitting) {
+      return;
+    }
+
+    if (draftSaveTimerRef.current) {
+      clearTimeout(draftSaveTimerRef.current);
+    }
+
+    draftSaveTimerRef.current = setTimeout(() => {
+      saveSignalementFormDraft({
+        nom,
+        email,
+        tel,
+        anonymousMode,
+        description,
+        province,
+        villeSite,
+        coords,
+        typeInfraction,
+        activeStep,
+      });
+    }, 280);
+
+    return () => {
+      if (draftSaveTimerRef.current) {
+        clearTimeout(draftSaveTimerRef.current);
+      }
+    };
+  }, [
+    activeStep,
+    anonymousMode,
+    coords,
+    description,
+    email,
+    nom,
+    province,
+    submitting,
+    tel,
+    typeInfraction,
+    villeSite,
+  ]);
+
+  useEffect(() => {
+    onSubmittingChange?.(submitting);
+  }, [onSubmittingChange, submitting]);
 
   useEffect(() => {
     setDictationSupported(!!getSpeechRecognitionCtor());
@@ -601,75 +674,66 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
     setSubmitting(true);
     setUploadProgress(null);
     try {
-      await toast.promise(
-        (async (): Promise<{ message?: string }> => {
-          const files = attachments.map((a) => a.file);
-          const data = await submitSignalementWithProgress(
-            files,
-            {
-              description: desc,
-              anonymousMode,
-              nom,
-              email,
-              tel,
-              province,
-              villeSite,
-              coords,
-              typeInfraction,
-              turnstileToken,
-            },
-            setUploadProgress,
-          );
-
-          setActiveStep(0);
-          setAnonymousMode(true);
-          setNom("");
-          setEmail("");
-          setTel("");
-          setDescription("");
-          setProvince("");
-          setVilleSite("");
-          setCoords("");
-          setTypeInfraction("");
-          setTurnstileToken(null);
-          turnstileRef.current?.reset();
-          attachments.forEach((a) => URL.revokeObjectURL(a.previewUrl));
-          setAttachments([]);
-          onSuccess?.();
-          return data;
-        })(),
+      const files = attachments.map((a) => a.file);
+      const data = await submitSignalementWithProgress(
+        files,
         {
-          pending: uploadProgress
-            ? formatSignalementUploadProgressLabel(uploadProgress)
-            : "Envoi…",
-          success: {
-            render({ data }) {
-              const m = data?.message?.trim();
-              if (m && m.length <= 56) return m;
-              return "Envoyé.";
-            },
-            autoClose: 9000,
-          },
-          error: {
-            render({ data }) {
-              if (data instanceof Error) {
-                const m = data.message.trim();
-                return m.length > 56 ? `${m.slice(0, 53)}…` : m;
-              }
-              return "Erreur réseau.";
-            },
-          },
+          description: desc,
+          anonymousMode,
+          nom,
+          email,
+          tel,
+          province,
+          villeSite,
+          coords,
+          typeInfraction,
+          turnstileToken,
         },
-        { theme: "dark" },
+        setUploadProgress,
       );
-    } catch {
+
+      clearSignalementFormDraft();
+      setActiveStep(0);
+      setAnonymousMode(true);
+      setNom("");
+      setEmail("");
+      setTel("");
+      setDescription("");
+      setProvince("");
+      setVilleSite("");
+      setCoords("");
+      setTypeInfraction("");
+      setTurnstileToken(null);
+      turnstileRef.current?.reset();
+      attachments.forEach((a) => URL.revokeObjectURL(a.previewUrl));
+      setAttachments([]);
+
+      const successMessage = data.message?.trim();
+      toast.success(
+        successMessage && successMessage.length <= 56 ? successMessage : "Envoyé.",
+        { autoClose: 9000, theme: "dark" },
+      );
+      onSuccess?.();
+    } catch (error) {
       turnstileRef.current?.reset();
       setTurnstileToken(null);
+      const message =
+        error instanceof Error
+          ? error.message.trim().length > 56
+            ? `${error.message.trim().slice(0, 53)}…`
+            : error.message.trim()
+          : "Erreur réseau.";
+      toast.error(message, { theme: "dark" });
     } finally {
       setSubmitting(false);
       setUploadProgress(null);
     }
   }
+
+  const overallUploadPercent = computeSignalementUploadOverallPercent(
+    uploadProgress,
+    attachments.length,
+  );
 
   const stepNavInCardEl = (
     <div className={styles.stepNavInCard}>
@@ -1257,19 +1321,6 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
               />
             </div>
           ) : null}
-          {uploadProgress ? (
-            <div className={styles.uploadProgress} aria-live="polite">
-              <div className={styles.uploadProgressLabel}>
-                {formatSignalementUploadProgressLabel(uploadProgress)}
-              </div>
-              <div className={styles.uploadProgressTrack} aria-hidden>
-                <div
-                  className={styles.uploadProgressFill}
-                  style={{ width: `${uploadProgress.filePercent}%` }}
-                />
-              </div>
-            </div>
-          ) : null}
           <div className={styles.stepNavInCard}>
             <div className={styles.stepNavActions}>
               <button type="button" className={`${styles.btn} ${styles.stepBtnGhost}`} onClick={goPrev}>
@@ -1297,6 +1348,33 @@ export default function SignalementForm({ onSuccess }: SignalementFormProps = {}
             <p className={styles.footerLegal}>
               Envoyer = vous confirmez le contenu. <a href="/">Politique données</a> (bientôt).
             </p>
+          </div>
+        </div>
+      ) : null}
+
+      {submitting ? (
+        <div
+          className={styles.submitOverlay}
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+          aria-label="Envoi du signalement en cours"
+        >
+          <div className={styles.submitOverlayInner}>
+            <div className={styles.submitSpinner} aria-hidden />
+            <p className={styles.submitOverlayTitle}>Envoi en cours</p>
+            <p className={styles.submitOverlayLabel}>
+              {uploadProgress
+                ? formatSignalementUploadProgressLabel(uploadProgress)
+                : "Préparation de l’envoi…"}
+            </p>
+            <div className={styles.submitProgressTrack} aria-hidden>
+              <div
+                className={styles.submitProgressFill}
+                style={{ width: `${overallUploadPercent}%` }}
+              />
+            </div>
+            <p className={styles.submitOverlayPercent}>{overallUploadPercent}%</p>
           </div>
         </div>
       ) : null}

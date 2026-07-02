@@ -27,6 +27,30 @@ export type UploadProgress = {
   maxUploadAttempts?: number;
 };
 
+export function computeSignalementUploadOverallPercent(
+  progress: UploadProgress | null,
+  fileCount: number,
+): number {
+  if (!progress) {
+    return 3;
+  }
+
+  if (fileCount <= 0) {
+    return Math.min(100, Math.max(5, Math.round(progress.filePercent)));
+  }
+
+  const totalSteps = fileCount + 1;
+  const stepWeight = 100 / totalSteps;
+
+  if (progress.phase === "final") {
+    const base = fileCount * stepWeight;
+    return Math.min(100, Math.round(base + (progress.filePercent / 100) * stepWeight));
+  }
+
+  const base = (progress.fileIndex - 1) * stepWeight;
+  return Math.min(99, Math.round(base + (progress.filePercent / 100) * stepWeight));
+}
+
 export function formatSignalementUploadProgressLabel(progress: UploadProgress): string {
   if (progress.phase === "final") {
     return "Finalisation du signalement…";

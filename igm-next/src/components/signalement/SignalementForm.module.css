@@ -193,6 +193,86 @@
   transition: width 180ms ease;
 }
 
+.submitOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  background: rgba(248, 246, 244, 0.94);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.submitOverlayInner {
+  width: min(100%, 340px);
+  padding: 28px 22px;
+  border-radius: 14px;
+  border: 1px solid var(--border-light);
+  background: var(--card-bg);
+  box-shadow: 0 12px 40px rgba(28, 20, 18, 0.08);
+  text-align: center;
+}
+
+.submitSpinner {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  border: 3px solid var(--border);
+  border-top-color: var(--red-primary);
+  animation: submitSpin 0.85s linear infinite;
+}
+
+@keyframes submitSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.submitOverlayTitle {
+  margin: 0 0 8px;
+  font-family: var(--ui-html-bebas), "Bebas Neue", sans-serif;
+  font-size: 26px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  color: var(--text-dark);
+}
+
+.submitOverlayLabel {
+  margin: 0 0 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-mid);
+}
+
+.submitProgressTrack {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--border-light);
+  overflow: hidden;
+}
+
+.submitProgressFill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--red-primary), var(--gold-light));
+  transition: width 220ms ease;
+}
+
+.submitOverlayPercent {
+  margin: 10px 0 0;
+  font-family: var(--ui-html-barlow-condensed), "Barlow Condensed", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-light);
+}
+
 /* Navigation étapes — dans la carte (séparateur type ui .divider) */
 .stepNavInCard {
   margin-top: 20px;

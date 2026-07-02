@@ -13,9 +13,14 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
-import SignalementForm from "@/components/signalement/SignalementForm";
+import {
+  loadSignalementModalOpen,
+  saveSignalementModalOpen,
+} from "@/lib/signalement/signalementFormDraft";
 
 import modalStyles from "./signalementModal.module.css";
+
+import SignalementForm from "@/components/signalement/SignalementForm";
 
 type SignalementModalContextValue = {
   open: () => void;
@@ -39,6 +44,7 @@ function SignalementModalPortal() {
   const titleId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
   const [mounted, setMounted] = useState(false);
+  const [formSubmitting, setFormSubmitting] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -54,13 +60,19 @@ function SignalementModalPortal() {
   }, [isOpen]);
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      setFormSubmitting(false);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || formSubmitting) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [isOpen, close]);
+  }, [isOpen, close, formSubmitting]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -74,6 +86,7 @@ function SignalementModalPortal() {
       className={modalStyles.backdrop}
       role="presentation"
       onMouseDown={(e) => {
+        if (formSubmitting) return;
         if (e.target === e.currentTarget) close();
       }}
     >
@@ -90,6 +103,7 @@ function SignalementModalPortal() {
           type="button"
           className={modalStyles.close}
           aria-label="Fermer le formulaire de signalement"
+          disabled={formSubmitting}
           onClick={close}
         >
           ×
@@ -102,7 +116,7 @@ function SignalementModalPortal() {
             Transmettez des informations sur des infractions ou pratiques irrégulières dans le
             secteur minier. Les champs marqués d’une astérisque sont obligatoires.
           </p>
-          <SignalementForm onSuccess={close} />
+          <SignalementForm onSuccess={close} onSubmittingChange={setFormSubmitting} />
         </div>
       </div>
     </div>,
@@ -112,8 +126,22 @@ function SignalementModalPortal() {
 
 export function SignalementModalProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
-  const open = useCallback(() => setIsOpen(true), []);
-  const close = useCallback(() => setIsOpen(false), []);
+
+  useEffect(() => {
+    if (loadSignalementModalOpen()) {
+      setIsOpen(true);
+    }
+  }, []);
+
+  const open = useCallback(() => {
+    setIsOpen(true);
+    saveSignalementModalOpen(true);
+  }, []);
+
+  const close = useCallback(() => {
+    setIsOpen(false);
+    saveSignalementModalOpen(false);
+  }, []);
 
   const value = useMemo(
     () => ({
