@@ -2,21 +2,21 @@
   var root = document.getElementById("igm-loader");
   if (!root) return;
 
-  var path = (window.location.pathname || "/").replace(/\/$/, "") || "/";
-  var isHomePath =
-    path === "/" ||
-    path === "/marketing-agency" ||
-    path === "/en";
-
-  if (!isHomePath) {
-    root.classList.add("is-hidden");
-    root.setAttribute("aria-hidden", "true");
-    return;
-  }
-
   root.setAttribute("data-init", "1");
 
   var words = ["Inspection", "Générale", "de Mines", "Bienvenue"];
+  var wordsRaw = root.getAttribute("data-loader-words");
+  if (wordsRaw) {
+    try {
+      var parsed = JSON.parse(wordsRaw);
+      if (Array.isArray(parsed) && parsed.length) {
+        words = parsed;
+      }
+    } catch (e) {
+      /* garde le fallback FR */
+    }
+  }
+
   var el = root.querySelector(".igm-loader-typewriter .line");
   if (!el) return;
   var progressEl = root.querySelector(".igm-loader-progress .value");

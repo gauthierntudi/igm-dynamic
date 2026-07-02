@@ -10,13 +10,12 @@ import SignalementAnchorBridge from "@/components/signalement/SignalementAnchorB
 import { SignalementModalProvider } from "@/components/signalement/SignalementModalProvider";
 import ChatWidget from "@/components/chat/ChatWidget";
 import { SiteHead } from "@/components/template/SiteHead";
-import { SiteLoader } from "@/components/template/SiteLoader";
+import { ConditionalSiteLoader } from "@/components/template/ConditionalSiteLoader";
 import { SiteScripts } from "@/components/template/SiteScripts";
 import TemplateFooter from "@/components/template/Footer";
 import TemplateHeader from "@/components/template/Header";
 import { getSiteSettings } from "@/lib/cms/client";
 import { getSiteOrigin } from "@/lib/seo/siteOrigin";
-import { ENABLE_SITE_LOADER } from "@/lib/template/siteAssets";
 
 import "./globals.css";
 
@@ -47,7 +46,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <SiteHead />
       </head>
       <body suppressHydrationWarning>
-        {ENABLE_SITE_LOADER ? <SiteLoader /> : null}
+        <ConditionalSiteLoader />
         <SiteScripts />
         <LocaleProvider>
           <SiteSettingsProvider settingsByLocale={{ fr: settingsFr, en: settingsEn }}>

@@ -17,6 +17,13 @@ function envFlag(name: string, defaultValue: boolean): boolean {
   return defaultValue;
 }
 
+function applyRequestHeaders(response: NextResponse, pathname: string, locale?: string, basePath?: string) {
+  response.headers.set("x-pathname", pathname);
+  if (locale) {
+    applyLocaleCookie(response, locale, basePath ?? "");
+  }
+}
+
 function applyLocaleCookie(response: NextResponse, locale: string, basePath: string) {
   response.cookies.set(LOCALE_COOKIE_NAME, locale, {
     path: localeCookiePath(basePath),
@@ -40,19 +47,21 @@ export function proxy(request: NextRequest) {
   });
 
   if (!decision) {
-    return NextResponse.next();
+    const response = NextResponse.next();
+    response.headers.set("x-pathname", pathname);
+    return response;
   }
 
   if (decision.action === "redirect") {
     const url = request.nextUrl.clone();
     url.pathname = decision.url;
     const response = NextResponse.redirect(url);
-    applyLocaleCookie(response, decision.locale, basePath);
+    applyRequestHeaders(response, decision.url, decision.locale, basePath);
     return response;
   }
 
   const response = NextResponse.next();
-  applyLocaleCookie(response, decision.locale, basePath);
+  applyRequestHeaders(response, pathname, decision.locale, basePath);
   return response;
 }
 

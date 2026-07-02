@@ -1,12 +1,15 @@
 import Script from "next/script";
 
 import { withDeployedBase } from "@/lib/deployBasePath";
-import { ENABLE_SITE_LOADER, SITE_SCRIPT_FILES } from "@/lib/template/siteAssets";
+import { shouldShowSiteLoader } from "@/lib/template/shouldShowSiteLoader";
+import { SITE_SCRIPT_FILES } from "@/lib/template/siteAssets";
 
-export function SiteScripts() {
+export async function SiteScripts() {
+  const showLoader = await shouldShowSiteLoader();
+
   return (
     <>
-      {ENABLE_SITE_LOADER ? (
+      {showLoader ? (
         <Script
           id="igm-loader-script"
           src={withDeployedBase(SITE_SCRIPT_FILES.loader)}

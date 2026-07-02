@@ -259,6 +259,7 @@ const fr = {
   loader: {
     ariaLabel: "Inspection Générale de Mines — Bienvenue",
     loading: "Chargement",
+    words: ["Inspection", "Générale", "de Mines", "Bienvenue"],
   },
 } as const;
 
@@ -521,6 +522,7 @@ const en = {
   loader: {
     ariaLabel: "General Mine Inspectorate — Welcome",
     loading: "Loading",
+    words: ["General", "Mine", "Inspectorate", "Welcome"],
   },
 } as const;
 
