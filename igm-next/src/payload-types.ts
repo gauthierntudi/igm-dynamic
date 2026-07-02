@@ -351,7 +351,7 @@ export interface Stat {
   createdAt: string;
 }
 /**
- * Signalements transmis via le formulaire public. Consultation seule — les données transmises par les utilisateurs ne peuvent pas être modifiées.
+ * Signalements transmis via le formulaire public. Les données soumises sont en lecture seule ; seuls le statut de traitement et les notes internes peuvent être modifiés.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "signalements".

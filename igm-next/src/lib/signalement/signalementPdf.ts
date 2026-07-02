@@ -1,18 +1,12 @@
 import { createRequire } from "node:module";
 
 import type { Signalement, SignalementFile } from "@/payload-types";
+import { getSignalementStatusLabel } from "@/lib/signalement/signalementStatus";
 
 const require = createRequire(import.meta.url);
 const PDFDocument = require("pdfkit") as typeof import("pdfkit");
 
 type PdfDoc = InstanceType<typeof PDFDocument>;
-
-const STATUS_LABELS: Record<NonNullable<Signalement["status"]>, string> = {
-  recu: "Reçu",
-  en_cours: "En cours",
-  traite: "Traité",
-  cloture: "Clôturé",
-};
 
 const PAGE_MARGIN = 50;
 const CONTENT_WIDTH = 495;
@@ -137,7 +131,7 @@ export async function buildSignalementPdfBuffer(
       .font("Helvetica")
       .fontSize(10)
       .fillColor("#5c6b82")
-      .text(`Statut : ${STATUS_LABELS[status]} · Généré le ${generatedAt}`, {
+      .text(`Statut : ${getSignalementStatusLabel(status)} · Généré le ${generatedAt}`, {
         width: CONTENT_WIDTH,
       });
     pdf.moveDown(0.6);

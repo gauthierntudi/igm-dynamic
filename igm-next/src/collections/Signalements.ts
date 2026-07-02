@@ -1,7 +1,9 @@
 import type { CollectionConfig } from "payload";
 
 import { isAdmin } from "../access/isAdmin";
+import { restrictSignalementAdminUpdate } from "../hooks/restrictSignalementAdminUpdate";
 import { PROVINCES_RDC, TYPES_INFRACTION } from "../lib/signalement/constants";
+import { SIGNALEMENT_STATUS_OPTIONS } from "../lib/signalement/signalementStatus";
 
 export const Signalements: CollectionConfig = {
   slug: "signalements",
@@ -32,14 +34,17 @@ export const Signalements: CollectionConfig = {
       "typeInfraction",
     ],
     description:
-      "Signalements transmis via le formulaire public. Consultation seule — les données transmises par les utilisateurs ne peuvent pas être modifiées.",
+      "Signalements transmis via le formulaire public. Les données soumises sont en lecture seule ; seuls le statut de traitement et les notes internes peuvent être modifiés.",
   },
   access: {
     // Création réservée au formulaire public (Local API serveur, overrideAccess).
     create: () => false,
     read: isAdmin,
-    update: () => false,
+    update: isAdmin,
     delete: isAdmin,
+  },
+  hooks: {
+    beforeChange: [restrictSignalementAdminUpdate],
   },
   fields: [
     {
@@ -67,15 +72,12 @@ export const Signalements: CollectionConfig = {
       type: "select",
       label: "Statut",
       defaultValue: "recu",
-      options: [
-        { label: "Reçu", value: "recu" },
-        { label: "En cours", value: "en_cours" },
-        { label: "Traité", value: "traite" },
-        { label: "Clôturé", value: "cloture" },
-      ],
+      options: [...SIGNALEMENT_STATUS_OPTIONS],
+      access: {
+        update: isAdmin,
+      },
       admin: {
         hidden: true,
-        readOnly: true,
       },
     },
     {
@@ -174,9 +176,11 @@ export const Signalements: CollectionConfig = {
       name: "notesInternes",
       type: "textarea",
       label: "Notes internes",
+      access: {
+        update: isAdmin,
+      },
       admin: {
         hidden: true,
-        readOnly: true,
       },
     },
   ],

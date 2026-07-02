@@ -78,9 +78,81 @@
   color: var(--dossier-muted);
 }
 
-.igm-dossier__readonly {
+.igm-dossier__treatment {
+  margin-bottom: 1rem;
+  padding: 1rem 1.125rem;
+  border: 1px solid var(--dossier-border);
+  border-radius: 8px;
+  background: var(--dossier-surface);
+}
+
+.igm-dossier__treatment-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.igm-dossier__treatment-help {
+  margin: 0.25rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--dossier-muted);
+}
+
+.igm-dossier__treatment-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) 1fr;
+  gap: 1rem;
+}
+
+.igm-dossier__control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.igm-dossier__control--full {
+  grid-column: 1 / -1;
+}
+
+.igm-dossier__control-label {
+  font-size: 0.75rem;
   font-weight: 500;
-  color: var(--dossier-subtle);
+  color: var(--dossier-muted);
+}
+
+.igm-dossier__select,
+.igm-dossier__textarea {
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--dossier-border);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--dossier-text);
+  font: inherit;
+  line-height: 1.4;
+}
+
+.igm-dossier__select:focus-visible,
+.igm-dossier__textarea:focus-visible {
+  outline: 2px solid #84caff;
+  outline-offset: 1px;
+}
+
+.igm-dossier__textarea {
+  resize: vertical;
+  min-height: 6rem;
+}
+
+.igm-dossier__btn--secondary {
+  background: #ffffff;
+  color: var(--dossier-text);
+}
+
+.igm-dossier__btn--secondary:hover:not(:disabled) {
+  background: var(--dossier-surface);
+  border-color: #98a2b3;
 }
 
 .igm-dossier__btn {
@@ -480,6 +552,15 @@
   .igm-dossier__header {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .igm-dossier__treatment-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .igm-dossier__treatment-grid {
+    grid-template-columns: 1fr;
   }
 
   .igm-dossier__btn {

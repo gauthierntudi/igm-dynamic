@@ -1,19 +1,17 @@
 "use client";
 
-import { useConfig, useDocumentInfo } from "@payloadcms/ui";
+import { useConfig, useDocumentInfo, useField, useForm, useFormModified, useFormProcessing } from "@payloadcms/ui";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { Signalement, SignalementFile } from "@/payload-types";
 import { withDeployedBase } from "@/lib/deployBasePath";
+import {
+  getSignalementStatusLabel,
+  SIGNALEMENT_STATUS_OPTIONS,
+  type SignalementStatus,
+} from "@/lib/signalement/signalementStatus";
 
 import "./signalement-detail-panel.css";
-
-const STATUS_LABELS: Record<NonNullable<Signalement["status"]>, string> = {
-  recu: "Reçu",
-  en_cours: "En cours",
-  traite: "Traité",
-  cloture: "Clôturé",
-};
 
 function formatDate(value?: string | null): string {
   if (!value) return "—";
@@ -220,6 +218,17 @@ function AttachmentPreview({
 export function SignalementDetailPanel() {
   const { config } = useConfig();
   const { data, initialData, id, isInitializing, lastUpdateTime } = useDocumentInfo();
+  const { submit } = useForm();
+  const formModified = useFormModified();
+  const formProcessing = useFormProcessing();
+  const {
+    value: statusValue,
+    setValue: setStatusValue,
+  } = useField<SignalementStatus>({ path: "status" });
+  const {
+    value: notesValue,
+    setValue: setNotesValue,
+  } = useField<string | null | undefined>({ path: "notesInternes" });
   const [attachments, setAttachments] = useState<SignalementFile[]>([]);
   const [loadingAttachments, setLoadingAttachments] = useState(false);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
@@ -296,6 +305,10 @@ export function SignalementDetailPanel() {
     }
   }, [doc?.reference, id, pdfDownloadUrl]);
 
+  const handleSaveTreatment = useCallback(() => {
+    void submit();
+  }, [submit]);
+
   if (!id) {
     return (
       <div className="igm-dossier igm-dossier--placeholder">
@@ -312,7 +325,8 @@ export function SignalementDetailPanel() {
     );
   }
 
-  const status = doc?.status ?? "recu";
+  const status = (statusValue ?? doc?.status ?? "recu") as SignalementStatus;
+  const notes = typeof notesValue === "string" ? notesValue : doc?.notesInternes ?? "";
 
   return (
     <div className="igm-dossier">
@@ -328,10 +342,8 @@ export function SignalementDetailPanel() {
             Reçu le {formatDate(doc?.createdAt)}
             <span className="igm-dossier__sep">·</span>
             <span className={`igm-dossier__status igm-dossier__status--${status}`}>
-              {STATUS_LABELS[status]}
+              {getSignalementStatusLabel(status)}
             </span>
-            <span className="igm-dossier__sep">·</span>
-            <span className="igm-dossier__readonly">Lecture seule</span>
           </p>
         </div>
         <button
@@ -345,6 +357,55 @@ export function SignalementDetailPanel() {
       </header>
 
       {pdfError ? <p className="igm-dossier__error">{pdfError}</p> : null}
+
+      <section className="igm-dossier__treatment">
+        <div className="igm-dossier__treatment-head">
+          <div>
+            <h3 className="igm-dossier__card-title">Traitement</h3>
+            <p className="igm-dossier__treatment-help">
+              Attribuez un statut au signalement et consignez vos notes internes.
+            </p>
+          </div>
+          <button
+            type="button"
+            className="igm-dossier__btn igm-dossier__btn--secondary"
+            onClick={handleSaveTreatment}
+            disabled={formProcessing || !formModified}
+          >
+            {formProcessing ? "Enregistrement…" : "Enregistrer le traitement"}
+          </button>
+        </div>
+
+        <div className="igm-dossier__treatment-grid">
+          <label className="igm-dossier__control">
+            <span className="igm-dossier__control-label">Statut</span>
+            <select
+              className="igm-dossier__select"
+              value={status}
+              disabled={formProcessing}
+              onChange={(event) => setStatusValue(event.target.value as SignalementStatus)}
+            >
+              {SIGNALEMENT_STATUS_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="igm-dossier__control igm-dossier__control--full">
+            <span className="igm-dossier__control-label">Notes internes</span>
+            <textarea
+              className="igm-dossier__textarea"
+              rows={4}
+              value={notes}
+              disabled={formProcessing}
+              placeholder="Observations, actions menées, éléments de suivi…"
+              onChange={(event) => setNotesValue(event.target.value)}
+            />
+          </label>
+        </div>
+      </section>
 
       <div className="igm-dossier__cards">
         <section className="igm-dossier__card">
