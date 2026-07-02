@@ -24,6 +24,7 @@ import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { SlugField as SlugField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
 import { SignalementDetailPanel as SignalementDetailPanel_690af1efc3c7706deeb0aa573fa2ff44 } from '@/components/admin/SignalementDetailPanel'
+import { SignalementLanceurCell as SignalementLanceurCell_b21945ae0e77e59b5229198705032919 } from '@/components/admin/SignalementLanceurCell'
 import { ContactMessageDetailPanel as ContactMessageDetailPanel_e253186454a51d44fe66c9fe0886c186 } from '@/components/admin/ContactMessageDetailPanel'
 import { NavMenuRowLabel as NavMenuRowLabel_ecdf19676b4c67fda96896c939ca488b } from '@/components/admin/NavMenuRowLabel'
 import { BannerSlideRowLabel as BannerSlideRowLabel_f7963e0c18066251d378bf55b98f97cd } from '@/components/admin/BannerSlideRowLabel'
@@ -61,6 +62,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/next/client#SlugField": SlugField_2b8867833a34864a02ddf429b0728a40,
   "@/components/admin/SignalementDetailPanel#SignalementDetailPanel": SignalementDetailPanel_690af1efc3c7706deeb0aa573fa2ff44,
+  "@/components/admin/SignalementLanceurCell#SignalementLanceurCell": SignalementLanceurCell_b21945ae0e77e59b5229198705032919,
   "@/components/admin/ContactMessageDetailPanel#ContactMessageDetailPanel": ContactMessageDetailPanel_e253186454a51d44fe66c9fe0886c186,
   "@/components/admin/NavMenuRowLabel#NavMenuRowLabel": NavMenuRowLabel_ecdf19676b4c67fda96896c939ca488b,
   "@/components/admin/BannerSlideRowLabel#BannerSlideRowLabel": BannerSlideRowLabel_f7963e0c18066251d378bf55b98f97cd,

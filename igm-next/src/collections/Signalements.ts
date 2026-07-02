@@ -97,7 +97,12 @@ export const Signalements: CollectionConfig = {
         readOnly: true,
       },
       fields: [
-        { name: "nom", type: "text", label: "Nom et prénom", admin: { readOnly: true } },
+        { name: "nom", type: "text", label: "Lanceur", admin: {
+          readOnly: true,
+          components: {
+            Cell: "@/components/admin/SignalementLanceurCell#SignalementLanceurCell",
+          },
+        } },
         { name: "email", type: "email", label: "Adresse e-mail", admin: { readOnly: true } },
         { name: "tel", type: "text", label: "Téléphone", admin: { readOnly: true } },
       ],

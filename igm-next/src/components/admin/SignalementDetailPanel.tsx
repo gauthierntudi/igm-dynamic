@@ -352,7 +352,7 @@ export function SignalementDetailPanel() {
           <dl className="igm-dossier__fields">
             <Field label="Anonyme" value={doc?.estAnonyme ? "Oui" : "Non"} />
             {doc?.estAnonyme ? (
-              <Field label="Identité" value="Non divulguée" />
+              <Field label="Identité" value="Anonyme" />
             ) : hasAlerteur ? (
               <>
                 {doc?.alerteur?.nom?.trim() ? (

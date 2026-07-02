@@ -1,6 +1,7 @@
 import type { Payload } from "payload";
 
 import { SIGNALEMENT_ORPHAN_MAX_AGE_MS } from "./constants";
+import { cleanupOrphanSignalementS3Objects } from "./cleanupOrphanSignalementS3Objects";
 import {
   collectLinkedSignalementPieceIds,
   selectOrphanSignalementPieceIds,
@@ -10,6 +11,9 @@ export type CleanupOrphanSignalementPiecesResult = {
   scanned: number;
   deleted: number;
   failed: number;
+  s3Scanned: number;
+  s3Deleted: number;
+  s3Failed: number;
 };
 
 const DEFAULT_BATCH_SIZE = 50;
@@ -86,5 +90,14 @@ export async function cleanupOrphanSignalementPieces(
     page = 1;
   }
 
-  return { scanned, deleted, failed };
+  const s3Result = await cleanupOrphanSignalementS3Objects(payload, { maxDeletes });
+
+  return {
+    scanned,
+    deleted,
+    failed,
+    s3Scanned: s3Result.scanned,
+    s3Deleted: s3Result.deleted,
+    s3Failed: s3Result.failed,
+  };
 }
