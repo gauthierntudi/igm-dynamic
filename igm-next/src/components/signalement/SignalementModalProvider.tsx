@@ -39,12 +39,17 @@ export function useSignalementModal() {
   return ctx;
 }
 
-function SignalementModalPortal() {
+function SignalementModalPortal({
+  formSubmitting,
+  onSubmittingChange,
+}: {
+  formSubmitting: boolean;
+  onSubmittingChange: (submitting: boolean) => void;
+}) {
   const { isOpen, close } = useSignalementModal();
   const titleId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
   const [mounted, setMounted] = useState(false);
-  const [formSubmitting, setFormSubmitting] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -57,12 +62,6 @@ function SignalementModalPortal() {
     return () => {
       document.body.style.overflow = prev;
     };
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) {
-      setFormSubmitting(false);
-    }
   }, [isOpen]);
 
   useEffect(() => {
@@ -116,7 +115,7 @@ function SignalementModalPortal() {
             Transmettez des informations sur des infractions ou pratiques irrégulières dans le
             secteur minier. Les champs marqués d’une astérisque sont obligatoires.
           </p>
-          <SignalementForm onSuccess={close} onSubmittingChange={setFormSubmitting} />
+          <SignalementForm onSuccess={close} onSubmittingChange={onSubmittingChange} />
         </div>
       </div>
     </div>,
@@ -126,6 +125,7 @@ function SignalementModalPortal() {
 
 export function SignalementModalProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [formSubmitting, setFormSubmitting] = useState(false);
 
   useEffect(() => {
     if (loadSignalementModalOpen()) {
@@ -139,9 +139,18 @@ export function SignalementModalProvider({ children }: { children: ReactNode }) 
   }, []);
 
   const close = useCallback(() => {
+    if (formSubmitting) {
+      return;
+    }
     setIsOpen(false);
     saveSignalementModalOpen(false);
-  }, []);
+  }, [formSubmitting]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setFormSubmitting(false);
+    }
+  }, [isOpen]);
 
   const value = useMemo(
     () => ({
@@ -155,7 +164,10 @@ export function SignalementModalProvider({ children }: { children: ReactNode }) 
   return (
     <SignalementModalContext.Provider value={value}>
       {children}
-      <SignalementModalPortal />
+      <SignalementModalPortal
+        formSubmitting={formSubmitting}
+        onSubmittingChange={setFormSubmitting}
+      />
     </SignalementModalContext.Provider>
   );
 }

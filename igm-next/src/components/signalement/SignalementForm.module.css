@@ -273,6 +273,41 @@
   color: var(--text-light);
 }
 
+.submitOverlayHint {
+  margin: 14px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-light);
+}
+
+.submitOverlaySuccess {
+  background: rgba(248, 246, 244, 0.96);
+}
+
+.submitOverlayError {
+  background: rgba(255, 245, 245, 0.96);
+}
+
+.submitSuccessIcon {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(34, 139, 34, 0.12);
+  color: #1f7a1f;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.submitOverlayBtn {
+  width: 100%;
+  margin-top: 18px;
+}
+
 /* Navigation étapes — dans la carte (séparateur type ui .divider) */
 .stepNavInCard {
   margin-top: 20px;

@@ -139,8 +139,11 @@ function formatGeolocationLine(pos: GeolocationPosition): string {
 
 type SignalementFormProps = {
   onSuccess?: () => void;
+  /** Vrai pendant l’envoi (upload) — bloque fermeture modal / refresh. */
   onSubmittingChange?: (submitting: boolean) => void;
 };
+
+const SUCCESS_AUTO_CLOSE_MS = 9000;
 
 function validateNonAnonymousContact(
   nom: string,
@@ -199,6 +202,8 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
   const chunksRef = useRef<Blob[]>([]);
 
   const [submitting, setSubmitting] = useState(false);
+  const [submitSuccessMessage, setSubmitSuccessMessage] = useState<string | null>(null);
+  const [submitErrorMessage, setSubmitErrorMessage] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [activeStep, setActiveStep] = useState(0);
@@ -270,6 +275,37 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
   useEffect(() => {
     onSubmittingChange?.(submitting);
   }, [onSubmittingChange, submitting]);
+
+  useEffect(() => {
+    if (!submitting) {
+      return;
+    }
+
+    const onBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [submitting]);
+
+  const dismissSubmitSuccess = useCallback(() => {
+    setSubmitSuccessMessage(null);
+    onSuccess?.();
+  }, [onSuccess]);
+
+  useEffect(() => {
+    if (!submitSuccessMessage) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      dismissSubmitSuccess();
+    }, SUCCESS_AUTO_CLOSE_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [dismissSubmitSuccess, submitSuccessMessage]);
 
   useEffect(() => {
     setDictationSupported(!!getSpeechRecognitionCtor());
@@ -673,6 +709,8 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
 
     setSubmitting(true);
     setUploadProgress(null);
+    setSubmitSuccessMessage(null);
+    setSubmitErrorMessage(null);
     try {
       const files = attachments.map((a) => a.file);
       const data = await submitSignalementWithProgress(
@@ -708,22 +746,25 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
       attachments.forEach((a) => URL.revokeObjectURL(a.previewUrl));
       setAttachments([]);
 
-      const successMessage = data.message?.trim();
-      toast.success(
-        successMessage && successMessage.length <= 56 ? successMessage : "Envoyé.",
-        { autoClose: 9000, theme: "dark" },
-      );
-      onSuccess?.();
+      const rawMessage = data.message?.trim();
+      const successMessage =
+        rawMessage && rawMessage.length <= 120
+          ? rawMessage
+          : rawMessage
+            ? `${rawMessage.slice(0, 117)}…`
+            : "Votre signalement a bien été envoyé.";
+
+      setSubmitSuccessMessage(successMessage);
     } catch (error) {
       turnstileRef.current?.reset();
       setTurnstileToken(null);
       const message =
         error instanceof Error
-          ? error.message.trim().length > 56
-            ? `${error.message.trim().slice(0, 53)}…`
+          ? error.message.trim().length > 120
+            ? `${error.message.trim().slice(0, 117)}…`
             : error.message.trim()
           : "Erreur réseau.";
-      toast.error(message, { theme: "dark" });
+      setSubmitErrorMessage(message);
     } finally {
       setSubmitting(false);
       setUploadProgress(null);
@@ -1352,7 +1393,47 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
         </div>
       ) : null}
 
-      {submitting ? (
+      {submitSuccessMessage ? (
+        <div
+          className={`${styles.submitOverlay} ${styles.submitOverlaySuccess}`}
+          role="status"
+          aria-live="polite"
+          aria-label="Signalement envoyé avec succès"
+        >
+          <div className={styles.submitOverlayInner}>
+            <div className={styles.submitSuccessIcon} aria-hidden>
+              ✓
+            </div>
+            <p className={styles.submitOverlayTitle}>Signalement envoyé</p>
+            <p className={styles.submitOverlayLabel}>{submitSuccessMessage}</p>
+            <button
+              type="button"
+              className={`${styles.btn} ${styles.stepBtnNext} ${styles.submitOverlayBtn}`}
+              onClick={dismissSubmitSuccess}
+            >
+              Fermer
+            </button>
+          </div>
+        </div>
+      ) : submitErrorMessage ? (
+        <div
+          className={`${styles.submitOverlay} ${styles.submitOverlayError}`}
+          role="alert"
+          aria-live="assertive"
+        >
+          <div className={styles.submitOverlayInner}>
+            <p className={styles.submitOverlayTitle}>Échec de l’envoi</p>
+            <p className={styles.submitOverlayLabel}>{submitErrorMessage}</p>
+            <button
+              type="button"
+              className={`${styles.btn} ${styles.stepBtnNext} ${styles.submitOverlayBtn}`}
+              onClick={() => setSubmitErrorMessage(null)}
+            >
+              Réessayer
+            </button>
+          </div>
+        </div>
+      ) : submitting ? (
         <div
           className={styles.submitOverlay}
           role="status"
@@ -1375,6 +1456,9 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
               />
             </div>
             <p className={styles.submitOverlayPercent}>{overallUploadPercent}%</p>
+            <p className={styles.submitOverlayHint}>
+              Ne fermez pas cette page pendant l’envoi.
+            </p>
           </div>
         </div>
       ) : null}
