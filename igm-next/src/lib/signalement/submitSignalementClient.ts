@@ -3,6 +3,7 @@ import { TURNSTILE_FORM_FIELD } from "@/lib/security/turnstile";
 
 import { prepareSignalementUploadFile } from "./compressSignalementImage";
 import { MAX_SIGNALEMENT_FILES, MAX_SIGNALEMENT_TOTAL_BYTES, maxSignalementFileBytes } from "./constants";
+import { uploadSignalementPieceWithProgress } from "./uploadSignalementPieceClient";
 
 export type SignalementSubmitFields = {
   description: string;
@@ -65,33 +66,7 @@ function uploadPieceWithProgress(
   file: File,
   onProgress: (percent: number) => void,
 ): Promise<number> {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", withDeployedBase("/api/signalement/piece"));
-    xhr.responseType = "text";
-
-    xhr.upload.onprogress = (event) => {
-      if (!event.lengthComputable) return;
-      const percent = Math.min(100, Math.round((event.loaded / event.total) * 100));
-      onProgress(percent);
-    };
-
-    xhr.onload = () => {
-      const data = parseJsonResponse(xhr);
-      if (xhr.status >= 200 && xhr.status < 300 && data.ok && typeof data.id === "number") {
-        resolve(data.id);
-        return;
-      }
-      reject(new Error(data.error || "Échec de l’envoi du fichier."));
-    };
-
-    xhr.onerror = () => reject(new Error("Erreur réseau lors de l’envoi du fichier."));
-    xhr.onabort = () => reject(new Error("Envoi annulé."));
-
-    const fd = new FormData();
-    fd.append("piece", file, file.name);
-    xhr.send(fd);
-  });
+  return uploadSignalementPieceWithProgress(file, onProgress);
 }
 
 async function uploadPieceWithRetry(

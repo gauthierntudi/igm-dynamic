@@ -10,7 +10,7 @@ export function s3MediaClient(): S3Client {
   }
 
   return new S3Client({
-    region: process.env.S3_REGION || "us-east-1",
+    region: process.env.S3_REGION || "eu-central-1",
     credentials: { accessKeyId, secretAccessKey },
   });
 }
