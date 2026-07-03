@@ -308,7 +308,18 @@ header.style-4 .main-menu > ul > li > a.drop-down {
   }
 
   header.style-4 .nav-right .igm-header-phone-desktop h6 a {
-    font-size: 15px;
+    font-size: 13px;
+  }
+
+  header.style-4 .nav-right a.primary-btn4 .content {
+    font-size: 13px;
+    padding: 10px 14px;
+  }
+
+  header.style-4 .nav-right a.primary-btn4 .icon {
+    min-width: 34px;
+    max-width: 34px;
+    height: 34px;
   }
 }
 
