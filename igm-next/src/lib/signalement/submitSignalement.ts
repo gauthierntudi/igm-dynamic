@@ -15,7 +15,13 @@ import {
 import { validateSignalementFile } from "./validateSignalementFile";
 
 export type SubmitSignalementResult =
-  | { ok: true; message: string; reference: string; id: number }
+  | {
+      ok: true;
+      message: string;
+      reference: string;
+      id: number;
+      emails: { adminNotified: boolean; acknowledgementSent: boolean };
+    }
   | { ok: false; error: string; status: number };
 
 function trimOrUndefined(value: string): string | undefined {
@@ -243,6 +249,10 @@ export async function submitSignalement(
       message: `Signalement ${reference} reçu.${acknowledgementNote}`,
       reference,
       id: signalement.id,
+      emails: {
+        adminNotified: emailResult.adminNotified,
+        acknowledgementSent: emailResult.acknowledgementSent,
+      },
     };
   } catch (error) {
     if (inlineFiles.length > 0) {

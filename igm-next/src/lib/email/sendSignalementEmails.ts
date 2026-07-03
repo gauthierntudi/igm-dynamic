@@ -1,16 +1,11 @@
 import {
-  buildIgmEmailHtml,
-  buildIgmEmailTextFooter,
-  renderIgmEmailButton,
-  renderIgmEmailInfoBox,
-  renderIgmEmailMessageBlock,
-  renderIgmEmailMetaTable,
-  renderIgmEmailReferenceBadge,
-  renderIgmEmailSuccessBanner,
-} from "@/lib/email/igmEmailTemplate";
+  buildMailContactHtml,
+  buildMailContactTextFooter,
+  renderMailContactMessageBlock,
+  renderMailContactMetaTable,
+  renderMailContactReferenceBadge,
+} from "@/lib/email/mailContactTemplate";
 import {
-  createSmtpTransporter,
-  escapeHtml,
   resolveNotifyEmail,
   sendSmtpMail,
   smtpConfigured,
@@ -59,32 +54,17 @@ export function buildSignalementAcknowledgementEmail(payload: SignalementEmailPa
     "Les informations transmises sont traitées de manière confidentielle.",
     "",
     "Conservez cette référence pour toute correspondance ultérieure avec l'IGM.",
-    buildIgmEmailTextFooter(),
+    buildMailContactTextFooter(),
   ].join("\n");
 
-  const html = buildIgmEmailHtml({
-    preheader: `Signalement ${payload.reference} enregistré avec succès.`,
-    eyebrow: "Accusé de réception",
-    title: "Votre signalement a bien été enregistré",
-    variant: "success",
-    introHtml: `<p style="margin:0 0 14px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.65;color:#1c1412;">${escapeHtml(greeting)}</p>
-      <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.65;color:#6b6460;">
-        Nous accusons réception de votre signalement transmis à l'Inspection Générale des Mines.
-      </p>`,
-    bodyHtml: `
-      ${renderIgmEmailSuccessBanner("Votre déclaration a été transmise avec succès.")}
-      ${renderIgmEmailReferenceBadge(payload.reference)}
-      ${renderIgmEmailInfoBox(
-        "Prochaines étapes",
-        "Votre déclaration sera examinée par nos équipes dans le cadre de nos missions légales. " +
-          "Conservez la référence ci-dessus pour toute correspondance ultérieure avec l'IGM.",
-      )}
-      ${renderIgmEmailInfoBox(
-        "Confidentialité",
-        "Les informations transmises sont traitées de manière <strong>confidentielle</strong>, " +
-          "conformément aux missions de l'IGM en matière de lutte contre la fraude et la contrebande minières.",
-      )}
-    `,
+  const html = buildMailContactHtml({
+    headline: "Votre signalement a bien été enregistré",
+    greeting,
+    paragraphs: [
+      "Nous accusons réception de votre signalement transmis à l'Inspection Générale des Mines (IGM).",
+      "Votre déclaration sera examinée par nos équipes dans le cadre de nos missions légales. Les informations transmises sont traitées de manière confidentielle.",
+    ],
+    contentHtml: renderMailContactReferenceBadge(payload.reference),
   });
 
   return { subject, text, html };
@@ -113,20 +93,18 @@ export function buildSignalementAdminNotificationEmail(
     excerpt(payload.description),
     "",
     `Voir dans l'admin : ${adminUrl}`,
-    buildIgmEmailTextFooter(),
+    buildMailContactTextFooter(),
   ].filter(Boolean);
 
   const text = lines.join("\n");
-  const html = buildIgmEmailHtml({
-    preheader: `Nouveau signalement ${payload.reference} — action requise.`,
-    eyebrow: "Notification interne",
-    title: `Nouveau signalement ${payload.reference}`,
-    variant: "alert",
-    introHtml: `<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.65;color:#6b6460;">
-      Un signalement vient d'être transmis via le formulaire public du site IGM. Merci de l'examiner dans le back-office.
-    </p>`,
-    bodyHtml: `
-      ${renderIgmEmailMetaTable([
+  const html = buildMailContactHtml({
+    headline: `Nouveau signalement ${payload.reference}`,
+    greeting: "Bonjour,",
+    paragraphs: [
+      "Un signalement vient d'être transmis via le formulaire public du site IGM. Merci de l'examiner dans le back-office.",
+    ],
+    contentHtml: `
+      ${renderMailContactMetaTable([
         { label: "Référence", value: payload.reference },
         { label: "Anonyme", value: payload.estAnonyme ? "Oui" : "Non" },
         ...(payload.alerteurNom ? [{ label: "Nom", value: payload.alerteurNom }] : []),
@@ -138,9 +116,12 @@ export function buildSignalementAdminNotificationEmail(
         ...(payload.typeInfraction ? [{ label: "Type d'infraction", value: payload.typeInfraction }] : []),
         { label: "Pièces jointes", value: String(payload.pieceCount) },
       ])}
-      ${renderIgmEmailMessageBlock("Description des faits", excerpt(payload.description))}
-      ${renderIgmEmailButton(adminUrl, "Ouvrir le dossier dans l'admin")}
+      ${renderMailContactMessageBlock("Description des faits", excerpt(payload.description))}
     `,
+    button: { href: adminUrl, label: "Ouvrir le dossier dans l'admin" },
+    closingHtml: `<p style="margin:0;font-family:Arial,sans-serif;font-size:14px;line-height:1.5;color:#777;">
+      Notification automatique — Inspection Générale des Mines
+    </p>`,
   });
 
   return { subject, text, html };
@@ -165,51 +146,40 @@ export async function sendSignalementSubmissionEmails(
     );
   }
 
-  const transporter = createSmtpTransporter();
   let adminNotified = false;
   let acknowledgementSent = false;
 
-  try {
-    if (notifyTo) {
-      console.info(`[signalement] envoi notification admin → ${notifyTo}`);
-      const adminMail = buildSignalementAdminNotificationEmail(payload, adminUrl);
-      const replyTo =
-        alerteurEmail && alerteurEmail !== notifyTo ? alerteurEmail : undefined;
-      const result = await sendSmtpMail(
-        {
-          to: notifyTo,
-          subject: adminMail.subject,
-          text: adminMail.text,
-          html: adminMail.html,
-          replyTo,
-        },
-        transporter,
-      );
-      adminNotified = result.sent;
-      if (!result.sent) {
-        console.error("[signalement] notification admin échouée:", result.reason);
-      }
+  if (notifyTo) {
+    console.info(`[signalement] envoi notification admin → ${notifyTo}`);
+    const adminMail = buildSignalementAdminNotificationEmail(payload, adminUrl);
+    const replyTo =
+      alerteurEmail && alerteurEmail !== notifyTo ? alerteurEmail : undefined;
+    const result = await sendSmtpMail({
+      to: notifyTo,
+      subject: adminMail.subject,
+      text: adminMail.text,
+      html: adminMail.html,
+      replyTo,
+    });
+    adminNotified = result.sent;
+    if (!result.sent) {
+      console.error("[signalement] notification admin échouée:", result.reason);
     }
+  }
 
-    if (alerteurEmail) {
-      console.info(`[signalement] envoi accusé → ${alerteurEmail}`);
-      const acknowledgement = buildSignalementAcknowledgementEmail(payload);
-      const result = await sendSmtpMail(
-        {
-          to: alerteurEmail,
-          subject: acknowledgement.subject,
-          text: acknowledgement.text,
-          html: acknowledgement.html,
-        },
-        transporter,
-      );
-      acknowledgementSent = result.sent;
-      if (!result.sent) {
-        console.error("[signalement] accusé échoué:", result.reason);
-      }
+  if (alerteurEmail) {
+    console.info(`[signalement] envoi accusé → ${alerteurEmail}`);
+    const acknowledgement = buildSignalementAcknowledgementEmail(payload);
+    const result = await sendSmtpMail({
+      to: alerteurEmail,
+      subject: acknowledgement.subject,
+      text: acknowledgement.text,
+      html: acknowledgement.html,
+    });
+    acknowledgementSent = result.sent;
+    if (!result.sent) {
+      console.error("[signalement] accusé échoué:", result.reason);
     }
-  } finally {
-    transporter.close();
   }
 
   console.info(

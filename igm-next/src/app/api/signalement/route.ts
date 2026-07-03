@@ -47,5 +47,6 @@ export async function POST(request: Request) {
     message: result.message,
     reference: result.reference,
     id: result.id,
+    emails: result.emails,
   });
 }

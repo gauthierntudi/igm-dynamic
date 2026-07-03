@@ -1,10 +1,9 @@
 import {
-  buildIgmEmailHtml,
-  buildIgmEmailTextFooter,
-  renderIgmEmailButton,
-  renderIgmEmailMessageBlock,
-  renderIgmEmailMetaTable,
-} from "@/lib/email/igmEmailTemplate";
+  buildMailContactHtml,
+  buildMailContactTextFooter,
+  renderMailContactMessageBlock,
+  renderMailContactMetaTable,
+} from "@/lib/email/mailContactTemplate";
 import {
   resolveNotifyEmail,
   sendSmtpMail,
@@ -47,28 +46,32 @@ export async function sendContactNotificationEmail(
     payload.message,
     "",
     payload.adminUrl ? `Voir dans l'admin : ${payload.adminUrl}` : null,
-    buildIgmEmailTextFooter(),
+    buildMailContactTextFooter(),
   ].filter(Boolean);
 
   const textBody = lines.join("\n");
-  const htmlBody = buildIgmEmailHtml({
-    preheader: `Nouveau message de ${payload.name} : ${payload.subject}`,
-    eyebrow: "Formulaire contact",
-    title: payload.subject,
-    introHtml: `<p style="margin:0;font-family:Inter,'Google Sans',system-ui,sans-serif;font-size:14px;line-height:1.6;color:#6b6460;">
-      Un nouveau message a été transmis via le formulaire de contact du site IGM.
-    </p>`,
-    bodyHtml: `
-      ${renderIgmEmailMetaTable([
+  const htmlBody = buildMailContactHtml({
+    headline: payload.subject,
+    greeting: "Bonjour,",
+    paragraphs: [
+      "Un nouveau message a été transmis via le formulaire de contact du site IGM.",
+    ],
+    contentHtml: `
+      ${renderMailContactMetaTable([
         { label: "Nom", value: payload.name },
         { label: "E-mail", value: payload.email },
         ...(payload.phone ? [{ label: "Téléphone", value: payload.phone }] : []),
         { label: "Objet", value: payload.subject },
         ...(payload.locale ? [{ label: "Langue", value: payload.locale.toUpperCase() }] : []),
       ])}
-      ${renderIgmEmailMessageBlock("Message", payload.message)}
-      ${payload.adminUrl ? renderIgmEmailButton(payload.adminUrl, "Ouvrir dans l'admin") : ""}
+      ${renderMailContactMessageBlock("Message", payload.message)}
     `,
+    button: payload.adminUrl
+      ? { href: payload.adminUrl, label: "Ouvrir dans l'admin" }
+      : undefined,
+    closingHtml: `<p style="margin:0;font-family:Arial,sans-serif;font-size:14px;line-height:1.5;color:#777;">
+      Notification automatique — Inspection Générale des Mines
+    </p>`,
   });
 
   const result = await sendSmtpMail({

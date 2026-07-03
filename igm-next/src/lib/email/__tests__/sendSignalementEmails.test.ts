@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildIgmEmailHtml, renderIgmEmailReferenceBadge } from "../igmEmailTemplate";
+import { buildMailContactHtml, renderMailContactReferenceBadge } from "../mailContactTemplate";
 import {
   buildSignalementAcknowledgementEmail,
   buildSignalementAdminNotificationEmail,
@@ -25,8 +25,8 @@ describe("sendSignalementEmails", () => {
     expect(mail.subject).toContain("SIG-20260703-ABCDE");
     expect(mail.text).toContain("SIG-20260703-ABCDE");
     expect(mail.html).toContain("SIG-20260703-ABCDE");
-    expect(mail.html).toContain("logo-color.png");
-    expect(mail.html).toContain("Accusé de réception");
+    expect(mail.html).toContain("https://www.igmrdc.com/assets/img/logo-color.png");
+    expect(mail.html).toContain("Votre signalement a bien été enregistré");
   });
 
   it("inclut les informations clés dans la notification admin", () => {
@@ -40,19 +40,19 @@ describe("sendSignalementEmails", () => {
     expect(mail.text).toContain("Pièces jointes : 2");
     expect(mail.html).toContain("https://www.igmrdc.com/admin/collections/signalements/42");
     expect(mail.html).toContain("Ouvrir le dossier dans l'admin");
-    expect(mail.html).toContain("#1b4491");
+    expect(mail.html).toContain("#ff0c0e");
   });
 });
 
-describe("igmEmailTemplate", () => {
-  it("affiche la bande tricolore et le logo IGM", () => {
-    const html = buildIgmEmailHtml({
-      title: "Test",
-      bodyHtml: renderIgmEmailReferenceBadge("SIG-TEST"),
+describe("mailContactTemplate", () => {
+  it("utilise le template mail-contact avec logo et footer IGM", () => {
+    const html = buildMailContactHtml({
+      headline: "Test",
+      contentHtml: renderMailContactReferenceBadge("SIG-TEST"),
     });
-    expect(html).toContain("logo-color.png");
-    expect(html).toContain("#f6bf0d");
-    expect(html).toContain("#e60404");
-    expect(html).toContain("Inspection Générale des Mines");
+    expect(html).toContain("https://www.igmrdc.com/assets/img/logo-color.png");
+    expect(html).toContain("conditions-generales");
+    expect(html).toContain("Kinshasa-Gombe");
+    expect(html).toContain("SIG-TEST");
   });
 });
