@@ -7,6 +7,7 @@ import {
   TurnstileWidget,
   type TurnstileWidgetHandle,
 } from "@/components/security/TurnstileWidget";
+import { useLocale } from "@/components/i18n/LocaleProvider";
 import { isTurnstileClientEnabled, turnstileSiteKey } from "@/lib/security/turnstileConfig";
 import {
   clearSignalementFormDraft,
@@ -169,6 +170,7 @@ function validateNonAnonymousContact(
 }
 
 export default function SignalementForm({ onSuccess, onSubmittingChange }: SignalementFormProps = {}) {
+  const { locale } = useLocale();
   const formId = useId();
   const mediaInputRef = useRef<HTMLInputElement>(null);
   const audioPickRef = useRef<HTMLInputElement>(null);
@@ -726,6 +728,7 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
           coords,
           typeInfraction,
           turnstileToken,
+          locale,
         },
         setUploadProgress,
       );

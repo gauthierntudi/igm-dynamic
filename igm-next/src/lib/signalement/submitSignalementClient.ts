@@ -1,4 +1,5 @@
 import { withDeployedBase } from "@/lib/deployBasePath";
+import type { SupportedLocale } from "@/i18n/locales";
 import { TURNSTILE_FORM_FIELD } from "@/lib/security/turnstile";
 
 import { prepareSignalementUploadFile } from "./compressSignalementImage";
@@ -16,6 +17,7 @@ export type SignalementSubmitFields = {
   coords: string;
   typeInfraction: string;
   turnstileToken: string | null;
+  locale: SupportedLocale;
 };
 
 export type UploadProgress = {
@@ -121,6 +123,7 @@ function submitMetadataWithProgress(
     fd.set("ville_site", fields.villeSite.trim());
     fd.set("coords", fields.coords.trim());
     fd.set("type_infraction", fields.typeInfraction);
+    fd.set("locale", fields.locale);
     if (fields.turnstileToken) {
       fd.set(TURNSTILE_FORM_FIELD, fields.turnstileToken);
     }

@@ -1,4 +1,6 @@
 import { escapeHtml } from "@/lib/email/smtp";
+import type { SupportedLocale } from "@/i18n/locales";
+import { hrefForRoute } from "@/i18n/paths";
 
 const IGM_SITE = "https://www.igmrdc.com";
 const LOGO_URL = `${IGM_SITE}/assets/img/logo-color.png`;
@@ -9,6 +11,7 @@ export type MailContactButton = {
 };
 
 export type MailContactTemplateOptions = {
+  locale?: SupportedLocale;
   headline?: string;
   greeting?: string;
   paragraphs?: string[];
@@ -17,10 +20,32 @@ export type MailContactTemplateOptions = {
   button?: MailContactButton;
 };
 
-export function buildMailContactTextFooter(): string {
-  return ["", "—", "Inspection Générale des Mines", "République Démocratique du Congo", IGM_SITE].join(
-    "\n",
-  );
+const FOOTER_COPY: Record<
+  SupportedLocale,
+  { contact: string; news: string; about: string; terms: string; teamClosing: string; orgName: string }
+> = {
+  fr: {
+    contact: "Nous contacter",
+    news: "Actualités",
+    about: "Qui sommes-nous?",
+    terms: "Termes & Conditions",
+    teamClosing: "Cordialement,<br /><br /><strong>Équipe IGM</strong>",
+    orgName: "Inspection Générale des Mines",
+  },
+  en: {
+    contact: "Contact us",
+    news: "News",
+    about: "About us",
+    terms: "Terms & Conditions",
+    teamClosing: "Kind regards,<br /><br /><strong>IGM Team</strong>",
+    orgName: "General Inspectorate of Mines",
+  },
+};
+
+export function buildMailContactTextFooter(locale: SupportedLocale = "fr"): string {
+  const copy = FOOTER_COPY[locale];
+  const country = locale === "en" ? "Democratic Republic of the Congo" : "République Démocratique du Congo";
+  return ["", "—", copy.orgName, country, IGM_SITE].join("\n");
 }
 
 function renderParagraphs(paragraphs: string[]): string {
@@ -61,10 +86,14 @@ export function renderMailContactMetaTable(
   `;
 }
 
-export function renderMailContactReferenceBadge(reference: string): string {
+export function renderMailContactReferenceBadge(
+  reference: string,
+  locale: SupportedLocale = "fr",
+): string {
+  const label = locale === "en" ? "Your reference" : "Votre référence";
   return `
     <p style="margin:20px 0;font-family:Arial,sans-serif;font-size:14px;line-height:1.5;color:#333;">
-      <strong style="color:#2482ff;">Votre référence</strong><br />
+      <strong style="color:#2482ff;">${escapeHtml(label)}</strong><br />
       <span style="font-size:20px;font-weight:700;color:#1b4491;letter-spacing:0.04em;">${escapeHtml(reference)}</span>
     </p>
   `;
@@ -92,21 +121,27 @@ export function renderMailContactButton(href: string, label: string): string {
 }
 
 export function buildMailContactHtml(options: MailContactTemplateOptions): string {
-  const greeting = options.greeting?.trim() || "Bonjour,";
+  const locale = options.locale ?? "fr";
+  const footer = FOOTER_COPY[locale];
+  const greeting = options.greeting?.trim() || (locale === "en" ? "Hello," : "Bonjour,");
   const headline = options.headline?.trim();
   const paragraphs = renderParagraphs(options.paragraphs ?? []);
   const contentHtml = options.contentHtml?.trim() ?? "";
   const closing =
     options.closingHtml?.trim() ??
     `<p style="margin:0;font-family:Arial,sans-serif;font-size:14px;line-height:1.5;color:#777;">
-      Cordialement,<br /><br /><strong>Équipe IGM</strong>
+      ${footer.teamClosing}
     </p>`;
   const button = options.button
     ? renderMailContactButton(options.button.href, options.button.label)
     : "";
+  const contactHref = `${IGM_SITE}${hrefForRoute("contact", locale)}`;
+  const newsHref = `${IGM_SITE}${hrefForRoute("news", locale)}`;
+  const aboutHref = `${IGM_SITE}${hrefForRoute("about", locale)}`;
+  const termsHref = `${IGM_SITE}${hrefForRoute("terms", locale)}`;
 
   return `<!DOCTYPE html>
-<html lang="fr">
+<html lang="${locale}">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -164,7 +199,7 @@ export function buildMailContactHtml(options: MailContactTemplateOptions): strin
   <div class="container">
     <div class="header">
       <a href="${IGM_SITE}/" target="_blank">
-        <img src="${LOGO_URL}" alt="Inspection Générale des Mines" width="240" />
+        <img src="${LOGO_URL}" alt="${escapeHtml(footer.orgName)}" width="240" />
       </a>
     </div>
     <div class="content">
@@ -181,10 +216,10 @@ export function buildMailContactHtml(options: MailContactTemplateOptions): strin
         Kinshasa-Gombe
       </div>
       <div>
-        <a href="${IGM_SITE}/contact" target="_blank">Nous contacter</a> |
-        <a href="${IGM_SITE}/actualites" target="_blank">Actualités</a> |
-        <a href="${IGM_SITE}/a-propos" target="_blank">Qui sommes-nous?</a> |
-        <a href="${IGM_SITE}/conditions-generales" target="_blank">Termes &amp; Conditions</a>
+        <a href="${contactHref}" target="_blank">${footer.contact}</a> |
+        <a href="${newsHref}" target="_blank">${footer.news}</a> |
+        <a href="${aboutHref}" target="_blank">${footer.about}</a> |
+        <a href="${termsHref}" target="_blank">${footer.terms}</a>
       </div>
     </div>
   </div>

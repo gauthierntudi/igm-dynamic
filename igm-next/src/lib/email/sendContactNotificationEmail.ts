@@ -46,11 +46,12 @@ export async function sendContactNotificationEmail(
     payload.message,
     "",
     payload.adminUrl ? `Voir dans l'admin : ${payload.adminUrl}` : null,
-    buildMailContactTextFooter(),
+    buildMailContactTextFooter(payload.locale === "en" ? "en" : "fr"),
   ].filter(Boolean);
 
   const textBody = lines.join("\n");
   const htmlBody = buildMailContactHtml({
+    locale: payload.locale === "en" ? "en" : "fr",
     headline: payload.subject,
     greeting: "Bonjour,",
     paragraphs: [

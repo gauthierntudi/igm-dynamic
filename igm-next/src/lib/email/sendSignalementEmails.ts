@@ -6,10 +6,15 @@ import {
   renderMailContactReferenceBadge,
 } from "@/lib/email/mailContactTemplate";
 import {
+  getSignalementAcknowledgementCopy,
+  resolveSignalementLocale,
+} from "@/lib/email/signalementEmailCopy";
+import {
   resolveNotifyEmail,
   sendSmtpMail,
   smtpConfigured,
 } from "@/lib/email/smtp";
+import type { SupportedLocale } from "@/i18n/locales";
 import { getSiteOrigin } from "@/lib/seo/siteOrigin";
 
 export type SignalementEmailPayload = {
@@ -25,6 +30,7 @@ export type SignalementEmailPayload = {
   coords?: string;
   typeInfraction?: string;
   pieceCount: number;
+  locale?: SupportedLocale;
 };
 
 function excerpt(text: string, max = 500): string {
@@ -38,33 +44,32 @@ export function buildSignalementAcknowledgementEmail(payload: SignalementEmailPa
   text: string;
   html: string;
 } {
-  const subject = `[IGM] Accusé de réception — ${payload.reference}`;
+  const locale = resolveSignalementLocale(payload.locale);
+  const copy = getSignalementAcknowledgementCopy(locale);
+  const subject = copy.subject(payload.reference);
   const greeting = payload.alerteurNom?.trim()
-    ? `Bonjour ${payload.alerteurNom.trim()},`
-    : "Bonjour,";
+    ? copy.greetingNamed(payload.alerteurNom.trim())
+    : copy.greetingDefault;
 
   const text = [
     greeting,
     "",
-    "Nous accusons réception de votre signalement transmis à l'Inspection Générale des Mines (IGM).",
+    copy.textRegistered,
     "",
-    `Référence : ${payload.reference}`,
+    `${locale === "en" ? "Reference" : "Référence"} : ${payload.reference}`,
     "",
-    "Votre déclaration a été enregistrée et sera examinée par nos équipes dans le cadre de nos missions légales.",
-    "Les informations transmises sont traitées de manière confidentielle.",
+    copy.textConfidential,
     "",
-    "Conservez cette référence pour toute correspondance ultérieure avec l'IGM.",
-    buildMailContactTextFooter(),
+    copy.textKeepReference,
+    buildMailContactTextFooter(locale),
   ].join("\n");
 
   const html = buildMailContactHtml({
-    headline: "Votre signalement a bien été enregistré",
+    locale,
+    headline: copy.headline,
     greeting,
-    paragraphs: [
-      "Nous accusons réception de votre signalement transmis à l'Inspection Générale des Mines (IGM).",
-      "Votre déclaration sera examinée par nos équipes dans le cadre de nos missions légales. Les informations transmises sont traitées de manière confidentielle.",
-    ],
-    contentHtml: renderMailContactReferenceBadge(payload.reference),
+    paragraphs: [copy.bodyIntro, copy.bodyLegal],
+    contentHtml: renderMailContactReferenceBadge(payload.reference, locale),
   });
 
   return { subject, text, html };
@@ -93,11 +98,12 @@ export function buildSignalementAdminNotificationEmail(
     excerpt(payload.description),
     "",
     `Voir dans l'admin : ${adminUrl}`,
-    buildMailContactTextFooter(),
+    buildMailContactTextFooter("fr"),
   ].filter(Boolean);
 
   const text = lines.join("\n");
   const html = buildMailContactHtml({
+    locale: "fr",
     headline: `Nouveau signalement ${payload.reference}`,
     greeting: "Bonjour,",
     paragraphs: [

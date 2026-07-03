@@ -2,6 +2,10 @@ import type { File as PayloadUploadFile } from "payload";
 
 import { getPayloadClient } from "@/lib/cms/payload";
 import { sendSignalementSubmissionEmails } from "@/lib/email/sendSignalementEmails";
+import {
+  getSignalementAcknowledgementCopy,
+  resolveSignalementLocale,
+} from "@/lib/email/signalementEmailCopy";
 import { TURNSTILE_FORM_FIELD, verifyTurnstileToken } from "@/lib/security/turnstile";
 
 import { assertOrphanSignalementPieces } from "./assertOrphanSignalementPieces";
@@ -143,6 +147,8 @@ export async function submitSignalement(
   const typeInfraction =
     typeRaw && isTypeInfraction(typeRaw) ? typeRaw : undefined;
 
+  const locale = resolveSignalementLocale(String(formData.get("locale") ?? "fr"));
+
   const pieceIds = parsePieceIds(formData);
   const inlineFiles = formData
     .getAll("pieces")
@@ -236,17 +242,17 @@ export async function submitSignalement(
         coords,
         typeInfraction,
         pieceCount: uploadedFileIds.length,
+        locale,
       },
       siteEmail,
     );
 
-    const acknowledgementNote = emailResult.acknowledgementSent
-      ? " Un accusé de réception vous a été envoyé par e-mail."
-      : "";
+    const copy = getSignalementAcknowledgementCopy(locale);
+    const message = copy.receivedMessage(reference, emailResult.acknowledgementSent);
 
     return {
       ok: true,
-      message: `Signalement ${reference} reçu.${acknowledgementNote}`,
+      message,
       reference,
       id: signalement.id,
       emails: {

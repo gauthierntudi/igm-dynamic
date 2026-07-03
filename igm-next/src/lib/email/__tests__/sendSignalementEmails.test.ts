@@ -42,6 +42,15 @@ describe("sendSignalementEmails", () => {
     expect(mail.html).toContain("Ouvrir le dossier dans l'admin");
     expect(mail.html).toContain("#ff0c0e");
   });
+
+  it("envoie l'accusé en anglais lorsque locale=en", () => {
+    const mail = buildSignalementAcknowledgementEmail({ ...basePayload, locale: "en" });
+    expect(mail.subject).toContain("Acknowledgement of receipt");
+    expect(mail.html).toContain("Your report has been successfully registered");
+    expect(mail.html).toContain("Your reference");
+    expect(mail.html).toContain('lang="en"');
+    expect(mail.html).toContain("/en/contact");
+  });
 });
 
 describe("mailContactTemplate", () => {
