@@ -318,14 +318,14 @@ header.style-4 .main-menu > ul > li > a.drop-down {
   }
 
   header.style-4 .nav-right a.primary-btn4 .content {
-    font-size: 13px;
-    padding: 10px 14px;
+    font-size: 16px;
+    padding: 12px 18px;
   }
 
   header.style-4 .nav-right a.primary-btn4 .icon {
-    min-width: 34px;
-    max-width: 34px;
-    height: 34px;
+    min-width: 40px;
+    max-width: 40px;
+    height: 40px;
   }
 }
 
