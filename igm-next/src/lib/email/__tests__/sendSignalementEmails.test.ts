@@ -39,7 +39,7 @@ describe("sendSignalementEmails", () => {
     expect(mail.text).toContain("jean@example.com");
     expect(mail.text).toContain("Pièces jointes : 2");
     expect(mail.html).toContain("https://www.igmrdc.com/admin/collections/signalements/42");
-    expect(mail.html).toContain("Ouvrir dans l'admin");
+    expect(mail.html).toContain("Ouvrir le dossier dans l'admin");
     expect(mail.html).toContain("#1b4491");
   });
 });

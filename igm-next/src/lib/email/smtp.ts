@@ -1,16 +1,19 @@
+import type { Transporter } from "nodemailer";
 import nodemailer from "nodemailer";
 
 export function smtpConfigured(): boolean {
   return Boolean(process.env.SMTP_HOST && process.env.SMTP_FROM);
 }
 
+/** Adresse de notification admin — CONTACT_NOTIFY_EMAIL ou e-mail du site, jamais SMTP_FROM. */
 export function resolveNotifyEmail(fallback?: string | null): string | null {
-  return (
-    process.env.CONTACT_NOTIFY_EMAIL?.trim() ||
-    fallback?.trim() ||
-    process.env.SMTP_FROM?.trim() ||
-    null
-  );
+  const notify = process.env.CONTACT_NOTIFY_EMAIL?.trim();
+  if (notify) return notify;
+
+  const site = fallback?.trim();
+  if (site && site.includes("@")) return site;
+
+  return null;
 }
 
 export function escapeHtml(value: string): string {
@@ -27,13 +30,11 @@ export function getServerBaseUrl(): string {
 
 /** Normalise SMTP_FROM (guillemets éventuels dans .env). */
 export function parseSmtpFrom(value?: string | null): string {
-  const trimmed = value?.trim().replace(/^["']|["']$/g, "") ?? "";
-  return trimmed;
+  return value?.trim().replace(/^["']|["']$/g, "") ?? "";
 }
 
-export function createSmtpTransporter() {
+export function createSmtpTransporter(): Transporter {
   const port = Number.parseInt(process.env.SMTP_PORT ?? "587", 10);
-  // Port 587 = STARTTLS ; 465 = SSL direct.
   const secure = port === 465;
 
   return nodemailer.createTransport({
@@ -60,21 +61,22 @@ export type SendSmtpMailOptions = {
 
 export async function sendSmtpMail(
   options: SendSmtpMailOptions,
+  transporter?: Transporter,
 ): Promise<{ sent: boolean; reason?: string }> {
   if (!smtpConfigured()) {
     return { sent: false, reason: "SMTP non configuré." };
   }
 
-  const transporter = createSmtpTransporter();
+  const from = parseSmtpFrom(process.env.SMTP_FROM);
+  if (!from) {
+    console.error("[email] SMTP_FROM manquant");
+    return { sent: false, reason: "SMTP_FROM manquant." };
+  }
+
+  const transport = transporter ?? createSmtpTransporter();
 
   try {
-    const from = parseSmtpFrom(process.env.SMTP_FROM);
-    if (!from) {
-      console.error("[email] SMTP_FROM manquant");
-      return { sent: false, reason: "SMTP_FROM manquant." };
-    }
-
-    await transporter.sendMail({
+    const info = await transport.sendMail({
       from,
       to: options.to,
       replyTo: options.replyTo,
@@ -82,11 +84,17 @@ export async function sendSmtpMail(
       text: options.text,
       html: options.html,
     });
-    console.info(`[email] envoyé → ${options.to} (${options.subject})`);
+    console.info(
+      `[email] envoyé → ${options.to} (${options.subject}) id=${info.messageId ?? "?"}`,
+    );
     return { sent: true };
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
     console.error(`[email] échec envoi → ${options.to} (${options.subject}):`, detail);
     return { sent: false, reason: detail || "Échec d'envoi SMTP." };
+  } finally {
+    if (!transporter) {
+      transport.close();
+    }
   }
 }
