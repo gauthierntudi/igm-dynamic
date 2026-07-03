@@ -25,9 +25,16 @@ export function getServerBaseUrl(): string {
   return (process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000").replace(/\/$/, "");
 }
 
+/** Normalise SMTP_FROM (guillemets éventuels dans .env). */
+export function parseSmtpFrom(value?: string | null): string {
+  const trimmed = value?.trim().replace(/^["']|["']$/g, "") ?? "";
+  return trimmed;
+}
+
 export function createSmtpTransporter() {
   const port = Number.parseInt(process.env.SMTP_PORT ?? "587", 10);
-  const secure = process.env.SMTP_SECURE === "true" || port === 465;
+  // Port 587 = STARTTLS ; 465 = SSL direct.
+  const secure = port === 465;
 
   return nodemailer.createTransport({
     host: process.env.SMTP_HOST,
@@ -61,17 +68,25 @@ export async function sendSmtpMail(
   const transporter = createSmtpTransporter();
 
   try {
+    const from = parseSmtpFrom(process.env.SMTP_FROM);
+    if (!from) {
+      console.error("[email] SMTP_FROM manquant");
+      return { sent: false, reason: "SMTP_FROM manquant." };
+    }
+
     await transporter.sendMail({
-      from: process.env.SMTP_FROM,
+      from,
       to: options.to,
       replyTo: options.replyTo,
       subject: options.subject,
       text: options.text,
       html: options.html,
     });
+    console.info(`[email] envoyé → ${options.to} (${options.subject})`);
     return { sent: true };
   } catch (error) {
-    console.error("[email] SMTP send failed", error);
-    return { sent: false, reason: "Échec d'envoi SMTP." };
+    const detail = error instanceof Error ? error.message : String(error);
+    console.error(`[email] échec envoi → ${options.to} (${options.subject}):`, detail);
+    return { sent: false, reason: detail || "Échec d'envoi SMTP." };
   }
 }

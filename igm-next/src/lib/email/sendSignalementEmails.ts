@@ -147,41 +147,54 @@ export async function sendSignalementSubmissionEmails(
   }
 
   const adminUrl = `${getServerBaseUrl()}/admin/collections/signalements/${payload.id}`;
-  let acknowledgementSent = false;
-  let adminNotified = false;
-
   const alerteurEmail = payload.alerteurEmail?.trim();
-  if (alerteurEmail) {
-    const acknowledgement = buildSignalementAcknowledgementEmail(payload);
-    const result = await sendSmtpMail({
-      to: alerteurEmail,
-      subject: acknowledgement.subject,
-      text: acknowledgement.text,
-      html: acknowledgement.html,
-    });
-    acknowledgementSent = result.sent;
-    if (!result.sent) {
-      console.warn("[signalement] accusé de réception non envoyé", result.reason);
-    }
+  const notifyTo = resolveNotifyEmail(siteEmail);
+
+  if (!notifyTo) {
+    console.warn(
+      "[signalement] aucune adresse admin — définir CONTACT_NOTIFY_EMAIL (ou e-mail site / SMTP_FROM).",
+    );
+  } else {
+    console.info(`[signalement] notification admin → ${notifyTo}`);
   }
 
-  const notifyTo = resolveNotifyEmail(siteEmail);
-  if (notifyTo) {
-    const adminMail = buildSignalementAdminNotificationEmail(payload, adminUrl);
-    const result = await sendSmtpMail({
-      to: notifyTo,
-      subject: adminMail.subject,
-      text: adminMail.text,
-      html: adminMail.html,
-      replyTo: alerteurEmail || undefined,
-    });
-    adminNotified = result.sent;
-    if (!result.sent) {
-      console.warn("[signalement] notification admin non envoyée", result.reason);
-    }
-  } else {
-    console.warn("[signalement] CONTACT_NOTIFY_EMAIL non configuré — admin non notifié.");
-  }
+  const adminPromise = notifyTo
+    ? (async () => {
+        const adminMail = buildSignalementAdminNotificationEmail(payload, adminUrl);
+        const result = await sendSmtpMail({
+          to: notifyTo,
+          subject: adminMail.subject,
+          text: adminMail.text,
+          html: adminMail.html,
+          replyTo: alerteurEmail || undefined,
+        });
+        if (!result.sent) {
+          console.warn("[signalement] notification admin non envoyée", result.reason);
+        }
+        return result.sent;
+      })()
+    : Promise.resolve(false);
+
+  const acknowledgementPromise = alerteurEmail
+    ? (async () => {
+        const acknowledgement = buildSignalementAcknowledgementEmail(payload);
+        const result = await sendSmtpMail({
+          to: alerteurEmail,
+          subject: acknowledgement.subject,
+          text: acknowledgement.text,
+          html: acknowledgement.html,
+        });
+        if (!result.sent) {
+          console.warn("[signalement] accusé de réception non envoyé", result.reason);
+        }
+        return result.sent;
+      })()
+    : Promise.resolve(false);
+
+  const [adminNotified, acknowledgementSent] = await Promise.all([
+    adminPromise,
+    acknowledgementPromise,
+  ]);
 
   return { acknowledgementSent, adminNotified };
 }
