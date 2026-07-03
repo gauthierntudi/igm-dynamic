@@ -283,6 +283,12 @@ header.style-4 .main-menu > ul > li > a.drop-down {
   letter-spacing: normal !important;
 }
 
+@media (min-width: 1566px) {
+  header.style-4 .main-menu > ul > li > a {
+    font-size: 14px;
+  }
+}
+
 @media (min-width: 992px) {
   header.style-4 .nav-right .igm-header-phone-desktop .icon {
     border-radius: 999px !important;
@@ -333,7 +339,7 @@ header.style-4 .main-menu > ul > li > a.drop-down {
   }
 
   header.style-4 .main-menu > ul > li > a {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   header.style-4 .nav-right .contact-area .content > span {
