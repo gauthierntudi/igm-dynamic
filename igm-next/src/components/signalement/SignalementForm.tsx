@@ -1383,7 +1383,7 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
         <div className={styles.formFooter}>
           <div className={styles.footerLeft}>
             <p className={styles.footerNote}>
-              Accusé possible si e-mail renseigné. PJ : {formatBytes(MAX_SIGNALEMENT_FILE_BYTES)} (photos/audio),{" "}
+              Accusé de réception par e-mail si une adresse est renseignée. PJ : {formatBytes(MAX_SIGNALEMENT_FILE_BYTES)} (photos/audio),{" "}
               {formatBytes(MAX_SIGNALEMENT_VIDEO_FILE_BYTES)} (vidéos), {MAX_FILES} max.
             </p>
             <p className={styles.footerLegal}>

@@ -1,6 +1,7 @@
 import type { File as PayloadUploadFile } from "payload";
 
 import { getPayloadClient } from "@/lib/cms/payload";
+import { sendSignalementSubmissionEmails } from "@/lib/email/sendSignalementEmails";
 import { TURNSTILE_FORM_FIELD, verifyTurnstileToken } from "@/lib/security/turnstile";
 
 import { assertOrphanSignalementPieces } from "./assertOrphanSignalementPieces";
@@ -204,9 +205,42 @@ export async function submitSignalement(
       overrideAccess: true,
     });
 
+    let siteEmail: string | null = null;
+    try {
+      const settings = await payload.findGlobal({ slug: "site-settings", locale: "fr" });
+      siteEmail =
+        (typeof settings?.email === "string" && settings.email) ||
+        (typeof settings?.footerContactEmail === "string" && settings.footerContactEmail) ||
+        null;
+    } catch {
+      /* ignore settings lookup errors */
+    }
+
+    const emailResult = await sendSignalementSubmissionEmails(
+      {
+        id: signalement.id,
+        reference,
+        description,
+        estAnonyme,
+        alerteurNom,
+        alerteurEmail,
+        alerteurTel,
+        province,
+        villeSite,
+        coords,
+        typeInfraction,
+        pieceCount: uploadedFileIds.length,
+      },
+      siteEmail,
+    );
+
+    const acknowledgementNote = emailResult.acknowledgementSent
+      ? " Un accusé de réception vous a été envoyé par e-mail."
+      : "";
+
     return {
       ok: true,
-      message: `Signalement ${reference} reçu.`,
+      message: `Signalement ${reference} reçu.${acknowledgementNote}`,
       reference,
       id: signalement.id,
     };

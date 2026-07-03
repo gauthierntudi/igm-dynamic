@@ -1,4 +1,15 @@
-import nodemailer from "nodemailer";
+import {
+  buildIgmEmailHtml,
+  buildIgmEmailTextFooter,
+  renderIgmEmailButton,
+  renderIgmEmailMessageBlock,
+  renderIgmEmailMetaTable,
+} from "@/lib/email/igmEmailTemplate";
+import {
+  resolveNotifyEmail,
+  sendSmtpMail,
+  smtpConfigured,
+} from "@/lib/email/smtp";
 
 type ContactEmailPayload = {
   name: string;
@@ -9,27 +20,6 @@ type ContactEmailPayload = {
   locale?: string;
   adminUrl?: string;
 };
-
-function smtpConfigured(): boolean {
-  return Boolean(process.env.SMTP_HOST && process.env.SMTP_FROM);
-}
-
-function resolveNotifyEmail(fallback?: string | null): string | null {
-  return (
-    process.env.CONTACT_NOTIFY_EMAIL?.trim() ||
-    fallback?.trim() ||
-    process.env.SMTP_FROM?.trim() ||
-    null
-  );
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
 
 export async function sendContactNotificationEmail(
   payload: ContactEmailPayload,
@@ -45,23 +35,9 @@ export async function sendContactNotificationEmail(
     return { sent: false, reason: "SMTP non configuré." };
   }
 
-  const port = Number.parseInt(process.env.SMTP_PORT ?? "587", 10);
-  const secure = process.env.SMTP_SECURE === "true" || port === 465;
-
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port,
-    secure,
-    auth:
-      process.env.SMTP_USER && process.env.SMTP_PASS
-        ? {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
-          }
-        : undefined,
-  });
-
   const lines = [
+    "Nouveau message via le formulaire de contact.",
+    "",
     `Nom : ${payload.name}`,
     `E-mail : ${payload.email}`,
     payload.phone ? `Téléphone : ${payload.phone}` : null,
@@ -71,35 +47,41 @@ export async function sendContactNotificationEmail(
     payload.message,
     "",
     payload.adminUrl ? `Voir dans l'admin : ${payload.adminUrl}` : null,
+    buildIgmEmailTextFooter(),
   ].filter(Boolean);
 
   const textBody = lines.join("\n");
-  const htmlBody = `
-    <p><strong>Nouveau message via le formulaire de contact</strong></p>
-    <ul>
-      <li><strong>Nom :</strong> ${escapeHtml(payload.name)}</li>
-      <li><strong>E-mail :</strong> ${escapeHtml(payload.email)}</li>
-      ${payload.phone ? `<li><strong>Téléphone :</strong> ${escapeHtml(payload.phone)}</li>` : ""}
-      <li><strong>Objet :</strong> ${escapeHtml(payload.subject)}</li>
-      ${payload.locale ? `<li><strong>Langue :</strong> ${escapeHtml(payload.locale.toUpperCase())}</li>` : ""}
-    </ul>
-    <p><strong>Message :</strong></p>
-    <p style="white-space:pre-wrap">${escapeHtml(payload.message)}</p>
-    ${payload.adminUrl ? `<p><a href="${escapeHtml(payload.adminUrl)}">Ouvrir dans l'admin</a></p>` : ""}
-  `;
+  const htmlBody = buildIgmEmailHtml({
+    preheader: `Nouveau message de ${payload.name} : ${payload.subject}`,
+    eyebrow: "Formulaire contact",
+    title: payload.subject,
+    introHtml: `<p style="margin:0;font-family:Inter,'Google Sans',system-ui,sans-serif;font-size:14px;line-height:1.6;color:#6b6460;">
+      Un nouveau message a été transmis via le formulaire de contact du site IGM.
+    </p>`,
+    bodyHtml: `
+      ${renderIgmEmailMetaTable([
+        { label: "Nom", value: payload.name },
+        { label: "E-mail", value: payload.email },
+        ...(payload.phone ? [{ label: "Téléphone", value: payload.phone }] : []),
+        { label: "Objet", value: payload.subject },
+        ...(payload.locale ? [{ label: "Langue", value: payload.locale.toUpperCase() }] : []),
+      ])}
+      ${renderIgmEmailMessageBlock("Message", payload.message)}
+      ${payload.adminUrl ? renderIgmEmailButton(payload.adminUrl, "Ouvrir dans l'admin") : ""}
+    `,
+  });
 
-  try {
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM,
-      to,
-      replyTo: payload.email,
-      subject: `[IGM Contact] ${payload.subject}`,
-      text: textBody,
-      html: htmlBody,
-    });
-    return { sent: true };
-  } catch (error) {
-    console.error("[contact] e-mail notification failed", error);
-    return { sent: false, reason: "Échec d'envoi SMTP." };
+  const result = await sendSmtpMail({
+    to,
+    subject: `[IGM Contact] ${payload.subject}`,
+    text: textBody,
+    html: htmlBody,
+    replyTo: payload.email,
+  });
+
+  if (!result.sent) {
+    console.error("[contact] e-mail notification failed", result.reason);
   }
+
+  return result;
 }
