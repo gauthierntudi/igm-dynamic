@@ -21,6 +21,8 @@ export const ROUTE_KEYS = {
   photos: { fr: "photos", en: "photos" },
   videos: { fr: "videos", en: "videos" },
   contact: { fr: "contact", en: "contact" },
+  terms: { fr: "conditions-generales", en: "terms-and-conditions" },
+  cookies: { fr: "politique-cookies", en: "cookie-policy" },
 } as const;
 
 export type RouteKey = keyof typeof ROUTE_KEYS;

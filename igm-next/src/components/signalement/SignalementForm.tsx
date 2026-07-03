@@ -1387,7 +1387,11 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
               {formatBytes(MAX_SIGNALEMENT_VIDEO_FILE_BYTES)} (vidéos), {MAX_FILES} max.
             </p>
             <p className={styles.footerLegal}>
-              Envoyer = vous confirmez le contenu. <a href="/">Politique données</a> (bientôt).
+              Envoyer = vous confirmez le contenu.{" "}
+              <a href="/conditions-generales" target="_blank" rel="noreferrer">
+                Conditions générales
+              </a>
+              .
             </p>
           </div>
         </div>

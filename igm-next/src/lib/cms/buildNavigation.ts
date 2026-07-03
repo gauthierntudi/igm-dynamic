@@ -185,6 +185,25 @@ function resolveLocalizedFooterText(
   return trimmed;
 }
 
+/** Liens légaux hérités avec href "#" (anciens réglages CMS) → pages internes dédiées. */
+function resolveLegalLinkFallback(
+  link: RuntimeFooterLink,
+  locale: SupportedLocale,
+): RuntimeFooterLink {
+  if (link.href !== "#") return link;
+
+  const fr = getMessages("fr").footer;
+  const en = getMessages("en").footer;
+
+  if (link.label === fr.terms || link.label === en.terms) {
+    return { ...link, href: hrefForRoute("terms", locale) };
+  }
+  if (link.label === fr.cookies || link.label === en.cookies) {
+    return { ...link, href: hrefForRoute("cookies", locale) };
+  }
+  return link;
+}
+
 function resolveFooterColumnTitle(title: string, locale: SupportedLocale): string {
   const fr = getMessages("fr").footer;
   const localized = getMessages(locale).footer;
@@ -226,15 +245,16 @@ export function buildSiteNavigation(
           iconClass: SOCIAL_ICONS[s.network!] ?? "bi-link",
         }));
 
-  const footerLegalLinks =
+  const footerLegalLinks = (
     settings?.footerLegalLinks?.length
       ? settings.footerLegalLinks
           .map((link) => cmsFooterLinkToRuntime(link, locale))
           .filter((l): l is RuntimeFooterLink => l !== null)
       : [
-          { label: f.terms, href: "#" },
-          { label: f.cookies, href: "#" },
-        ];
+          { label: f.terms, href: hrefForRoute("terms", locale) },
+          { label: f.cookies, href: hrefForRoute("cookies", locale) },
+        ]
+  ).map((link) => resolveLegalLinkFallback(link, locale));
 
   return {
     locale,

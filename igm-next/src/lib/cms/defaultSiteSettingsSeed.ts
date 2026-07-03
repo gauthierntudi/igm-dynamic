@@ -168,12 +168,12 @@ export function buildDefaultSiteSettingsSeed(): DefaultSiteSettingsSeed {
       {
         label: { fr: fr.footer.terms, en: en.footer.terms },
         navLink: CUSTOM_NAV_LINK_VALUE,
-        customHref: "#",
+        customHref: "/conditions-generales",
       },
       {
         label: { fr: fr.footer.cookies, en: en.footer.cookies },
         navLink: CUSTOM_NAV_LINK_VALUE,
-        customHref: "#",
+        customHref: "/politique-cookies",
       },
     ],
     footerCopyright: {

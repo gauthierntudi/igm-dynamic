@@ -28,6 +28,13 @@ DO $$ BEGIN ALTER TABLE "pages" ADD CONSTRAINT "pages_hero_cta_media_id_media_id
 
 CREATE INDEX IF NOT EXISTS "pages_hero_cta_media_idx" ON "pages" ("hero_cta_media_id");
 
+-- Bandeau CTA : table des versions (_pages_v)
+ALTER TABLE "_pages_v" ADD COLUMN IF NOT EXISTS "version_hero_cta_media_id" integer;
+
+DO $$ BEGIN ALTER TABLE "_pages_v" ADD CONSTRAINT "_pages_v_version_hero_cta_media_id_media_id_fk" FOREIGN KEY ("version_hero_cta_media_id") REFERENCES "media"("id") ON DELETE SET NULL; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+CREATE INDEX IF NOT EXISTS "_pages_v_version_hero_version_hero_cta_media_idx" ON "_pages_v" ("version_hero_cta_media_id");
+
 -- Bandeaux CTA LCFCM : global page-heroes
 ALTER TABLE "page_heroes" ADD COLUMN IF NOT EXISTS "fraud_cta_hero_image_id" integer;
 ALTER TABLE "page_heroes" ADD COLUMN IF NOT EXISTS "smuggling_cta_hero_image_id" integer;

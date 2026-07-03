@@ -318,9 +318,189 @@ export const DEFAULT_SANCTIONS_PAGE_EN: DefaultPageSeed = {
     "Mining sanctions regime in the DRC: Mining Code, Mining Regulations and IGM's role in establishing offences and monitoring procedures.",
 };
 
+const TERMS_CONTENT_FR = `
+<p>Les présentes conditions générales définissent les modalités d'accès et d'utilisation du site officiel de l'Inspection Générale des Mines (IGM), service public spécialisé de l'État congolais créé par le Décret n°23/19 du 09 juin 2023.</p>
+<p>En accédant au site et en le consultant, l'utilisateur reconnaît avoir pris connaissance des présentes conditions et s'engage à les respecter.</p>
+<p>Le site de l'IGM a pour vocation :</p>
+<ul>
+  <li>D'informer le public sur les missions, l'organisation et les activités de l'Inspection Générale des Mines ;</li>
+  <li>De diffuser les textes légaux et réglementaires applicables au secteur minier en République Démocratique du Congo ;</li>
+  <li>De publier les actualités institutionnelles de l'IGM ;</li>
+  <li>De permettre le signalement de cas présumés de fraude ou de contrebande minières via le formulaire dédié ;</li>
+  <li>De faciliter la prise de contact avec les services de l'IGM.</li>
+</ul>
+<p>L'ensemble des contenus publiés sur le site — textes, logos, images, documents, vidéos et éléments graphiques — est protégé par les dispositions relatives à la propriété intellectuelle. Toute reproduction, représentation ou diffusion, totale ou partielle, à des fins commerciales est interdite sans autorisation préalable et écrite de l'IGM. La citation des contenus à des fins d'information, d'étude ou de recherche est autorisée sous réserve de mentionner la source.</p>
+<p>L'utilisateur s'engage à :</p>
+<ul>
+  <li>Utiliser le site conformément à sa destination et aux lois en vigueur en République Démocratique du Congo ;</li>
+  <li>Ne pas entraver le fonctionnement du site ni tenter d'accéder de manière non autorisée à ses systèmes ;</li>
+  <li>Fournir des informations exactes et de bonne foi lors de l'utilisation des formulaires de contact ou de signalement ;</li>
+  <li>Ne pas utiliser le formulaire de signalement à des fins de dénonciation calomnieuse, de diffamation ou de harcèlement.</li>
+</ul>
+<p>Les signalements transmis via la plateforme sont traités de manière confidentielle. L'utilisateur peut choisir de signaler de façon anonyme. Les informations communiquées sont utilisées exclusivement dans le cadre des missions légales de l'IGM en matière de lutte contre la fraude et la contrebande minières.</p>
+<p>L'IGM s'efforce d'assurer l'exactitude et la mise à jour des informations publiées. Toutefois, les contenus sont fournis à titre informatif et ne sauraient engager la responsabilité de l'IGM en cas d'erreur, d'omission ou d'indisponibilité temporaire du site. Seuls les textes officiels publiés au Journal Officiel font foi.</p>
+<p>Le site peut contenir des liens vers des sites tiers, notamment des institutions partenaires. L'IGM n'exerce aucun contrôle sur ces sites et décline toute responsabilité quant à leurs contenus.</p>
+<p>L'IGM se réserve le droit de modifier les présentes conditions générales à tout moment. Les conditions applicables sont celles en vigueur à la date de consultation du site. Les présentes conditions sont régies par le droit congolais ; tout litige relatif à leur application relève de la compétence des juridictions de la République Démocratique du Congo.</p>
+<p>Pour toute question relative aux présentes conditions générales ou à l'utilisation du site, vous pouvez contacter l'Inspection Générale des Mines via la page contact ou aux coordonnées officielles indiquées sur le site.</p>
+`.trim();
+
+const TERMS_CONTENT_EN = `
+<p>These terms and conditions define the terms of access and use of the official website of the General Inspectorate of Mines (IGM), a specialised public service of the Congolese State created by Decree No. 23/19 of 9 June 2023.</p>
+<p>By accessing and browsing the site, users acknowledge that they have read these terms and agree to comply with them.</p>
+<p>The IGM website is intended to:</p>
+<ul>
+  <li>Inform the public about the missions, organisation and activities of the General Inspectorate of Mines;</li>
+  <li>Disseminate the legal and regulatory texts applicable to the mining sector in the Democratic Republic of Congo;</li>
+  <li>Publish IGM institutional news;</li>
+  <li>Enable the reporting of suspected cases of mining fraud or smuggling via the dedicated form;</li>
+  <li>Facilitate contact with IGM services.</li>
+</ul>
+<p>All content published on the site — texts, logos, images, documents, videos and graphic elements — is protected by intellectual property provisions. Any reproduction, representation or distribution, in whole or in part, for commercial purposes is prohibited without the prior written authorisation of IGM. Quoting content for information, study or research purposes is permitted provided the source is acknowledged.</p>
+<p>Users undertake to:</p>
+<ul>
+  <li>Use the site in accordance with its purpose and the laws in force in the Democratic Republic of Congo;</li>
+  <li>Not disrupt the operation of the site or attempt unauthorised access to its systems;</li>
+  <li>Provide accurate information in good faith when using the contact or reporting forms;</li>
+  <li>Not use the reporting form for the purposes of slanderous accusation, defamation or harassment.</li>
+</ul>
+<p>Reports submitted through the platform are treated confidentially. Users may choose to report anonymously. The information provided is used exclusively within the framework of IGM's legal missions to combat mining fraud and smuggling.</p>
+<p>IGM strives to ensure the accuracy and currency of the information published. However, content is provided for information purposes only and IGM cannot be held liable for any error, omission or temporary unavailability of the site. Only official texts published in the Official Gazette are authoritative.</p>
+<p>The site may contain links to third-party websites, in particular partner institutions. IGM has no control over these sites and accepts no responsibility for their content.</p>
+<p>IGM reserves the right to amend these terms and conditions at any time. The applicable terms are those in force on the date the site is consulted. These terms are governed by Congolese law; any dispute relating to their application falls under the jurisdiction of the courts of the Democratic Republic of Congo.</p>
+<p>For any questions regarding these terms and conditions or the use of the site, you may contact the General Inspectorate of Mines via the contact page or the official contact details provided on the site.</p>
+`.trim();
+
+export const DEFAULT_TERMS_PAGE_FR: DefaultPageSeed = {
+  routeKey: "terms",
+  slug: "conditions-generales",
+  title: "Conditions Générales",
+  hero: {
+    eyebrow: "Informations légales",
+    title: "Conditions Générales",
+    lead:
+      "Modalités d'accès et d'utilisation du site officiel de l'Inspection Générale des Mines.",
+    ctaLabel: "Nous contacter",
+    ctaHref: "/contact",
+  },
+  contentHtml: TERMS_CONTENT_FR,
+  seoTitle: "Conditions Générales — IGM",
+  seoDescription:
+    "Conditions générales d'utilisation du site officiel de l'Inspection Générale des Mines (IGM) en République Démocratique du Congo.",
+};
+
+export const DEFAULT_TERMS_PAGE_EN: DefaultPageSeed = {
+  routeKey: "terms",
+  slug: "terms-and-conditions",
+  title: "Terms & conditions",
+  hero: {
+    eyebrow: "Legal information",
+    title: "Terms & conditions",
+    lead:
+      "Terms of access and use of the official website of the General Inspectorate of Mines.",
+    ctaLabel: "Contact us",
+    ctaHref: "/contact",
+  },
+  contentHtml: TERMS_CONTENT_EN,
+  seoTitle: "Terms & conditions — IGM",
+  seoDescription:
+    "Terms and conditions of use of the official website of the General Inspectorate of Mines (IGM) in the Democratic Republic of Congo.",
+};
+
+const COOKIES_CONTENT_FR = `
+<p>La présente politique explique ce que sont les cookies, comment le site officiel de l'Inspection Générale des Mines (IGM) les utilise et comment vous pouvez les gérer.</p>
+<p>Un cookie est un petit fichier texte déposé sur votre appareil (ordinateur, tablette, téléphone) lors de la consultation d'un site internet. Il permet notamment de mémoriser vos préférences de navigation et d'assurer le bon fonctionnement des services proposés.</p>
+<p>Le site de l'IGM utilise un nombre limité de cookies, strictement nécessaires ou destinés à améliorer votre expérience :</p>
+<ul>
+  <li>Cookies techniques indispensables au fonctionnement du site, à la sécurité et à la navigation ;</li>
+  <li>Cookie de préférence de langue, permettant de mémoriser votre choix entre le français et l'anglais ;</li>
+  <li>Cookies de session liés à l'utilisation des formulaires du site, notamment le formulaire de signalement.</li>
+</ul>
+<p>Ces cookies ne sont pas utilisés à des fins publicitaires et ne servent pas à suivre votre navigation sur d'autres sites. Les informations qu'ils contiennent ne sont ni vendues ni communiquées à des tiers.</p>
+<p>Les signalements effectués via la plateforme peuvent être réalisés de manière anonyme : les cookies utilisés par le site ne permettent pas d'identifier l'auteur d'un signalement anonyme.</p>
+<p>Vous pouvez à tout moment gérer ou supprimer les cookies via les paramètres de votre navigateur :</p>
+<ul>
+  <li>Configurer votre navigateur pour accepter ou refuser les cookies, en totalité ou au cas par cas ;</li>
+  <li>Supprimer les cookies déjà enregistrés sur votre appareil ;</li>
+  <li>Activer la navigation privée, qui supprime automatiquement les cookies à la fermeture du navigateur.</li>
+</ul>
+<p>Le refus ou la suppression de certains cookies techniques peut toutefois altérer le fonctionnement de certaines fonctionnalités du site, notamment la mémorisation de la langue choisie.</p>
+<p>La présente politique peut être mise à jour à tout moment, notamment en cas d'évolution du site ou de la réglementation applicable. La version en vigueur est celle publiée sur cette page.</p>
+<p>Pour toute question relative à la présente politique des cookies, vous pouvez contacter l'Inspection Générale des Mines via la page contact du site.</p>
+`.trim();
+
+const COOKIES_CONTENT_EN = `
+<p>This policy explains what cookies are, how the official website of the General Inspectorate of Mines (IGM) uses them and how you can manage them.</p>
+<p>A cookie is a small text file placed on your device (computer, tablet, phone) when you visit a website. It is used in particular to remember your browsing preferences and to ensure the proper functioning of the services provided.</p>
+<p>The IGM website uses a limited number of cookies, either strictly necessary or intended to improve your experience:</p>
+<ul>
+  <li>Technical cookies essential to the operation, security and navigation of the site;</li>
+  <li>A language preference cookie, used to remember your choice between French and English;</li>
+  <li>Session cookies related to the use of the site's forms, in particular the reporting form.</li>
+</ul>
+<p>These cookies are not used for advertising purposes and do not track your browsing on other websites. The information they contain is neither sold nor shared with third parties.</p>
+<p>Reports submitted through the platform can be made anonymously: the cookies used by the site do not make it possible to identify the author of an anonymous report.</p>
+<p>You can manage or delete cookies at any time through your browser settings:</p>
+<ul>
+  <li>Configure your browser to accept or refuse cookies, in full or on a case-by-case basis;</li>
+  <li>Delete cookies already stored on your device;</li>
+  <li>Enable private browsing, which automatically deletes cookies when the browser is closed.</li>
+</ul>
+<p>However, refusing or deleting certain technical cookies may affect the operation of some site features, in particular the storage of your language preference.</p>
+<p>This policy may be updated at any time, in particular if the site or applicable regulations change. The version in force is the one published on this page.</p>
+<p>For any questions regarding this cookie policy, you may contact the General Inspectorate of Mines via the site's contact page.</p>
+`.trim();
+
+export const DEFAULT_COOKIES_PAGE_FR: DefaultPageSeed = {
+  routeKey: "cookies",
+  slug: "politique-cookies",
+  title: "Politiques des cookies",
+  hero: {
+    eyebrow: "Informations légales",
+    title: "Politiques des cookies",
+    lead:
+      "Utilisation et gestion des cookies sur le site officiel de l'Inspection Générale des Mines.",
+    ctaLabel: "Nous contacter",
+    ctaHref: "/contact",
+  },
+  contentHtml: COOKIES_CONTENT_FR,
+  seoTitle: "Politiques des cookies — IGM",
+  seoDescription:
+    "Politique des cookies du site officiel de l'Inspection Générale des Mines (IGM) : types de cookies utilisés, finalités et gestion par l'utilisateur.",
+};
+
+export const DEFAULT_COOKIES_PAGE_EN: DefaultPageSeed = {
+  routeKey: "cookies",
+  slug: "cookie-policy",
+  title: "Cookie policy",
+  hero: {
+    eyebrow: "Legal information",
+    title: "Cookie policy",
+    lead:
+      "Use and management of cookies on the official website of the General Inspectorate of Mines.",
+    ctaLabel: "Contact us",
+    ctaHref: "/contact",
+  },
+  contentHtml: COOKIES_CONTENT_EN,
+  seoTitle: "Cookie policy — IGM",
+  seoDescription:
+    "Cookie policy of the official website of the General Inspectorate of Mines (IGM): types of cookies used, purposes and user management.",
+};
+
 const DEFAULT_PAGES_BY_LOCALE = {
-  fr: [DEFAULT_MINING_FRAUD_PAGE_FR, DEFAULT_MINING_SMUGGLING_PAGE_FR, DEFAULT_SANCTIONS_PAGE_FR],
-  en: [DEFAULT_MINING_FRAUD_PAGE_EN, DEFAULT_MINING_SMUGGLING_PAGE_EN, DEFAULT_SANCTIONS_PAGE_EN],
+  fr: [
+    DEFAULT_MINING_FRAUD_PAGE_FR,
+    DEFAULT_MINING_SMUGGLING_PAGE_FR,
+    DEFAULT_SANCTIONS_PAGE_FR,
+    DEFAULT_TERMS_PAGE_FR,
+    DEFAULT_COOKIES_PAGE_FR,
+  ],
+  en: [
+    DEFAULT_MINING_FRAUD_PAGE_EN,
+    DEFAULT_MINING_SMUGGLING_PAGE_EN,
+    DEFAULT_SANCTIONS_PAGE_EN,
+    DEFAULT_TERMS_PAGE_EN,
+    DEFAULT_COOKIES_PAGE_EN,
+  ],
 } satisfies Record<SupportedLocale, DefaultPageSeed[]>;
 
 export function getDefaultPageSeed(slug: string, locale: SupportedLocale): DefaultPageSeed | null {
@@ -371,4 +551,6 @@ export const DEFAULT_PAGE_SEED_PAIRS = [
   { fr: DEFAULT_MINING_FRAUD_PAGE_FR, en: DEFAULT_MINING_FRAUD_PAGE_EN },
   { fr: DEFAULT_MINING_SMUGGLING_PAGE_FR, en: DEFAULT_MINING_SMUGGLING_PAGE_EN },
   { fr: DEFAULT_SANCTIONS_PAGE_FR, en: DEFAULT_SANCTIONS_PAGE_EN },
+  { fr: DEFAULT_TERMS_PAGE_FR, en: DEFAULT_TERMS_PAGE_EN },
+  { fr: DEFAULT_COOKIES_PAGE_FR, en: DEFAULT_COOKIES_PAGE_EN },
 ] as const;
