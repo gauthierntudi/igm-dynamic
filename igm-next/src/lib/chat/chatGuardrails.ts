@@ -9,6 +9,9 @@ const IGM_TOPIC =
 const OFF_TOPIC_PERSONAL =
   /\b(drague|dragger|draguer|seduir|seduction|pickup|flirt|flirter|copine|petite amie|petit ami|petite-amie|rencontre amoureuse|relation amoureuse|conquete|filles? de \d+|gars de \d+|homme de \d+|femme de \d+|dating|girlfriend|boyfriend|pick up|crush|romance|sortir avec|date her|date him)\b/;
 
+const OFF_TOPIC_GENERAL =
+  /\b(reussir dans la vie|reussite dans la vie|bonheur|conseils? de vie|life advice|how to succeed in life|how to be happy|epanouissement|developpement personnel|dev perso|coaching de vie|motivation personnelle|trouver l amour|maigrir|perdre du poids|recette de|cuisiner un|film a voir|serie netflix|parier sur|gagner au loto|astrologie|horoscope)\b/;
+
 const OFF_TOPIC_SENSITIVE =
   /\b(porno|sexe|strip tease|faire l amour|casino|paris sportif|pirater|torrent|hack compte|malware|fabriquer.{0,12}(bombe|arme)|drogue recreative)\b/;
 
@@ -23,7 +26,20 @@ export function isOffTopicQuestion(question: string): boolean {
   if (isIgmRelatedQuestion(question)) return false;
 
   const normalized = normalizeForSearch(question);
-  return OFF_TOPIC_PERSONAL.test(normalized) || OFF_TOPIC_SENSITIVE.test(normalized);
+  return (
+    OFF_TOPIC_PERSONAL.test(normalized) ||
+    OFF_TOPIC_GENERAL.test(normalized) ||
+    OFF_TOPIC_SENSITIVE.test(normalized)
+  );
+}
+
+/** Score RAG minimum pour autoriser le LLM sans mot-clé IGM explicite. */
+export const MIN_LLM_RANK_SCORE = 10;
+
+/** Question couverte par l'assistant (IGM ou correspondance forte au contenu du site). */
+export function isInAssistantScope(question: string, topRankScore = 0): boolean {
+  if (isIgmRelatedQuestion(question)) return true;
+  return topRankScore >= MIN_LLM_RANK_SCORE;
 }
 
 export function isOffTopicInsistence(question: string): boolean {

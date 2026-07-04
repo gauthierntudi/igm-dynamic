@@ -7,6 +7,7 @@ import {
   isContactPhoneQuestion,
   isGreenNumberQuestion,
 } from "../chatIntents";
+import { isOffTopicQuestion } from "../chatGuardrails";
 import { buildCartographyCoverageAnswer } from "@/lib/cartography/chatFacts";
 import { getLastUserText, getMessageSources } from "../chatMessageUtils";
 import { prepareChatContext, resolveContactPhoneAnswer } from "../prepareChatContext";
@@ -57,7 +58,7 @@ describe("prepareChatContext", () => {
   });
 
   it("construit un prompt système en anglais", async () => {
-    const prepared = await prepareChatContext("en", "Tell me about compliance audits in 2026");
+    const prepared = await prepareChatContext("en", "Tell me about IGM compliance audits in 2026");
     expect(prepared.systemPrompt).toContain("General Mine Inspection");
     expect(prepared.directAnswer).toBeUndefined();
   });
@@ -92,6 +93,15 @@ describe("prepareChatContext", () => {
     expect(prepared.directAnswer).toContain("22 provinces");
     expect(prepared.directAnswer).not.toContain("25 provinces");
     expect(prepared.sources[0]?.url).toContain("cartographie");
+  });
+
+  it("refuse sans LLM les questions générales hors IGM", async () => {
+    const prepared = await prepareChatContext("fr", "comment faire pour réussir dans la vie ?");
+
+    expect(prepared.directAnswer).toContain("ne relève pas");
+    expect(prepared.directAnswer).not.toContain("D'après ce que je sais");
+    expect(prepared.sources).toEqual([]);
+    expect(isOffTopicQuestion("comment faire pour réussir dans la vie ?")).toBe(true);
   });
 });
 

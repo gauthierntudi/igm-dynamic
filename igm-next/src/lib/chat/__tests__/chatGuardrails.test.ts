@@ -4,6 +4,7 @@ import {
   buildOffTopicRefusal,
   evaluateOffTopicGuard,
   isIgmRelatedQuestion,
+  isInAssistantScope,
   isOffTopicInsistence,
   isOffTopicQuestion,
 } from "../chatGuardrails";
@@ -45,5 +46,15 @@ describe("chatGuardrails", () => {
 
   it("formule un refus ferme en cas d'insistance", () => {
     expect(buildOffTopicRefusal("fr", true)).toContain("même si vous insistez");
+  });
+
+  it("détecte les questions générales hors périmètre", () => {
+    expect(isOffTopicQuestion("comment faire pour réussir dans la vie ?")).toBe(true);
+  });
+
+  it("refuse le périmètre sans mot-clé IGM ni score RAG suffisant", () => {
+    expect(isInAssistantScope("comment faire pour réussir dans la vie ?", 0)).toBe(false);
+    expect(isInAssistantScope("quelle est la mission de l'IGM ?", 0)).toBe(true);
+    expect(isInAssistantScope("expliquez la fraude minière", 12)).toBe(true);
   });
 });

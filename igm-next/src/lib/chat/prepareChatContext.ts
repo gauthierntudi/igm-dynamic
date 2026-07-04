@@ -20,7 +20,7 @@ import { getKnowledgeBase, type KnowledgeChunk } from "./knowledgeBase";
 import { buildIgmChatSystemPrompt } from "./systemPrompt";
 import { normalizeForSearch, tokenizeForSearch, tokenizeQuery } from "./textUtils";
 import { buildCartographyCoverageAnswer } from "@/lib/cartography/chatFacts";
-import { evaluateOffTopicGuard } from "./chatGuardrails";
+import { buildOffTopicRefusal, evaluateOffTopicGuard, isInAssistantScope } from "./chatGuardrails";
 
 export type PreparedChatContext = {
   /** Réponse immédiate (FAQ, small talk) — pas d'appel LLM. */
@@ -303,6 +303,18 @@ export async function prepareChatContext(
 
   const contactIntent = isContactQuestion(trimmed);
   const ranked = rankChunks(knowledge, trimmed, contactIntent);
+  const topRankScore = ranked[0]?.score ?? 0;
+
+  if (!isInAssistantScope(trimmed, topRankScore)) {
+    const refusal = buildOffTopicRefusal(locale, false);
+    return {
+      directAnswer: refusal,
+      systemPrompt: buildIgmChatSystemPrompt(locale, []),
+      sources: [],
+      fallbackAnswer: refusal,
+    };
+  }
+
   const contextChunks = ranked.length > 0 ? ranked.map((entry) => entry.item) : fallbackChunks(knowledge);
   const sources = filterPublicSources(
     ranked.slice(0, 2).map((entry) => ({ title: entry.item.title, url: entry.item.url })),
