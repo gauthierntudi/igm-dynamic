@@ -23,13 +23,16 @@ import { ContactPage } from "./globals/ContactPage";
 import { Legislation } from "./globals/Legislation";
 import { PageHeroes } from "./globals/PageHeroes";
 import { WhoWeAre } from "./globals/WhoWeAre";
+import { resolveDatabaseUri } from "./lib/cms/databaseUri";
+import { buildPayloadEmailAdapter } from "./lib/cms/payloadEmail";
 import { mediaFilenameVersioningPlugin } from "./plugins/mediaFilenameVersioning";
 import { videoPosterPlugin } from "./plugins/videoPosterPlugin";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
-const databaseUri = process.env.DATABASE_URI || process.env.DATABASE_URL || "";
+const databaseUri = resolveDatabaseUri();
+const payloadEmail = buildPayloadEmailAdapter();
 
 const s3Enabled = Boolean(
   process.env.S3_BUCKET && process.env.S3_ACCESS_KEY_ID && process.env.S3_SECRET_ACCESS_KEY,
@@ -66,6 +69,7 @@ export default buildConfig({
   globals: [SiteSettings, Home, WhoWeAre, Legislation, PageHeroes, ContactPage],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
+  ...(payloadEmail ? { email: payloadEmail } : {}),
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),
   },
