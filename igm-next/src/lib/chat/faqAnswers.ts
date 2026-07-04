@@ -105,6 +105,7 @@ export function getFaqSuggestions(locale: SupportedLocale): FaqSuggestion[] {
   if (locale === "fr") {
     return [
       { id: "mission", label: "Quelle est la mission de l'IGM ?" },
+      { id: "green-number", label: "L'IGM a-t-il un numéro vert ?" },
       { id: "report", label: "Comment signaler un cas ?" },
       { id: "map", label: "Où consulter la cartographie ?" },
     ];
@@ -112,6 +113,7 @@ export function getFaqSuggestions(locale: SupportedLocale): FaqSuggestion[] {
 
   return [
     { id: "mission", label: "What is IGM's mission?" },
+    { id: "green-number", label: "Does IGM have a green line?" },
     { id: "report", label: "How do I report a case?" },
     { id: "map", label: "Where is the map?" },
   ];

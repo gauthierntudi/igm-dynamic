@@ -16,6 +16,7 @@ import {
   mergeTextParts,
   stripHtml,
 } from "./textUtils";
+import { buildCartographyKnowledgeText } from "@/lib/cartography/chatFacts";
 
 export type KnowledgeChunk = {
   id: string;
@@ -80,7 +81,23 @@ async function buildKnowledgeBaseUncached(locale: SupportedLocale): Promise<Know
 
   const contactParts: string[] = [];
   if (settings?.siteName) contactParts.push(`Nom du site : ${settings.siteName}`);
-  if (settings?.phoneVert) contactParts.push(`Téléphone : ${settings.phoneVert}`);
+  if (settings?.phoneVert) {
+    contactParts.push(`Numéro vert IGM : ${settings.phoneVert}`);
+    contactParts.push(
+      locale === "fr"
+        ? "L'Inspection Générale des Mines dispose d'un numéro vert pour joindre l'IGM."
+        : "The General Inspectorate of Mines provides a green line to reach IGM.",
+    );
+    contactParts.push(`Téléphone : ${settings.phoneVert}`);
+  }
+  if (settings?.address) {
+    contactParts.push(`Adresse du siège : ${settings.address}`);
+    contactParts.push(
+      locale === "fr"
+        ? "L'IGM dispose d'un bureau à Kinshasa (Gombe)."
+        : "IGM has an office in Kinshasa (Gombe).",
+    );
+  }
   if (settings?.email) contactParts.push(`E-mail : ${settings.email}`);
   if (settings?.address) contactParts.push(`Adresse : ${settings.address}`);
   if (settings?.footerContactLead) contactParts.push(settings.footerContactLead);
@@ -88,8 +105,8 @@ async function buildKnowledgeBaseUncached(locale: SupportedLocale): Promise<Know
 
   const contactChunk = chunk(
     "contact",
-    locale === "fr" ? "Contact IGM" : "IGM contact",
-    withLocalePath(locale, "/"),
+    locale === "fr" ? "Contact IGM — Numéro vert" : "IGM contact — Green line",
+    withLocalePath(locale, "/contact"),
     contactParts,
   );
   if (contactChunk) chunks.push(contactChunk);
@@ -181,10 +198,7 @@ async function buildKnowledgeBaseUncached(locale: SupportedLocale): Promise<Know
     id: "cartographie",
     title: locale === "fr" ? "Cartographie minière" : "Mining map",
     url: withLocalePath(locale, "/cartographie"),
-    text:
-      locale === "fr"
-        ? "La cartographie interactive présente les activités minières en République Démocratique du Congo, par province et site."
-        : "The interactive map shows mining activities in the Democratic Republic of Congo, by province and site.",
+    text: buildCartographyKnowledgeText(locale),
   });
 
   // Pages statiques connues si absentes du CMS

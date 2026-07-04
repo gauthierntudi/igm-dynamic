@@ -2,6 +2,7 @@ import { getPayloadClient } from "@/lib/cms/payload";
 import { sendContactNotificationEmail } from "@/lib/email/sendContactNotificationEmail";
 import { getMessages } from "@/i18n/messages";
 import type { SupportedLocale } from "@/i18n/locales";
+import { TURNSTILE_FORM_FIELD, verifyTurnstileToken } from "@/lib/security/turnstile";
 
 export type SubmitContactMessageResult =
   | { ok: true; message: string; id: number }
@@ -27,10 +28,19 @@ function isSupportedLocale(value: string): value is SupportedLocale {
 
 export async function submitContactMessage(
   body: Record<string, unknown>,
+  options: { remoteIp?: string | null } = {},
 ): Promise<SubmitContactMessageResult> {
   const localeRaw = String(body.locale ?? "fr").trim();
   const locale = isSupportedLocale(localeRaw) ? localeRaw : "fr";
   const t = getMessages(locale).contactPage.form;
+
+  const captcha = await verifyTurnstileToken(
+    String(body[TURNSTILE_FORM_FIELD] ?? ""),
+    options.remoteIp,
+  );
+  if (!captcha.ok) {
+    return { ok: false, error: captcha.error, status: 400 };
+  }
 
   if (body._gotcha && String(body._gotcha).trim()) {
     return { ok: true, message: t.success, id: 0 };

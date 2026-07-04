@@ -78,6 +78,14 @@
   transform: scale(0.85);
 }
 
+.turnstileWrap {
+  min-height: 65px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 @media (max-width: 767px) {
   .grid {
     grid-template-columns: 1fr;

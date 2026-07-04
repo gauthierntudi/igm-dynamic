@@ -1,4 +1,4 @@
-/** Clé site Turnstile (publique) — widget formulaire signalement. */
+/** Clé site Turnstile (publique) — formulaires contact et signalement. */
 export function turnstileSiteKey(): string | undefined {
   const raw = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim();
   return raw || undefined;
