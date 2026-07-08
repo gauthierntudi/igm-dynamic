@@ -5,31 +5,27 @@ export const DEFAULT_HOME_ORG_CHART_FR: CmsHomeOrgChartSection = {
   titleHighlight: "organigramme",
   titleSuffix: "institutionnel.",
   lead:
-    "Conformément au Décret n° 23/19 du 09 juin 2023, l'IGM est structurée en administration centrale (Kinshasa) et administration provinciale, sous la direction de l'Inspecteur général et de l'Inspecteur général adjoint.",
+    "L'IGM est structurée autour de l'Inspecteur général et de l'Inspecteur général adjoint, de cellules et coordinations d'appui, puis de départements et services opérationnels, avec l'inspection provinciale des mines.",
   units: [
     {
       name: "Inspecteur général",
-      role: "Planification, supervision, coordination et contrôle (art. 10)",
+      role: "Direction de l'institution",
     },
     {
       name: "Inspecteur général adjoint",
-      role: "Assistance à la direction et intérim (art. 11)",
+      role: "Assistance à la direction",
     },
     {
-      name: "Administration centrale",
-      role: "Inspection générale, départements et services (art. 7)",
+      name: "Cellules & coordinations",
+      role: "CelCom, CPM, CPRP, CIG, CIP, CAI",
     },
     {
-      name: "Inspection générale",
-      role: "Pôle central de l'administration à Kinshasa",
+      name: "Départements centraux",
+      role: "DIT, DIJ, DREIO, DAF, DITIC",
     },
     {
-      name: "Administration provinciale",
-      role: "Inspection provinciale, brigades et antennes (art. 8)",
-    },
-    {
-      name: "Inspection provinciale",
-      role: "Coordination et contrôle des activités en province (art. 12-13)",
+      name: "Inspection provinciale des mines",
+      role: "Déploiement territorial",
     },
   ],
   ctaSidebarTitle: "Texte fondateur",
@@ -42,31 +38,27 @@ export const DEFAULT_HOME_ORG_CHART_EN: CmsHomeOrgChartSection = {
   titleHighlight: "organizational",
   titleSuffix: "chart.",
   lead:
-    "Under Decree No. 23/19 of 9 June 2023, the IGM is structured into central administration (Kinshasa) and provincial administration, led by the Inspector General and Deputy Inspector General.",
+    "The IGM is structured around the Inspector General and Deputy Inspector General, support units and coordinations, operational departments and services, and provincial mine inspection.",
   units: [
     {
       name: "Inspector General",
-      role: "Planning, supervision, coordination and control (Art. 10)",
+      role: "Institutional leadership",
     },
     {
       name: "Deputy Inspector General",
-      role: "Executive support and acting role (Art. 11)",
+      role: "Executive support",
     },
     {
-      name: "Central administration",
-      role: "General inspection, departments and services (Art. 7)",
+      name: "Units & coordinations",
+      role: "CelCom, CPM, CPRP, CIG, CIP, CAI",
     },
     {
-      name: "General inspection",
-      role: "Central hub at the Kinshasa headquarters",
+      name: "Central departments",
+      role: "DIT, DIJ, DREIO, DAF, DITIC",
     },
     {
-      name: "Provincial administration",
-      role: "Provincial inspection, brigades and field units (Art. 8)",
-    },
-    {
-      name: "Provincial inspection",
-      role: "Coordination and oversight of provincial activities (Art. 12-13)",
+      name: "Provincial mine inspection",
+      role: "Territorial deployment",
     },
   ],
   ctaSidebarTitle: "Founding decree",

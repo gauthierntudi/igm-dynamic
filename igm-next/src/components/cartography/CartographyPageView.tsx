@@ -1,18 +1,19 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { MapPin, X } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { useState } from "react";
 
 import { HeaderHeroDarkBody } from "@/components/cms/HeaderHeroDarkBody";
 import { AboutBreadcrumbHero } from "@/components/cms/who-we-are/AboutBreadcrumbHero";
+import { CartographyProvincePanel } from "@/components/cartography/CartographyProvincePanel";
 import type { SupportedLocale } from "@/i18n/locales";
 import { getMessages } from "@/i18n/messages";
+import type { CmsCartographySettings } from "@/lib/cms/cartography/types";
 import {
   DEPLOYED_PROVINCES_COUNT,
   DRC_MAP_PROVINCES,
   isProvinceDeployed,
-  provinceChefLieu,
   provinceLabel,
   type DrcMapProvince,
 } from "@/lib/cartography/provinces";
@@ -36,9 +37,10 @@ const CartographyMap = dynamic(
 type Props = {
   locale: SupportedLocale;
   heroImageSrc: string;
+  cartographySettings: CmsCartographySettings | null;
 };
 
-export function CartographyPageView({ locale, heroImageSrc }: Props) {
+export function CartographyPageView({ locale, heroImageSrc, cartographySettings }: Props) {
   const m = getMessages(locale).cartography;
   const [selected, setSelected] = useState<DrcMapProvince | null>(null);
   const pinSrc = withDeployedBase("/assets/img/pin-carte.png");
@@ -49,7 +51,10 @@ export function CartographyPageView({ locale, heroImageSrc }: Props) {
   };
 
   const selectedLabel = selected ? provinceLabel(selected, locale) : null;
-  const selectedCapital = selected ? provinceChefLieu(selected, locale) : null;
+  const selectedAssignment = selected
+    ? cartographySettings?.provinceAssignments?.find((item) => item.province === selected)
+    : null;
+  const inspectors = selectedAssignment?.inspectors?.filter((inspector) => inspector?.name?.trim()) ?? [];
 
   return (
     <main className="igm-cartography-page" data-igm-page="cartography">
@@ -127,31 +132,12 @@ export function CartographyPageView({ locale, heroImageSrc }: Props) {
               aria-atomic="true"
             >
               {selected && selectedLabel ? (
-                <article className="igm-cartography-legend__pick-card">
-                  <div className="igm-cartography-legend__pick-row">
-                    <span className="igm-cartography-legend__pick-mark" aria-hidden>
-                      <img src={pinSrc} alt="" width={28} height={28} />
-                    </span>
-                    <div className="igm-cartography-legend__pick-body">
-                      <h3 className="igm-cartography-legend__pick-name">{selectedLabel}</h3>
-                      {selectedCapital ? (
-                        <p className="igm-cartography-legend__pick-capital">{selectedCapital}</p>
-                      ) : null}
-                    </div>
-                    <button
-                      type="button"
-                      className="igm-cartography-legend__pick-close"
-                      onClick={() => setSelected(null)}
-                      aria-label={m.focusClear}
-                    >
-                      <X size={16} strokeWidth={2.25} aria-hidden />
-                    </button>
-                  </div>
-                  <p className="igm-cartography-legend__pick-status">
-                    <span className="igm-cartography-legend__pick-status-dot" aria-hidden />
-                    {m.focusDeployedBadge}
-                  </p>
-                </article>
+                <p className="igm-cartography-legend__pick-selected">
+                  <span className="igm-cartography-legend__pick-selected-mark" aria-hidden>
+                    <img src={pinSrc} alt="" width={18} height={18} />
+                  </span>
+                  <span>{selectedLabel}</span>
+                </p>
               ) : (
                 <div className="igm-cartography-legend__pick-empty">
                   <MapPin size={18} strokeWidth={1.75} aria-hidden />
@@ -174,6 +160,15 @@ export function CartographyPageView({ locale, heroImageSrc }: Props) {
             <p className="igm-cartography-legend__footnote">{m.legendFootnote}</p>
           </aside>
         </div>
+
+        {selected ? (
+          <CartographyProvincePanel
+            locale={locale}
+            province={selected}
+            inspectors={inspectors}
+            onClose={() => setSelected(null)}
+          />
+        ) : null}
       </section>
     </main>
   );

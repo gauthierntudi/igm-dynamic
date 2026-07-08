@@ -91,7 +91,7 @@ export const revalidateFrontCollection: CollectionAfterChangeHook = ({ collectio
   }
 
   if (collection.slug === "media") {
-    for (const globalSlug of ["page-heroes", "who-we-are", "legislation", "home"]) {
+    for (const globalSlug of ["page-heroes", "who-we-are", "legislation", "home", "cartography-settings"]) {
       tags.push(`global:${globalSlug}`);
       for (const locale of SUPPORTED_LOCALES) {
         tags.push(`global:${globalSlug}:${locale}`);
@@ -177,6 +177,15 @@ export const revalidateFrontGlobal: GlobalAfterChangeHook = ({ global, doc }) =>
     try {
       revalidatePath(hrefForRoute("contact", "fr"));
       revalidatePath(hrefForRoute("contact", "en"));
+    } catch {
+      // Hors contexte Next.js.
+    }
+  }
+
+  if (String(global.slug) === "cartography-settings") {
+    try {
+      revalidatePath(hrefForRoute("map", "fr"));
+      revalidatePath(hrefForRoute("map", "en"));
     } catch {
       // Hors contexte Next.js.
     }

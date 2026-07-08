@@ -112,6 +112,7 @@ export interface Config {
     legislation: Legislation;
     'page-heroes': PageHero;
     'contact-page': ContactPage;
+    'cartography-settings': CartographySetting;
   };
   globalsSelect: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
@@ -120,6 +121,7 @@ export interface Config {
     legislation: LegislationSelect<false> | LegislationSelect<true>;
     'page-heroes': PageHeroesSelect<false> | PageHeroesSelect<true>;
     'contact-page': ContactPageSelect<false> | ContactPageSelect<true>;
+    'cartography-settings': CartographySettingsSelect<false> | CartographySettingsSelect<true>;
   };
   locale: 'fr' | 'en';
   widgets: {
@@ -1691,6 +1693,65 @@ export interface ContactPage {
   createdAt?: string | null;
 }
 /**
+ * Les provinces déployées sur la carte sont listées automatiquement. Ajoutez les inspecteurs (nom obligatoire ; titre, photo et minerais optionnels) pour chaque province.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cartography-settings".
+ */
+export interface CartographySetting {
+  id: number;
+  /**
+   * Une ligne par province couverte sur la carte. Vous ne choisissez pas la province : elle est fixée. Renseignez seulement les inspecteurs.
+   */
+  provinceAssignments?:
+    | {
+        province:
+          | 'Kinshasa'
+          | 'Kongo-Central'
+          | 'Kwilu'
+          | 'Kasaï'
+          | 'Maï-Ndombe'
+          | 'Équateur'
+          | 'Sud-Ubangi'
+          | 'Tshuapa'
+          | 'Sankuru'
+          | 'Kasaï Oriental'
+          | 'Kasaï Central'
+          | 'Lualaba'
+          | 'Haut-Lomami'
+          | 'Tanganyika'
+          | 'Kaut-Katanga'
+          | 'Sud-Kivu'
+          | 'Maniema'
+          | 'Tshopo'
+          | 'Ituri'
+          | 'Nord-Kivu'
+          | 'Bas-Uele'
+          | 'Haut-Uele';
+        inspectors?:
+          | {
+              name: string;
+              title?: string | null;
+              photo?: (number | null) | Media;
+              /**
+               * Ajoutez un ou plusieurs minerais suivis par cet inspecteur.
+               */
+              minerals?:
+                | {
+                    name: string;
+                    id?: string | null;
+                  }[]
+                | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings_select".
  */
@@ -2116,6 +2177,35 @@ export interface ContactPageSelect<T extends boolean = true> {
   formTitle?: T;
   infoTitle?: T;
   infoLead?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cartography-settings_select".
+ */
+export interface CartographySettingsSelect<T extends boolean = true> {
+  provinceAssignments?:
+    | T
+    | {
+        province?: T;
+        inspectors?:
+          | T
+          | {
+              name?: T;
+              title?: T;
+              photo?: T;
+              minerals?:
+                | T
+                | {
+                    name?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

@@ -3,7 +3,7 @@ import { hrefForRoute, localizeHref } from "@/i18n/paths";
 import type { CmsHomeOrgChartSection } from "@/lib/cms/home/types";
 
 import { PrimaryBtn4Content } from "../banner/PrimaryBtn4Content";
-import { OrgChartDecreeDiagram } from "./OrgChartDecreeDiagram";
+import { OrgChartFlowDiagram } from "./OrgChartFlowDiagram";
 import {
   resolveOrgChartImageAlt,
   resolveOrgChartImageSrc,
@@ -125,7 +125,7 @@ export function HomeOrgChartSection({
                 <img src={diagramSrc} alt={diagramAlt} loading="lazy" decoding="async" />
               </div>
             ) : (
-              <OrgChartDecreeDiagram locale={locale} />
+              <OrgChartFlowDiagram locale={locale} />
             )}
           </div>
         ) : (
@@ -141,7 +141,7 @@ export function HomeOrgChartSection({
                     <img src={diagramSrc} alt={diagramAlt} loading="lazy" decoding="async" />
                   </div>
                 ) : (
-                  <OrgChartDecreeDiagram locale={locale} />
+                  <OrgChartFlowDiagram locale={locale} />
                 )}
               </div>
             </div>

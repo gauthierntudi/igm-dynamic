@@ -1,0 +1,116 @@
+/* React Flow — organigramme (fond transparent, intégré à la section) */
+
+.igm-orgchart-flow {
+  position: relative;
+  width: 100%;
+  height: min(78vh, 760px);
+  min-height: 420px;
+  background: transparent;
+}
+
+.igm-orgchart-flow .react-flow {
+  background: transparent !important;
+}
+
+.igm-orgchart-flow .react-flow__pane {
+  cursor: grab;
+}
+
+.igm-orgchart-flow .react-flow__pane.dragging {
+  cursor: grabbing;
+}
+
+.igm-orgchart-flow__status,
+.igm-orgchart-flow__hint {
+  margin: 0;
+  font-family: "Google Sans", Inter, system-ui, sans-serif;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: #5a6f94;
+  text-align: center;
+}
+
+.igm-orgchart-flow__status {
+  padding: 2rem 1rem;
+}
+
+.igm-orgchart-flow__hint {
+  margin-top: 0.65rem;
+}
+
+.igm-orgchart-flow-handle {
+  width: 1px;
+  height: 1px;
+  min-width: 0;
+  min-height: 0;
+  opacity: 0;
+  border: none;
+  background: transparent;
+  pointer-events: none;
+}
+
+.igm-orgchart-flow-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 0.65rem 0.75rem;
+  border-radius: 6px;
+  border: 1.5px solid rgba(12, 31, 61, 0.85);
+  background: #fff;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(27, 68, 145, 0.06);
+}
+
+.igm-orgchart-flow-node--leadership {
+  background: linear-gradient(160deg, #153a7a 0%, #1b4491 100%);
+  border-color: transparent;
+  color: #fff;
+}
+
+.igm-orgchart-flow-node--leadership span {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.igm-orgchart-flow-node--department {
+  background: #c8daf4;
+  border-color: rgba(27, 68, 145, 0.55);
+}
+
+.igm-orgchart-flow-node strong {
+  display: block;
+  font-family: "Google Sans", Inter, system-ui, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.igm-orgchart-flow-node span {
+  display: block;
+  margin-top: 0.12rem;
+  font-family: "Google Sans", Inter, system-ui, sans-serif;
+  font-size: 0.62rem;
+  line-height: 1.35;
+  color: #5a6f94;
+}
+
+.igm-orgchart-flow-node--leadership strong,
+.igm-orgchart-flow-node--leadership span {
+  color: inherit;
+}
+
+.igm-orgchart-flow-node--leadership span {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+@media (max-width: 767px) {
+  .igm-orgchart-flow {
+    height: min(72vh, 640px);
+    min-height: 360px;
+  }
+}

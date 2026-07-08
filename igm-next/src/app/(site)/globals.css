@@ -1360,7 +1360,7 @@ header.style-4 .main-menu a.primary-btn4:focus-visible {
 /* Organigramme (section home4-team-section) */
 .home4-team-section .igm-orgchart-stage {
   width: 100%;
-  max-width: 1180px;
+  max-width: none;
   margin: 0 auto;
 }
 
@@ -1390,7 +1390,7 @@ header.style-4 .main-menu a.primary-btn4:focus-visible {
   align-items: center;
   gap: 0;
   width: 100%;
-  max-width: 1180px;
+  max-width: 1280px;
   margin: 0 auto;
 }
 
@@ -1409,6 +1409,48 @@ header.style-4 .main-menu a.primary-btn4:focus-visible {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #6a7fa8;
+}
+
+.igm-orgchart-level--leadership {
+  gap: 0;
+}
+
+.igm-orgchart-level--support {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem 2rem;
+  width: 100%;
+  max-width: 920px;
+}
+
+.igm-orgchart-support-col {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+}
+
+.igm-orgchart-level--departments {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.85rem;
+  width: 100%;
+  align-items: start;
+}
+
+.igm-orgchart-department {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
+.igm-orgchart-services {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.65rem;
+  width: 100%;
 }
 
 .igm-orgchart-level--duo .igm-orgchart-row {
@@ -1434,14 +1476,16 @@ header.style-4 .main-menu a.primary-btn4:focus-visible {
   flex-shrink: 0;
 }
 
-.igm-orgchart-connector--split {
+.igm-orgchart-connector--split,
+.igm-orgchart-connector--wide {
   position: relative;
   width: min(82%, 680px);
   height: 28px;
   background: transparent;
 }
 
-.igm-orgchart-connector--split::before {
+.igm-orgchart-connector--split::before,
+.igm-orgchart-connector--wide::before {
   content: "";
   position: absolute;
   top: 0;
@@ -1452,7 +1496,8 @@ header.style-4 .main-menu a.primary-btn4:focus-visible {
   transform: translateX(-50%);
 }
 
-.igm-orgchart-connector--split::after {
+.igm-orgchart-connector--split::after,
+.igm-orgchart-connector--wide::after {
   content: "";
   position: absolute;
   top: 14px;
@@ -1481,14 +1526,14 @@ header.style-4 .main-menu a.primary-btn4:focus-visible {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-width: 148px;
-  max-width: 220px;
-  padding: 0.8rem 1rem;
-  border-radius: 10px;
-  border: 1px solid rgba(27, 68, 145, 0.16);
+  width: 100%;
+  min-width: 0;
+  padding: 0.75rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid rgba(12, 31, 61, 0.85);
   background: #fff;
   text-align: center;
-  box-shadow: 0 4px 14px rgba(27, 68, 145, 0.05);
+  box-shadow: none;
 }
 
 .igm-orgchart-box--ministry {
@@ -1516,9 +1561,27 @@ header.style-4 .main-menu a.primary-btn4:focus-visible {
 }
 
 .igm-orgchart-box--leadership {
-  background: #eef3fc;
-  border-color: rgba(27, 68, 145, 0.28);
-  border-left: 3px solid #1b4491;
+  background: linear-gradient(160deg, #153a7a 0%, #1b4491 100%);
+  border-color: transparent;
+  color: #fff;
+  min-width: 240px;
+  max-width: 340px;
+}
+
+.igm-orgchart-box--leadership span {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.igm-orgchart-box--support,
+.igm-orgchart-box--service {
+  background: #fff;
+  border-color: rgba(12, 31, 61, 0.85);
+}
+
+.igm-orgchart-box--department {
+  background: #c8daf4;
+  border-color: rgba(27, 68, 145, 0.45);
+  min-height: 4.5rem;
 }
 
 .igm-orgchart-box--branch {
@@ -1531,10 +1594,12 @@ header.style-4 .main-menu a.primary-btn4:focus-visible {
 .igm-orgchart-box strong {
   display: block;
   font-family: "Google Sans", sans-serif;
-  font-size: 0.88rem;
+  font-size: 0.72rem;
   font-weight: 700;
   line-height: 1.35;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.15rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .igm-orgchart-box span {
@@ -1572,9 +1637,18 @@ header.style-4 .main-menu a.primary-btn4:focus-visible {
 }
 
 .igm-orgchart-legend-swatch--leadership {
-  background: #eef3fc;
-  border: 1px solid rgba(27, 68, 145, 0.28);
-  border-left: 3px solid #1b4491;
+  background: linear-gradient(160deg, #153a7a 0%, #1b4491 100%);
+  border: none;
+}
+
+.igm-orgchart-legend-swatch--support {
+  background: #fff;
+  border: 1px solid rgba(12, 31, 61, 0.85);
+}
+
+.igm-orgchart-legend-swatch--department {
+  background: #c8daf4;
+  border: 1px solid rgba(27, 68, 145, 0.45);
 }
 
 .igm-orgchart-legend-swatch--branch {
@@ -1582,19 +1656,22 @@ header.style-4 .main-menu a.primary-btn4:focus-visible {
   border: 1px solid rgba(27, 68, 145, 0.22);
 }
 
+.igm-orgchart-legend-swatch--service,
 .igm-orgchart-legend-swatch--unit {
   background: #fff;
-  border: 1px solid rgba(27, 68, 145, 0.16);
+  border: 1px solid rgba(12, 31, 61, 0.85);
+}
+
+@media (max-width: 1199px) {
+  .igm-orgchart-level--departments {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 767px) {
   .igm-orgchart-level--split {
-    grid-template-columns: 1fr;
-  }
-
-  .igm-orgchart-box {
-    max-width: 100%;
-    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .igm-orgchart-level--duo .igm-orgchart-row {
