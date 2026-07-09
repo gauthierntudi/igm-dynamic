@@ -35,7 +35,7 @@ function OrgChartFlowCanvas({ locale }: Props) {
     [content, locale],
   );
 
-  const onInit = useCallback((instance: ReactFlowInstance) => {
+  const onInit = useCallback((instance: ReactFlowInstance<Node<OrgChartNodeData>>) => {
     requestAnimationFrame(() => {
       void instance.fitView({ ...ORG_CHART_FIT_VIEW_OPTIONS, duration: 0 });
     });
