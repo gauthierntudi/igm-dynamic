@@ -1,27 +1,23 @@
-import { Handle, Position, type NodeProps } from "@xyflow/react";
+import type { NodeProps } from "@xyflow/react";
 import { memo } from "react";
 
-import type { OrgChartNodeData } from "./buildOrgChartFlowLayout";
+import type { OrgChartNodeData } from "./buildOrgChartFixedLayout";
 
 function OrgChartFlowNodeComponent({ data }: NodeProps) {
   const nodeData = data as OrgChartNodeData;
 
   return (
-    <div className={`igm-orgchart-flow-node igm-orgchart-flow-node--${nodeData.tone}`}>
-      <Handle
-        type="target"
-        position={Position.Top}
-        className="igm-orgchart-flow-handle"
-        isConnectable={false}
-      />
-      <strong>{nodeData.label}</strong>
-      {nodeData.sublabel ? <span>{nodeData.sublabel}</span> : null}
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="igm-orgchart-flow-handle"
-        isConnectable={false}
-      />
+    <div
+      className={[
+        "igm-orgchart-flow-node",
+        `igm-orgchart-flow-node--${nodeData.tone}`,
+        nodeData.compact ? "igm-orgchart-flow-node--compact" : "",
+        nodeData.tone === "service" ? "igm-orgchart-flow-node--service" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      <span className="igm-orgchart-flow-node__label">{nodeData.label}</span>
     </div>
   );
 }

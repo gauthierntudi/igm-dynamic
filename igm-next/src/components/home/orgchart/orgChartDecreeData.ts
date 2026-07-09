@@ -69,8 +69,8 @@ const DEPARTMENTS_FR: OrgChartDepartment[] = [
     ],
   },
   {
-    label: "Département Recherche et Enseignement, Investigations et Opérations",
-    abbr: "DREIO",
+    label: "Département Renseignement, Investigations et Opérations",
+    abbr: "DRIO",
     services: [
       { label: "Service Renseignement et Filature", abbr: "SEREFI" },
       { label: "Service Enquêtes, Investigations et Opérations", abbr: "SENINOP" },
@@ -97,7 +97,7 @@ const DEPARTMENTS_FR: OrgChartDepartment[] = [
       { label: "Service Infrastructures, Systèmes et Réseaux", abbr: "SINFSYRE" },
       {
         label: "Service Génie et Développement Applicatifs/Logiciels",
-        abbr: "SEGENDA",
+        abbr: "SEGEDA",
       },
     ],
   },
@@ -142,8 +142,8 @@ const DEPARTMENTS_EN: OrgChartDepartment[] = [
     ],
   },
   {
-    label: "Research, Training, Investigations and Operations Department",
-    abbr: "DREIO",
+    label: "Intelligence, Investigations and Operations Department",
+    abbr: "DRIO",
     services: [
       { label: "Intelligence and Surveillance Service", abbr: "SEREFI" },
       { label: "Inquiries, Investigations and Operations Service", abbr: "SENINOP" },
@@ -169,7 +169,7 @@ const DEPARTMENTS_EN: OrgChartDepartment[] = [
       { label: "Infrastructure, Systems and Networks Service", abbr: "SINFSYRE" },
       {
         label: "Engineering and Application/Software Development Service",
-        abbr: "SEGENDA",
+        abbr: "SEGEDA",
       },
     ],
   },

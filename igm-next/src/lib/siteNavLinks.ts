@@ -18,6 +18,7 @@ export const SITE_NAV_LINKS = [
   { label: "Législation — Décisions", value: "/decisions" },
   { label: "Médiathèque — Photos", value: "/photos" },
   { label: "Médiathèque — Vidéos", value: "/videos" },
+  { label: "Médiathèque — Revue de presse", value: "/revue-de-presse" },
   { label: "Contact", value: "/contact" },
 ] as const;
 

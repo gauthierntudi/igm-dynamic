@@ -24,8 +24,9 @@ const fr = {
     mediaLibrary: "Médiathèque",
     photos: "Photos",
     videos: "Vidéos",
+    pressReview: "Revue de presse",
     audios: "Audios",
-    resources: "Ressources",
+    resources: "Plus",
     contact: "Contact",
   },
   common: {
@@ -291,8 +292,9 @@ const en = {
     mediaLibrary: "Media library",
     photos: "Photos",
     videos: "Videos",
+    pressReview: "Press review",
     audios: "Audio",
-    resources: "Resources",
+    resources: "More",
     contact: "Contact",
   },
   common: {

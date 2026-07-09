@@ -1,5 +1,5 @@
 import { getMessages } from "@/i18n/messages";
-import { MAIN_NAV, type NavItem } from "@/i18n/navigation";
+import { MAIN_NAV, navNestedIconStyle, type NavItem } from "@/i18n/navigation";
 import type { RouteKey } from "@/i18n/paths";
 import { ROUTE_KEYS } from "@/i18n/paths";
 import { CUSTOM_NAV_LINK_VALUE } from "@/lib/siteNavLinks";
@@ -83,7 +83,7 @@ function navItemToSeed(item: NavItem, depth: 1 | 2): SeedNavItem {
     itemType: "dropdown",
     label: navLabel(item.labelKey),
     cssClass: item.className,
-    nestedIcon: item.labelKey === "whoWeAre" ? "caret" : "plus",
+    nestedIcon: navNestedIconStyle(item.labelKey),
   };
 
   if (depth === 1) {

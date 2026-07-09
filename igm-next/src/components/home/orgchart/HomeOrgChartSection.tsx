@@ -71,84 +71,79 @@ export function HomeOrgChartSection({
     ? "home4-team-section igm-orgchart-section--page"
     : "home4-team-section mb-130";
 
+  const orgChartStage = (
+    <div className="igm-orgchart-stage igm-orgchart-stage--fullwidth">
+      {diagramSrc ? (
+        <div className="igm-orgchart-diagram">
+          <img src={diagramSrc} alt={diagramAlt} loading="lazy" decoding="async" />
+        </div>
+      ) : (
+        <OrgChartFlowDiagram locale={locale} />
+      )}
+    </div>
+  );
+
   return (
     <div className={sectionClassName}>
-      <div className={isPage ? undefined : "container"}>
-        {showHomeHeader ? (
-          <div className="row justify-content-lg-end mb-70">
-            <div className="col-xl-10 col-lg-11">
-              <div className="row g-4 justify-content-between align-items-end">
-                {hasTitle || lead ? (
-                  <div
-                    className="col-xl-5 col-md-6 wow animate fadeInDown"
-                    data-wow-delay="200ms"
-                    data-wow-duration="1500ms"
-                  >
-                    <div className="section-title2">
-                      {hasTitle ? (
-                        <h2>
-                          {titlePrefix ? `${titlePrefix} ` : null}
-                          {titleHighlight ? <strong>{titleHighlight}</strong> : null}
-                          {titleSuffix ? ` ${titleSuffix}` : null}
-                        </h2>
-                      ) : null}
-                      {lead ? <p>{lead}</p> : null}
+      {!isPage ? (
+        <div className="container">
+          {showHomeHeader ? (
+            <div className="row justify-content-lg-end mb-70">
+              <div className="col-xl-10 col-lg-11">
+                <div className="row g-4 justify-content-between align-items-end">
+                  {hasTitle || lead ? (
+                    <div
+                      className="col-xl-5 col-md-6 wow animate fadeInDown"
+                      data-wow-delay="200ms"
+                      data-wow-duration="1500ms"
+                    >
+                      <div className="section-title2">
+                        {hasTitle ? (
+                          <h2>
+                            {titlePrefix ? `${titlePrefix} ` : null}
+                            {titleHighlight ? <strong>{titleHighlight}</strong> : null}
+                            {titleSuffix ? ` ${titleSuffix}` : null}
+                          </h2>
+                        ) : null}
+                        {lead ? <p>{lead}</p> : null}
+                      </div>
                     </div>
-                  </div>
-                ) : null}
-                {showCtaSidebar ? (
-                  <div
-                    className="col-lg-3 col-md-6 d-flex justify-content-md-end wow animate fadeInRight"
-                    data-wow-delay="200ms"
-                    data-wow-duration="1500ms"
-                  >
-                    <div className="button-area">
-                      <TeamSectionArrow />
-                      {ctaSidebarTitle ? <h5>{ctaSidebarTitle}</h5> : null}
-                      {ctaHref && ctaLabel ? (
-                        <a className="primary-btn4 black-bg" href={ctaHref}>
-                          <PrimaryBtn4Content label={ctaLabel} />
-                        </a>
-                      ) : null}
+                  ) : null}
+                  {showCtaSidebar ? (
+                    <div
+                      className="col-lg-3 col-md-6 d-flex justify-content-md-end wow animate fadeInRight"
+                      data-wow-delay="200ms"
+                      data-wow-duration="1500ms"
+                    >
+                      <div className="button-area">
+                        <TeamSectionArrow />
+                        {ctaSidebarTitle ? <h5>{ctaSidebarTitle}</h5> : null}
+                        {ctaHref && ctaLabel ? (
+                          <a className="primary-btn4 black-bg" href={ctaHref}>
+                            <PrimaryBtn4Content label={ctaLabel} />
+                          </a>
+                        ) : null}
+                      </div>
                     </div>
-                  </div>
-                ) : null}
+                  ) : null}
+                </div>
               </div>
             </div>
-          </div>
-        ) : null}
+          ) : null}
+        </div>
+      ) : null}
 
-        {isPage ? (
-          <div className="igm-orgchart-stage">
-            {diagramSrc ? (
-              <div className="igm-orgchart-diagram">
-                <img src={diagramSrc} alt={diagramAlt} loading="lazy" decoding="async" />
-              </div>
-            ) : (
-              <OrgChartFlowDiagram locale={locale} />
-            )}
-          </div>
-        ) : (
-          <div
-            className="row wow animate fadeInUp"
-            data-wow-delay="200ms"
-            data-wow-duration="1500ms"
-          >
-            <div className="col-lg-12">
-              <div className="igm-orgchart-stage">
-                {diagramSrc ? (
-                  <div className="igm-orgchart-diagram">
-                    <img src={diagramSrc} alt={diagramAlt} loading="lazy" decoding="async" />
-                  </div>
-                ) : (
-                  <OrgChartFlowDiagram locale={locale} />
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-      </div>
+      {isPage ? (
+        orgChartStage
+      ) : (
+        <div
+          className="wow animate fadeInUp"
+          data-wow-delay="200ms"
+          data-wow-duration="1500ms"
+        >
+          {orgChartStage}
+        </div>
+      )}
     </div>
   );
 }

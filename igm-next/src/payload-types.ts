@@ -941,6 +941,7 @@ export interface SiteSetting {
               | '/decisions'
               | '/photos'
               | '/videos'
+              | '/revue-de-presse'
               | '/contact'
               | '__custom__'
             )
@@ -981,6 +982,7 @@ export interface SiteSetting {
                     | '/decisions'
                     | '/photos'
                     | '/videos'
+                    | '/revue-de-presse'
                     | '/contact'
                     | '__custom__'
                   )
@@ -1021,6 +1023,7 @@ export interface SiteSetting {
                           | '/decisions'
                           | '/photos'
                           | '/videos'
+                          | '/revue-de-presse'
                           | '/contact'
                           | '__custom__'
                         )
@@ -1074,6 +1077,7 @@ export interface SiteSetting {
                     | '/decisions'
                     | '/photos'
                     | '/videos'
+                    | '/revue-de-presse'
                     | '/contact'
                     | '__custom__'
                   )
@@ -1124,6 +1128,7 @@ export interface SiteSetting {
               | '/decisions'
               | '/photos'
               | '/videos'
+              | '/revue-de-presse'
               | '/contact'
               | '__custom__'
             )
@@ -1193,6 +1198,7 @@ export interface Home {
                 | '/decisions'
                 | '/photos'
                 | '/videos'
+                | '/revue-de-presse'
                 | '/contact'
                 | '__custom__'
               )
@@ -1227,6 +1233,7 @@ export interface Home {
                 | '/decisions'
                 | '/photos'
                 | '/videos'
+                | '/revue-de-presse'
                 | '/contact'
                 | '__custom__'
               )
@@ -1530,6 +1537,7 @@ export interface WhoWeAre {
             | '/decisions'
             | '/photos'
             | '/videos'
+            | '/revue-de-presse'
             | '/contact'
             | '__custom__'
           )
@@ -1568,6 +1576,7 @@ export interface WhoWeAre {
             | '/decisions'
             | '/photos'
             | '/videos'
+            | '/revue-de-presse'
             | '/contact'
             | '__custom__'
           )

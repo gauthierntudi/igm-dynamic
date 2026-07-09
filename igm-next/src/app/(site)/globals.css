@@ -1358,10 +1358,22 @@ header.style-4 .main-menu a.primary-btn4:focus-visible {
 }
 
 /* Organigramme (section home4-team-section) */
-.home4-team-section .igm-orgchart-stage {
+.home4-team-section .igm-orgchart-stage,
+.igm-orgchart-stage--fullwidth {
   width: 100%;
   max-width: none;
   margin: 0 auto;
+}
+
+.igm-orgchart-stage--fullwidth .igm-orgchart-decree,
+.igm-orgchart-stage--fullwidth .igm-orgchart-diagram,
+.igm-orgchart-stage--fullwidth .igm-orgchart-flow {
+  width: 100%;
+  max-width: none;
+}
+
+.igm-orgchart-stage--fullwidth .igm-orgchart-decree {
+  padding-inline: clamp(0.75rem, 2.5vw, 2rem);
 }
 
 .igm-orgchart-diagram,

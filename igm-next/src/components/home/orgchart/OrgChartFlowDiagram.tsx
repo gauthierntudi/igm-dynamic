@@ -3,21 +3,23 @@
 import {
   ReactFlow,
   ReactFlowProvider,
-  useEdgesState,
-  useNodesState,
-  useReactFlow,
-  type Edge,
   type Node,
+  type ReactFlowInstance,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 
 import type { SupportedLocale } from "@/i18n/locales";
 
+import { buildOrgChartFixedLayout } from "./buildOrgChartFixedLayout";
+import { OrgChartConnectorsLayer } from "./OrgChartConnectorsLayer";
+import {
+  ORG_CHART_FIT_VIEW_OPTIONS,
+  OrgChartZoomControls,
+} from "./OrgChartZoomControls";
 import { getOrgChartDecreeContent } from "./orgChartDecreeData";
-import { layoutOrgChartWithElk } from "./layoutOrgChartWithElk";
 import { orgChartFlowNodeTypes } from "./OrgChartFlowNode";
-import type { OrgChartNodeData } from "./buildOrgChartFlowLayout";
+import type { OrgChartNodeData } from "./buildOrgChartFixedLayout";
 
 import "./orgchart-flow.css";
 
@@ -27,62 +29,43 @@ type Props = {
 
 function OrgChartFlowCanvas({ locale }: Props) {
   const content = useMemo(() => getOrgChartDecreeContent(locale), [locale]);
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node<OrgChartNodeData>>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
-  const [loading, setLoading] = useState(true);
-  const { fitView } = useReactFlow();
 
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
+  const { nodes, connectors } = useMemo(
+    () => buildOrgChartFixedLayout(content, locale),
+    [content, locale],
+  );
 
-    layoutOrgChartWithElk(content)
-      .then((layout) => {
-        if (cancelled) return;
-        setNodes(layout.nodes);
-        setEdges(layout.edges);
-        setLoading(false);
-        requestAnimationFrame(() => {
-          fitView({ padding: 0.18, duration: 0 });
-        });
-      })
-      .catch(() => {
-        if (!cancelled) setLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [content, fitView, setEdges, setNodes]);
+  const onInit = useCallback((instance: ReactFlowInstance) => {
+    requestAnimationFrame(() => {
+      void instance.fitView({ ...ORG_CHART_FIT_VIEW_OPTIONS, duration: 0 });
+    });
+  }, []);
 
   return (
     <figure className="igm-orgchart-decree">
       <figcaption>{content.caption}</figcaption>
 
-      <div className="igm-orgchart-flow" aria-busy={loading}>
-        {loading ? (
-          <p className="igm-orgchart-flow__status">
-            {locale === "en" ? "Loading org chart…" : "Chargement de l'organigramme…"}
-          </p>
-        ) : (
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            nodeTypes={orgChartFlowNodeTypes}
-            nodesDraggable={false}
-            nodesConnectable={false}
-            elementsSelectable={false}
-            panOnDrag
-            panOnScroll
-            zoomOnScroll
-            zoomOnPinch
-            minZoom={0.25}
-            maxZoom={1.75}
-            proOptions={{ hideAttribution: true }}
-          />
-        )}
+      <div className="igm-orgchart-flow">
+        <ReactFlow
+          nodes={nodes as Node<OrgChartNodeData>[]}
+          edges={[]}
+          nodeTypes={orgChartFlowNodeTypes}
+          onInit={onInit}
+          nodesDraggable={false}
+          nodesConnectable={false}
+          elementsSelectable={false}
+          panOnDrag
+          panOnScroll={false}
+          zoomOnScroll={false}
+          zoomOnPinch={false}
+          preventScrolling={false}
+          minZoom={0.35}
+          maxZoom={1.35}
+          proOptions={{ hideAttribution: true }}
+        >
+          <OrgChartConnectorsLayer connectors={connectors} />
+          <OrgChartZoomControls locale={locale} />
+        </ReactFlow>
       </div>
 
       <p className="igm-orgchart-flow__hint">{content.panHint}</p>

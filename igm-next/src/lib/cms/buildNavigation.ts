@@ -1,5 +1,5 @@
 import { getMessages } from "@/i18n/messages";
-import { MAIN_NAV, type NavItem } from "@/i18n/navigation";
+import { MAIN_NAV, navNestedIconStyle, type NavItem } from "@/i18n/navigation";
 import type { SupportedLocale } from "@/i18n/locales";
 import { hrefForRoute } from "@/i18n/paths";
 
@@ -24,6 +24,18 @@ const SOCIAL_ICONS: Record<string, string> = {
   x: "bi-twitter-x",
 };
 
+function getNestedMenuItems(
+  item: CmsNavMenuItem,
+  level: 1 | 2 | 3,
+): CmsNavMenuItem[] | null | undefined {
+  if (level === 1) return item.children;
+  if (level === 2) {
+    const merged = [...(item.children ?? []), ...(item.subItems ?? [])];
+    return merged.length ? merged : undefined;
+  }
+  return item.subItems;
+}
+
 function cmsNavItemToRuntime(
   item: CmsNavMenuItem,
   locale: SupportedLocale,
@@ -37,7 +49,7 @@ function cmsNavItemToRuntime(
   }
 
   if (item.itemType === "dropdown") {
-    const nested = level === 1 ? item.children : item.subItems;
+    const nested = getNestedMenuItems(item, level);
     const childLevel = level === 1 ? 2 : 3;
     const children =
       nested
@@ -85,7 +97,7 @@ function defaultNavItemToRuntime(item: NavItem, locale: SupportedLocale): Runtim
     kind: "dropdown",
     label: messages.nav[item.labelKey],
     className: item.className,
-    iconStyle: item.labelKey === "whoWeAre" ? "caret" : "plus",
+    iconStyle: navNestedIconStyle(item.labelKey),
     children: item.items.map((child) => defaultNavItemToRuntime(child, locale)),
   };
 }

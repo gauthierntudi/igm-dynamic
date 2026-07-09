@@ -8,6 +8,13 @@ export type NavItem =
   | { kind: "dropdown"; labelKey: NavLabelKey; className?: string; items: NavItem[] }
   | { kind: "denounce"; className?: string };
 
+/** Sous-menus de 2e niveau affichés avec la flèche caret (comme « Qui sommes-nous ? »). */
+export const NESTED_DROPDOWN_CARET_KEYS = new Set<NavLabelKey>(["whoWeAre", "lcfcm"]);
+
+export function navNestedIconStyle(labelKey: NavLabelKey): "caret" | "plus" {
+  return NESTED_DROPDOWN_CARET_KEYS.has(labelKey) ? "caret" : "plus";
+}
+
 /** Structure du menu principal (header). */
 export const MAIN_NAV: NavItem[] = [
   { kind: "route", routeKey: "home", labelKey: "home" },
@@ -24,18 +31,18 @@ export const MAIN_NAV: NavItem[] = [
           { kind: "route", routeKey: "mission", labelKey: "mission" },
         ],
       },
+      {
+        kind: "dropdown",
+        labelKey: "lcfcm",
+        items: [
+          { kind: "route", routeKey: "fraud", labelKey: "miningFraud" },
+          { kind: "route", routeKey: "smuggling", labelKey: "miningSmuggling" },
+          { kind: "denounce" },
+          { kind: "route", routeKey: "sanctions", labelKey: "sanctions" },
+        ],
+      },
       { kind: "route", routeKey: "orgChart", labelKey: "orgChart" },
       { kind: "route", routeKey: "map", labelKey: "map" },
-    ],
-  },
-  {
-    kind: "dropdown",
-    labelKey: "lcfcm",
-    items: [
-      { kind: "route", routeKey: "fraud", labelKey: "miningFraud" },
-      { kind: "route", routeKey: "smuggling", labelKey: "miningSmuggling" },
-      { kind: "denounce" },
-      { kind: "route", routeKey: "sanctions", labelKey: "sanctions" },
     ],
   },
   { kind: "route", routeKey: "news", labelKey: "news", className: "nav-hide-1020" },
@@ -57,6 +64,7 @@ export const MAIN_NAV: NavItem[] = [
     items: [
       { kind: "route", routeKey: "photos", labelKey: "photos" },
       { kind: "route", routeKey: "videos", labelKey: "videos" },
+      { kind: "route", routeKey: "pressReview", labelKey: "pressReview" },
     ],
   },
   {
@@ -81,6 +89,7 @@ export const MAIN_NAV: NavItem[] = [
         items: [
           { kind: "route", routeKey: "photos", labelKey: "photos" },
           { kind: "route", routeKey: "videos", labelKey: "videos" },
+          { kind: "route", routeKey: "pressReview", labelKey: "pressReview" },
         ],
       },
       { kind: "route", routeKey: "contact", labelKey: "contact" },

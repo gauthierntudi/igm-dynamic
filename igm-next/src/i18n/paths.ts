@@ -20,6 +20,7 @@ export const ROUTE_KEYS = {
   decisions: { fr: "decisions", en: "decisions" },
   photos: { fr: "photos", en: "photos" },
   videos: { fr: "videos", en: "videos" },
+  pressReview: { fr: "revue-de-presse", en: "press-review" },
   contact: { fr: "contact", en: "contact" },
   terms: { fr: "conditions-generales", en: "terms-and-conditions" },
   cookies: { fr: "politique-cookies", en: "cookie-policy" },

@@ -3,8 +3,8 @@
 .igm-orgchart-flow {
   position: relative;
   width: 100%;
-  height: min(78vh, 760px);
-  min-height: 420px;
+  height: min(90vh, 980px);
+  min-height: 560px;
   background: transparent;
 }
 
@@ -38,6 +38,130 @@
   margin-top: 0.65rem;
 }
 
+.igm-orgchart-zoom-controls-panel {
+  margin: 0 0.85rem 0.85rem 0;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.igm-orgchart-zoom-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  min-height: 42px;
+  padding: 0.2rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.97);
+  border: 1px solid rgba(27, 68, 145, 0.18);
+  backdrop-filter: blur(8px);
+  pointer-events: auto;
+}
+
+.igm-orgchart-zoom-controls__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #1b4491;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.igm-orgchart-zoom-controls__btn:hover:not(:disabled) {
+  background: rgba(27, 68, 145, 0.08);
+  color: #153a7a;
+}
+
+.igm-orgchart-zoom-controls__btn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.igm-orgchart-zoom-controls__btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.igm-orgchart-zoom-controls__btn:focus-visible {
+  outline: 2px solid #1b4491;
+  outline-offset: 1px;
+}
+
+.igm-orgchart-zoom-controls__level {
+  min-width: 3.1rem;
+  padding: 0 0.15rem;
+  font-family: "Google Sans", Inter, system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: #153a7a;
+  text-align: center;
+  user-select: none;
+}
+
+.igm-orgchart-zoom-controls__divider {
+  width: 1px;
+  height: 22px;
+  margin: 0 0.15rem;
+  background: rgba(27, 68, 145, 0.16);
+}
+
+.igm-orgchart-zoom-controls__btn--reset {
+  margin-right: 0.1rem;
+}
+
+@media (max-width: 767px) {
+  .igm-orgchart-zoom-controls-panel {
+    margin: 0 0.55rem 0.55rem 0;
+  }
+
+  .igm-orgchart-zoom-controls {
+    min-height: 40px;
+  }
+
+  .igm-orgchart-zoom-controls__btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .igm-orgchart-zoom-controls__level {
+    min-width: 2.8rem;
+    font-size: 0.74rem;
+  }
+}
+
+.igm-orgchart-flow .react-flow__viewport {
+  overflow: visible;
+}
+
+.igm-orgchart-flow .react-flow__viewport-portal {
+  z-index: 0;
+}
+
+.igm-orgchart-flow .react-flow__nodes {
+  z-index: 1;
+}
+
+.igm-orgchart-flow .react-flow__node {
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.igm-orgchart-connectors {
+  overflow: visible;
+  pointer-events: none;
+}
+
 .igm-orgchart-flow-handle {
   width: 1px;
   height: 1px;
@@ -57,7 +181,7 @@
   box-sizing: border-box;
   width: 100%;
   height: 100%;
-  padding: 0.65rem 0.75rem;
+  padding: 0.75rem 0.85rem;
   border-radius: 6px;
   border: 1.5px solid rgba(12, 31, 61, 0.85);
   background: #fff;
@@ -80,37 +204,42 @@
   border-color: rgba(27, 68, 145, 0.55);
 }
 
-.igm-orgchart-flow-node strong {
+.igm-orgchart-flow-node__label {
   display: block;
   font-family: "Google Sans", Inter, system-ui, sans-serif;
-  font-size: 0.68rem;
+  font-size: 0.95rem;
   font-weight: 700;
   line-height: 1.35;
   text-transform: uppercase;
   letter-spacing: 0.02em;
+  white-space: pre-line;
 }
 
-.igm-orgchart-flow-node span {
-  display: block;
-  margin-top: 0.12rem;
-  font-family: "Google Sans", Inter, system-ui, sans-serif;
-  font-size: 0.62rem;
-  line-height: 1.35;
-  color: #5a6f94;
+.igm-orgchart-flow-node--compact .igm-orgchart-flow-node__label {
+  font-size: 0.88rem;
 }
 
-.igm-orgchart-flow-node--leadership strong,
-.igm-orgchart-flow-node--leadership span {
+.igm-orgchart-flow-node--support .igm-orgchart-flow-node__label {
+  font-size: 0.84rem;
+  text-transform: none;
+  font-weight: 600;
+}
+
+.igm-orgchart-flow-node--service .igm-orgchart-flow-node__label {
+  font-size: 0.8rem;
+  text-transform: none;
+  font-weight: 600;
+  text-align: left;
+  width: 100%;
+}
+
+.igm-orgchart-flow-node--leadership .igm-orgchart-flow-node__label {
   color: inherit;
-}
-
-.igm-orgchart-flow-node--leadership span {
-  color: rgba(255, 255, 255, 0.88);
 }
 
 @media (max-width: 767px) {
   .igm-orgchart-flow {
-    height: min(72vh, 640px);
-    min-height: 360px;
+    height: min(82vh, 820px);
+    min-height: 480px;
   }
 }
