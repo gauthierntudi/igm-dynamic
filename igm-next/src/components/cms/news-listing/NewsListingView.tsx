@@ -35,7 +35,9 @@ export function NewsListingView({
   q,
 }: Props) {
   const isPressReview = variant === "pressReview";
-  const m = getMessages(locale)[isPressReview ? "pressReviewListing" : "newsListing"];
+  const messages = getMessages(locale);
+  const m = isPressReview ? messages.pressReviewListing : messages.newsListing;
+  const pressReviewM = messages.pressReviewListing;
   const listingHref = isPressReview
     ? hrefForPressReviewListing(locale)
     : hrefForNewsListing(locale);

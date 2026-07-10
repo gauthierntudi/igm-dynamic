@@ -11,6 +11,7 @@ import "@/components/cms/who-we-are/about-page.css";
 
 const ROUTE_NAV_LABEL: Record<PageHeroRouteKey, keyof ReturnType<typeof getMessages>["nav"]> = {
   orgChart: "orgChart",
+  pressKit: "pressKit",
   map: "map",
   fraud: "miningFraud",
   smuggling: "miningSmuggling",
