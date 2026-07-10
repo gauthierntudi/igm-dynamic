@@ -58,10 +58,10 @@ export function NewsListingView({
 
       {isPressReview ? (
         <PressReviewListingHero
-          title={m.exploreTitle}
-          lead={m.heroLead}
-          sectionLabel={m.sectionLabel}
-          eyebrow={m.heroEyebrow}
+          title={pressReviewM.exploreTitle}
+          lead={pressReviewM.heroLead}
+          sectionLabel={pressReviewM.sectionLabel}
+          eyebrow={pressReviewM.heroEyebrow}
           featuredArticle={articles[0]}
         />
       ) : null}
@@ -71,7 +71,7 @@ export function NewsListingView({
           <div className="igm-news-listing-toolbar">
             {isPressReview ? (
               <h2 className="igm-news-listing-heading igm-news-listing-heading-secondary">
-                {m.bodyTitle}
+                {pressReviewM.bodyTitle}
               </h2>
             ) : (
               <h1 className="igm-news-listing-heading">{m.exploreTitle}</h1>
