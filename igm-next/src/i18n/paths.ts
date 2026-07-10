@@ -8,6 +8,7 @@ export const ROUTE_KEYS = {
   mission: { fr: "mission", en: "mission" },
   vision: { fr: "vision", en: "vision" },
   orgChart: { fr: "organigramme", en: "org-chart" },
+  pressKit: { fr: "dossier-de-presse", en: "press-kit" },
   map: { fr: "cartographie", en: "mapping" },
   fraud: { fr: "fraude-miniere", en: "mining-fraud" },
   smuggling: { fr: "contrebande-miniere", en: "mining-smuggling" },
@@ -76,9 +77,36 @@ export function parseNewsArticleSlug(
   return articleSlug;
 }
 
+/** Slug d’article revue de presse si l’URL est `revue-de-presse/{slug}` ou `press-review/{slug}`. */
+export function parsePressReviewArticleSlug(
+  pathSegments: string[],
+  locale: SupportedLocale,
+): string | null {
+  if (pathSegments.length !== 2) return null;
+  const [sectionSlug, articleSlug] = pathSegments;
+  if (findRouteKey(sectionSlug, locale) !== "pressReview") return null;
+  return articleSlug;
+}
+
 /** URL d’un article actualités pour une locale donnée. */
 export function hrefForNewsArticle(slug: string, locale: SupportedLocale): string {
   return `${hrefForRoute("news", locale)}/${slug}`;
+}
+
+/** URL d’un article revue de presse pour une locale donnée. */
+export function hrefForPressReviewArticle(slug: string, locale: SupportedLocale): string {
+  return `${hrefForRoute("pressReview", locale)}/${slug}`;
+}
+
+/** URL d’un article selon sa catégorie CMS. */
+export function hrefForNewsItem(
+  article: { slug: string; category?: string | null },
+  locale: SupportedLocale,
+): string {
+  if (article.category === "revue-de-presse") {
+    return hrefForPressReviewArticle(article.slug, locale);
+  }
+  return hrefForNewsArticle(article.slug, locale);
 }
 
 /** URL d’un album photo pour une locale donnée. */
@@ -113,6 +141,15 @@ export function isNewsListingPath(
 ): boolean {
   if (pathSegments.length !== 1) return false;
   return findRouteKey(pathSegments[0], locale) === "news";
+}
+
+/** True si le chemin est la page liste revue de presse (`revue-de-presse` / `press-review`). */
+export function isPressReviewListingPath(
+  pathSegments: string[],
+  locale: SupportedLocale,
+): boolean {
+  if (pathSegments.length !== 1) return false;
+  return findRouteKey(pathSegments[0], locale) === "pressReview";
 }
 
 export type WhoWeAreSectionId = "about" | "history" | "mission";
@@ -150,6 +187,19 @@ export function hrefForNewsListing(
   return qs ? `${base}?${qs}` : base;
 }
 
+/** URL de la page liste revue de presse avec pagination / recherche. */
+export function hrefForPressReviewListing(
+  locale: SupportedLocale,
+  query: NewsListingQuery = {},
+): string {
+  const base = hrefForRoute("pressReview", locale);
+  const params = new URLSearchParams();
+  if (query.q?.trim()) params.set("q", query.q.trim());
+  if (query.page && query.page > 1) params.set("page", String(query.page));
+  const qs = params.toString();
+  return qs ? `${base}?${qs}` : base;
+}
+
 /** URL équivalente dans une autre langue (navigation, sélecteur FR/EN). */
 export function switchLocaleHref(pathname: string, targetLocale: SupportedLocale): string {
   const segments = pathname.split("/").filter(Boolean);
@@ -162,6 +212,11 @@ export function switchLocaleHref(pathname: string, targetLocale: SupportedLocale
   const newsSlug = parseNewsArticleSlug(pathSegments, currentLocale);
   if (newsSlug) {
     return hrefForNewsArticle(newsSlug, targetLocale);
+  }
+
+  const pressReviewSlug = parsePressReviewArticleSlug(pathSegments, currentLocale);
+  if (pressReviewSlug) {
+    return hrefForPressReviewArticle(pressReviewSlug, targetLocale);
   }
 
   const photoAlbumSlug = parsePhotoAlbumSlug(pathSegments, currentLocale);

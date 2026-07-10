@@ -1,21 +1,32 @@
+import { resendAdapter } from "@payloadcms/email-resend";
 import { nodemailerAdapter } from "@payloadcms/email-nodemailer";
 
-import { parseSmtpFrom, smtpConfigured } from "@/lib/email/smtp";
+import {
+  getEmailTransportMode,
+  parseFromParts,
+  resendConfigured,
+  resolveEmailFromRaw,
+  smtpConfigured,
+} from "@/lib/email/config";
+import { parseSmtpFrom } from "@/lib/email/smtp";
 
-function parseFromParts(rawFrom: string): { name: string; address: string } {
-  const match = rawFrom.match(/^(.+?)\s*<([^>]+)>$/);
-  if (match) {
-    return {
-      name: match[1].trim().replace(/^["']|["']$/g, ""),
-      address: match[2].trim(),
-    };
+/** Adaptateur e-mail Payload (reset mot de passe admin, etc.) — suit SYS_ENVOI. */
+export function buildPayloadEmailAdapter() {
+  const mode = getEmailTransportMode();
+
+  if (mode === "resend") {
+    if (!resendConfigured()) {
+      return undefined;
+    }
+
+    const from = parseFromParts(resolveEmailFromRaw());
+    return resendAdapter({
+      defaultFromAddress: from.address,
+      defaultFromName: from.name,
+      apiKey: process.env.RESEND_API_KEY!.trim(),
+    });
   }
 
-  return { name: "IGM", address: rawFrom };
-}
-
-/** Adaptateur e-mail Payload (reset mot de passe admin, etc.) — réutilise SMTP_* */
-export function buildPayloadEmailAdapter() {
   if (!smtpConfigured()) {
     return undefined;
   }

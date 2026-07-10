@@ -4,11 +4,7 @@ import {
   renderMailContactMessageBlock,
   renderMailContactMetaTable,
 } from "@/lib/email/mailContactTemplate";
-import {
-  resolveNotifyEmail,
-  sendSmtpMail,
-  smtpConfigured,
-} from "@/lib/email/smtp";
+import { emailConfigured, resolveNotifyEmail, sendMail } from "@/lib/email/sendMail";
 
 type ContactEmailPayload = {
   name: string;
@@ -29,9 +25,9 @@ export async function sendContactNotificationEmail(
     return { sent: false, reason: "Aucune adresse de notification configurée." };
   }
 
-  if (!smtpConfigured()) {
-    console.warn("[contact] SMTP non configuré — message enregistré sans e-mail.");
-    return { sent: false, reason: "SMTP non configuré." };
+  if (!emailConfigured()) {
+    console.warn("[contact] Envoi e-mail non configuré — message enregistré sans notification.");
+    return { sent: false, reason: "Envoi e-mail non configuré." };
   }
 
   const lines = [
@@ -75,7 +71,7 @@ export async function sendContactNotificationEmail(
     </p>`,
   });
 
-  const result = await sendSmtpMail({
+  const result = await sendMail({
     to,
     subject: `[IGM Contact] ${payload.subject}`,
     text: textBody,

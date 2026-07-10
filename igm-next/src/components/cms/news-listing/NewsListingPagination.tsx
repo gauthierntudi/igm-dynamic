@@ -1,10 +1,13 @@
 import Link from "next/link";
 
 import type { SupportedLocale } from "@/i18n/locales";
-import { hrefForNewsListing } from "@/i18n/paths";
+import { hrefForNewsListing, hrefForPressReviewListing } from "@/i18n/paths";
+
+import type { NewsListingVariant } from "./NewsListingView";
 
 type Props = {
   locale: SupportedLocale;
+  variant?: NewsListingVariant;
   page: number;
   totalPages: number;
   q?: string;
@@ -36,6 +39,7 @@ function pageItems(current: number, total: number): (number | "ellipsis")[] {
 
 export function NewsListingPagination({
   locale,
+  variant = "news",
   page,
   totalPages,
   q,
@@ -44,6 +48,8 @@ export function NewsListingPagination({
 }: Props) {
   if (totalPages <= 1) return null;
 
+  const hrefForListing =
+    variant === "pressReview" ? hrefForPressReviewListing : hrefForNewsListing;
   const items = pageItems(page, totalPages);
 
   return (
@@ -61,7 +67,7 @@ export function NewsListingPagination({
                   {item}
                 </span>
               ) : (
-                <Link href={hrefForNewsListing(locale, { page: item, q })}>{item}</Link>
+                <Link href={hrefForListing(locale, { page: item, q })}>{item}</Link>
               )}
             </li>
           ),
@@ -69,7 +75,7 @@ export function NewsListingPagination({
         {page < totalPages ? (
           <li>
             <Link
-              href={hrefForNewsListing(locale, { page: page + 1, q })}
+              href={hrefForListing(locale, { page: page + 1, q })}
               className="igm-news-listing-pagination-next"
               aria-label={nextLabel}
             >

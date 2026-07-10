@@ -12,6 +12,8 @@ import * as mediaGallery from "./mediaGallery";
 import * as news from "./news";
 import * as orgChart from "./orgChart";
 import * as photos from "./photos";
+import * as pressKit from "./pressKit";
+import * as pressReview from "./pressReview";
 import * as signalement from "./signalement";
 import * as underConstruction from "./underConstruction";
 import * as whoWeAre from "./whoWeAre";
@@ -24,6 +26,10 @@ export async function renderSiteRoute(route: SiteRoute): Promise<ReactNode> {
       return news.renderNewsArticleRoute(route);
     case "news-listing":
       return news.renderNewsListingRoute(route);
+    case "press-review-article":
+      return pressReview.renderPressReviewArticleRoute(route);
+    case "press-review-listing":
+      return pressReview.renderPressReviewListingRoute(route);
     case "who-we-are-history":
       return whoWeAre.renderWhoWeAreHistoryRoute(route);
     case "who-we-are-section":
@@ -38,6 +44,8 @@ export async function renderSiteRoute(route: SiteRoute): Promise<ReactNode> {
       return cartography.renderMapRoute(route);
     case "contact":
       return contact.renderContactRoute(route);
+    case "press-kit":
+      return pressKit.renderPressKitRoute(route);
     case "legislation":
       return legislation.renderLegislationRoute(route);
     case "videos":
@@ -61,6 +69,10 @@ export async function buildRouteMetadata(route: SiteRoute): Promise<Metadata> {
       return news.buildNewsArticleMetadata(route);
     case "news-listing":
       return news.buildNewsListingMetadata(route);
+    case "press-review-article":
+      return pressReview.buildPressReviewArticleMetadata(route);
+    case "press-review-listing":
+      return pressReview.buildPressReviewListingMetadata(route);
     case "who-we-are-history":
     case "who-we-are-section":
       return whoWeAre.buildWhoWeAreMetadata(route);
@@ -74,6 +86,8 @@ export async function buildRouteMetadata(route: SiteRoute): Promise<Metadata> {
       return cartography.buildMapMetadata(route);
     case "contact":
       return contact.buildContactMetadata(route);
+    case "press-kit":
+      return pressKit.buildPressKitMetadata(route);
     case "legislation":
       return legislation.buildLegislationMetadata(route);
     case "videos":

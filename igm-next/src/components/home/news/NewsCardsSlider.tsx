@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 
 import type { SupportedLocale } from "@/i18n/locales";
-import { hrefForRoute } from "@/i18n/paths";
+import { hrefForNewsItem } from "@/i18n/paths";
 import { formatNewsDate } from "@/lib/cms/formatNewsDate";
 import type { CmsNews } from "@/lib/cms/types";
 import { getMessages } from "@/i18n/messages";
@@ -29,10 +29,8 @@ type SwiperWindow = Window & {
 export function NewsCardsSlider({ items, locale, layout = "slider" }: Props) {
   const sliderRef = useRef<HTMLDivElement>(null);
   const m = getMessages(locale).common;
-  const newsBase = hrefForRoute("news", locale);
-
   const cards = items.map((item, index) => {
-    const href = `${newsBase}/${item.slug}`;
+    const href = hrefForNewsItem(item, locale);
     const category =
       resolveNewsCategoryLabel(item.category, item.categoryCustom, locale) ||
       m.newsFallback;

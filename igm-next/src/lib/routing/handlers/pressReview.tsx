@@ -7,50 +7,45 @@ import { tryResolveHeroMediaSrc } from "@/lib/cms/resolveHeroMediaSrc";
 import { getMessages } from "@/i18n/messages";
 import { ARTICLE_RELATED_NEWS_MAX_ITEMS } from "@/lib/newsDisplay";
 import { PRESS_REVIEW_CATEGORY } from "@/lib/newsCategories";
-import {
-  NEWS_LISTING_HERO_COUNT,
-  NEWS_LISTING_PAGE_SIZE,
-} from "@/lib/newsListing";
+import { NEWS_LISTING_PAGE_SIZE } from "@/lib/newsListing";
 
 import { cmsMediaForOg, siteMeta } from "../siteMeta";
 import type { SiteRoute } from "../types";
 
-type NewsArticleRoute = Extract<SiteRoute, { kind: "news-article" }>;
-type NewsListingRoute = Extract<SiteRoute, { kind: "news-listing" }>;
+type PressReviewArticleRoute = Extract<SiteRoute, { kind: "press-review-article" }>;
+type PressReviewListingRoute = Extract<SiteRoute, { kind: "press-review-listing" }>;
 
-export async function renderNewsArticleRoute(route: NewsArticleRoute) {
+export async function renderPressReviewArticleRoute(route: PressReviewArticleRoute) {
   const { locale, article } = route;
   const related = await getNewsListing(locale, {
     page: 1,
     limit: ARTICLE_RELATED_NEWS_MAX_ITEMS + 1,
-    excludeCategory: PRESS_REVIEW_CATEGORY,
+    category: PRESS_REVIEW_CATEGORY,
   });
 
-  return <CmsNewsArticleView article={article} related={related.docs} locale={locale} />;
+  return (
+    <CmsNewsArticleView
+      article={article}
+      related={related.docs}
+      locale={locale}
+      variant="pressReview"
+    />
+  );
 }
 
-export async function renderNewsListingRoute(route: NewsListingRoute) {
+export async function renderPressReviewListingRoute(route: PressReviewListingRoute) {
   const { locale, page, q } = route;
-  const [listing, heroListing] = await Promise.all([
-    getNewsListing(locale, {
-      page,
-      limit: NEWS_LISTING_PAGE_SIZE,
-      q: q || undefined,
-      excludeCategory: PRESS_REVIEW_CATEGORY,
-    }),
-    q
-      ? Promise.resolve({ docs: [], totalDocs: 0, totalPages: 0, page: 1 })
-      : getNewsListing(locale, {
-          page: 1,
-          limit: NEWS_LISTING_HERO_COUNT,
-          excludeCategory: PRESS_REVIEW_CATEGORY,
-        }),
-  ]);
+  const listing = await getNewsListing(locale, {
+    page,
+    limit: NEWS_LISTING_PAGE_SIZE,
+    q: q || undefined,
+    category: PRESS_REVIEW_CATEGORY,
+  });
 
   return (
     <NewsListingView
       locale={locale}
-      heroArticles={heroListing.docs}
+      variant="pressReview"
       articles={listing.docs}
       page={listing.page}
       totalPages={listing.totalPages}
@@ -60,7 +55,9 @@ export async function renderNewsListingRoute(route: NewsListingRoute) {
   );
 }
 
-export async function buildNewsArticleMetadata(route: NewsArticleRoute): Promise<Metadata> {
+export async function buildPressReviewArticleMetadata(
+  route: PressReviewArticleRoute,
+): Promise<Metadata> {
   const { locale, pathSegments, article } = route;
   return siteMeta(locale, pathSegments, {
     title: article.seoTitle?.trim() || `${article.title} — IGM`,
@@ -72,9 +69,11 @@ export async function buildNewsArticleMetadata(route: NewsArticleRoute): Promise
   });
 }
 
-export async function buildNewsListingMetadata(route: NewsListingRoute): Promise<Metadata> {
+export async function buildPressReviewListingMetadata(
+  route: PressReviewListingRoute,
+): Promise<Metadata> {
   const { locale, pathSegments } = route;
-  const m = getMessages(locale).newsListing;
+  const m = getMessages(locale).pressReviewListing;
   return siteMeta(locale, pathSegments, {
     title: m.metaTitle,
     description: m.metaDescription,

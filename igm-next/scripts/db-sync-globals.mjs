@@ -22,6 +22,7 @@ const migrations = [
   "db-sync-page-heroes.sql",
   "db-sync-page-images.sql",
   "db-sync-contact-page.sql",
+  "db-sync-press-kit-page.sql",
   "db-sync-cartography-settings.sql",
 ];
 

@@ -1,5 +1,5 @@
 /**
- * Ajoute « Revue de presse » au menu Médiathèque principal (grand écran).
+ * Ajoute « Revue de presse » au menu Multimédia principal (grand écran).
  * Usage: npx tsx --env-file=.env.local scripts/sync-press-review-nav.ts
  */
 import { getPayload } from "payload";
@@ -12,6 +12,8 @@ const PRESS_LABEL = {
   fr: "Revue de presse",
   en: "Press review",
 } as const;
+
+const MEDIA_LIBRARY_LABELS = new Set(["Multimédia", "Médiathèque"]);
 
 function hasPressReviewLink(
   items: Array<{ label?: string | null; navLink?: string | null; customHref?: string | null }> | null | undefined,
@@ -49,7 +51,7 @@ function patchMediaLibraryChildren(
   let changed = false;
 
   for (const item of headerNav) {
-    if (item.itemType === "dropdown" && item.label === "Médiathèque") {
+    if (item.itemType === "dropdown" && MEDIA_LIBRARY_LABELS.has(String(item.label ?? ""))) {
       const children = (item.children as Array<Record<string, unknown>> | undefined) ?? [];
       if (!hasPressReviewLink(children)) {
         item.children = [...children, createPressReviewLink(locale)];
@@ -61,7 +63,7 @@ function patchMediaLibraryChildren(
     if (!children?.length) continue;
 
     for (const child of children) {
-      if (child.itemType === "dropdown" && child.label === "Médiathèque") {
+      if (child.itemType === "dropdown" && MEDIA_LIBRARY_LABELS.has(String(child.label ?? ""))) {
         const subItems = (child.subItems as Array<Record<string, unknown>> | undefined) ?? [];
         if (!hasPressReviewLink(subItems)) {
           child.subItems = [...subItems, createPressReviewLink(locale)];
@@ -106,7 +108,7 @@ async function main() {
     data: { headerNav },
   });
 
-  console.log("✓ « Revue de presse » ajoutée au menu Médiathèque (grand écran + menu condensé).");
+  console.log("✓ « Revue de presse » ajoutée au menu Multimédia (grand écran + menu condensé).");
   await payload.db.destroy?.();
 }
 

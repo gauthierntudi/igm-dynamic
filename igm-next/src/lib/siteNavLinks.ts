@@ -6,6 +6,7 @@ export const SITE_NAV_LINKS = [
   { label: "Présentation — Mission", value: "/mission" },
   { label: "Présentation — Vision", value: "/vision" },
   { label: "Présentation — Organigramme", value: "/organigramme" },
+  { label: "Présentation — Dossier de presse", value: "/dossier-de-presse" },
   { label: "Présentation — Cartographie", value: "/cartographie" },
   { label: "LCFCM — Fraude minière", value: "/fraude-miniere" },
   { label: "LCFCM — Contrebande minière", value: "/contrebande-miniere" },
@@ -16,9 +17,9 @@ export const SITE_NAV_LINKS = [
   { label: "Législation — Lois", value: "/lois" },
   { label: "Législation — Décrets", value: "/decrets" },
   { label: "Législation — Décisions", value: "/decisions" },
-  { label: "Médiathèque — Photos", value: "/photos" },
-  { label: "Médiathèque — Vidéos", value: "/videos" },
-  { label: "Médiathèque — Revue de presse", value: "/revue-de-presse" },
+  { label: "Multimédia — Photos", value: "/photos" },
+  { label: "Multimédia — Vidéos", value: "/videos" },
+  { label: "Multimédia — Revue de presse", value: "/revue-de-presse" },
   { label: "Contact", value: "/contact" },
 ] as const;
 

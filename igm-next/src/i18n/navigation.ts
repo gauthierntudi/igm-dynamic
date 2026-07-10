@@ -42,6 +42,7 @@ export const MAIN_NAV: NavItem[] = [
         ],
       },
       { kind: "route", routeKey: "orgChart", labelKey: "orgChart" },
+      { kind: "route", routeKey: "pressKit", labelKey: "pressKit" },
       { kind: "route", routeKey: "map", labelKey: "map" },
     ],
   },

@@ -1,5 +1,6 @@
 import { getNewsBySlug } from "@/lib/cms/client";
 import { isNewsListingPath, parseNewsArticleSlug } from "@/i18n/paths";
+import { PRESS_REVIEW_CATEGORY } from "@/lib/newsCategories";
 
 import type { RouteMatcher } from "../types";
 
@@ -9,7 +10,7 @@ export const matchNewsRoutes: RouteMatcher = async (ctx, input) => {
   const newsArticleSlug = parseNewsArticleSlug(pathSegments, locale);
   if (newsArticleSlug) {
     const article = await getNewsBySlug(newsArticleSlug, locale);
-    if (article) {
+    if (article && article.category !== PRESS_REVIEW_CATEGORY) {
       return { kind: "news-article", article, ...ctx };
     }
   }

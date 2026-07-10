@@ -17,3 +17,16 @@ ALTER TABLE "_news_v_locales" ADD COLUMN IF NOT EXISTS "version_category_custom"
 
 -- Section actualités accueil : 3 articles par défaut.
 ALTER TABLE "home" ALTER COLUMN "news_section_max_items" SET DEFAULT 3;
+
+-- Catégorie « Revue de presse »
+DO $$ BEGIN
+  ALTER TYPE "enum_news_category" ADD VALUE 'revue-de-presse';
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  ALTER TYPE "enum__news_v_version_category" ADD VALUE 'revue-de-presse';
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;

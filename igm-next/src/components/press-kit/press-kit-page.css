@@ -1,0 +1,41 @@
+.igm-press-kit-page {
+  background: #fff;
+}
+
+.igm-press-kit-section {
+  padding: clamp(2rem, 4vw, 3rem) 0 clamp(3rem, 5vw, 4rem);
+}
+
+.igm-press-kit-intro {
+  max-width: 68ch;
+  margin: 0 0 1.75rem;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: #334155;
+}
+
+.igm-press-kit-empty {
+  margin: 0;
+  padding: 2rem;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  text-align: center;
+  color: #64748b;
+  background: #f8fafc;
+}
+
+.igm-press-kit-viewer {
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #0f172a;
+  min-height: min(78vh, 860px);
+}
+
+.igm-press-kit-viewer-loading {
+  display: grid;
+  place-items: center;
+  min-height: min(78vh, 860px);
+  color: #94a3b8;
+  background: #0f172a;
+}

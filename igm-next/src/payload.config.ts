@@ -20,6 +20,7 @@ import { Users } from "./collections/Users";
 import { SiteSettings } from "./globals/SiteSettings";
 import { Home } from "./globals/Home";
 import { ContactPage } from "./globals/ContactPage";
+import { PressKitPage } from "./globals/PressKitPage";
 import { CartographySettings } from "./globals/CartographySettings";
 import { Legislation } from "./globals/Legislation";
 import { PageHeroes } from "./globals/PageHeroes";
@@ -67,7 +68,7 @@ export default buildConfig({
     },
   },
   collections: [Users, Media, SignalementFiles, Pages, News, Stats, Signalements, ContactMessages, LegislationDocuments, MediaGalleryItems, PhotoAlbums],
-  globals: [SiteSettings, Home, WhoWeAre, Legislation, PageHeroes, ContactPage, CartographySettings],
+  globals: [SiteSettings, Home, WhoWeAre, Legislation, PageHeroes, ContactPage, PressKitPage, CartographySettings],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
   ...(payloadEmail ? { email: payloadEmail } : {}),

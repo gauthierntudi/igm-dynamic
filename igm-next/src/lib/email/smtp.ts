@@ -1,20 +1,9 @@
 import type { Transporter } from "nodemailer";
 import nodemailer from "nodemailer";
 
-export function smtpConfigured(): boolean {
-  return Boolean(process.env.SMTP_HOST && process.env.SMTP_FROM);
-}
+import { parseSmtpFrom, smtpConfigured } from "@/lib/email/config";
 
-/** Adresse de notification admin — CONTACT_NOTIFY_EMAIL ou e-mail du site, jamais SMTP_FROM. */
-export function resolveNotifyEmail(fallback?: string | null): string | null {
-  const notify = process.env.CONTACT_NOTIFY_EMAIL?.trim();
-  if (notify) return notify;
-
-  const site = fallback?.trim();
-  if (site && site.includes("@")) return site;
-
-  return null;
-}
+export { parseSmtpFrom, resolveNotifyEmail, smtpConfigured } from "@/lib/email/config";
 
 export function escapeHtml(value: string): string {
   return value
@@ -26,11 +15,6 @@ export function escapeHtml(value: string): string {
 
 export function getServerBaseUrl(): string {
   return (process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000").replace(/\/$/, "");
-}
-
-/** Normalise SMTP_FROM (guillemets éventuels dans .env). */
-export function parseSmtpFrom(value?: string | null): string {
-  return value?.trim().replace(/^["']|["']$/g, "") ?? "";
 }
 
 export function createSmtpTransporter(): Transporter {
@@ -69,7 +53,7 @@ export async function sendSmtpMail(
 
   const from = parseSmtpFrom(process.env.SMTP_FROM);
   if (!from) {
-    console.error("[email] SMTP_FROM manquant");
+    console.error("[email:smtp] SMTP_FROM manquant");
     return { sent: false, reason: "SMTP_FROM manquant." };
   }
 
@@ -85,12 +69,12 @@ export async function sendSmtpMail(
       html: options.html,
     });
     console.info(
-      `[email] envoyé → ${options.to} (${options.subject}) id=${info.messageId ?? "?"}`,
+      `[email:smtp] envoyé → ${options.to} (${options.subject}) id=${info.messageId ?? "?"}`,
     );
     return { sent: true };
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
-    console.error(`[email] échec envoi → ${options.to} (${options.subject}):`, detail);
+    console.error(`[email:smtp] échec envoi → ${options.to} (${options.subject}):`, detail);
     return { sent: false, reason: detail || "Échec d'envoi SMTP." };
   } finally {
     if (!transporter) {

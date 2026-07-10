@@ -3,6 +3,7 @@ import type { RouteKey } from "@/i18n/paths";
 /** Pages dont la bannière est configurable via le global « page-heroes ». */
 export const PAGE_HERO_ROUTE_KEYS = [
   "orgChart",
+  "pressKit",
   "map",
   "fraud",
   "smuggling",
@@ -21,6 +22,7 @@ export function isPageHeroRouteKey(value: string): value is PageHeroRouteKey {
 
 export const PAGE_HERO_FIELD: Record<PageHeroRouteKey, `${PageHeroRouteKey}HeroImage`> = {
   orgChart: "orgChartHeroImage",
+  pressKit: "pressKitHeroImage",
   map: "mapHeroImage",
   fraud: "fraudHeroImage",
   smuggling: "smugglingHeroImage",
@@ -60,7 +62,7 @@ export const PAGE_HERO_GROUP_LABELS = {
   presentation: "Présentation (IGM)",
   lcfcm: "LCFCM",
   contact: "Contact",
-  media: "Médiathèque",
+  media: "Multimédia",
 } as const;
 
 export const PAGE_HERO_GROUPS: Record<
@@ -69,6 +71,7 @@ export const PAGE_HERO_GROUPS: Record<
 > = {
   presentation: [
     { routeKey: "orgChart", label: "Organigramme" },
+    { routeKey: "pressKit", label: "Dossier de presse" },
     { routeKey: "map", label: "Cartographie" },
   ],
   lcfcm: [

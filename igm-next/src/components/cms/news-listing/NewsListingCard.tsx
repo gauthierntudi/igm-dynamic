@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import type { SupportedLocale } from "@/i18n/locales";
-import { hrefForNewsArticle } from "@/i18n/paths";
+import { hrefForNewsArticle, hrefForPressReviewArticle } from "@/i18n/paths";
 import { formatNewsDate } from "@/lib/cms/formatNewsDate";
 import type { CmsNews } from "@/lib/cms/types";
 import { getMessages } from "@/i18n/messages";
@@ -10,16 +10,21 @@ import { truncateNewsCardText } from "@/lib/newsDisplay";
 import { NEWS_LISTING_CARD_TITLE_MAX } from "@/lib/newsListing";
 
 import { resolveNewsCoverSrc } from "@/components/home/news/resolveNewsMedia";
+import type { NewsListingVariant } from "./NewsListingView";
 
 type Props = {
   article: CmsNews;
   locale: SupportedLocale;
   index?: number;
+  variant?: NewsListingVariant;
 };
 
-export function NewsListingCard({ article, locale, index = 0 }: Props) {
+export function NewsListingCard({ article, locale, index = 0, variant = "news" }: Props) {
   const m = getMessages(locale).common;
-  const href = hrefForNewsArticle(article.slug, locale);
+  const href =
+    variant === "pressReview"
+      ? hrefForPressReviewArticle(article.slug, locale)
+      : hrefForNewsArticle(article.slug, locale);
   const category =
     resolveNewsCategoryLabel(article.category, article.categoryCustom, locale) ||
     m.newsFallback;

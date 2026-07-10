@@ -2,12 +2,15 @@ import type { SupportedLocale } from "@/i18n/locales";
 
 export const CUSTOM_NEWS_CATEGORY = "custom" as const;
 
+export const PRESS_REVIEW_CATEGORY = "revue-de-presse" as const;
+
 export const NEWS_CATEGORY_VALUES = [
   "inspection",
   "cadastre",
   "digitalisation",
   "conformite",
   "communique-presse",
+  PRESS_REVIEW_CATEGORY,
   CUSTOM_NEWS_CATEGORY,
 ] as const;
 
@@ -19,6 +22,7 @@ export const NEWS_CATEGORY_OPTIONS: { label: string; value: NewsCategoryValue }[
   { label: "Digitalisation", value: "digitalisation" },
   { label: "Conformité", value: "conformite" },
   { label: "Communiqué de presse", value: "communique-presse" },
+  { label: "Revue de presse", value: PRESS_REVIEW_CATEGORY },
   { label: "Personnaliser", value: CUSTOM_NEWS_CATEGORY },
 ];
 
@@ -28,6 +32,7 @@ const LABELS_FR: Record<Exclude<NewsCategoryValue, typeof CUSTOM_NEWS_CATEGORY>,
   digitalisation: "Digitalisation",
   conformite: "Conformité",
   "communique-presse": "Communiqué de presse",
+  "revue-de-presse": "Revue de presse",
 };
 
 const LABELS_EN: Record<Exclude<NewsCategoryValue, typeof CUSTOM_NEWS_CATEGORY>, string> = {
@@ -36,6 +41,7 @@ const LABELS_EN: Record<Exclude<NewsCategoryValue, typeof CUSTOM_NEWS_CATEGORY>,
   digitalisation: "Digitalisation",
   conformite: "Compliance",
   "communique-presse": "Press release",
+  "revue-de-presse": "Press review",
 };
 
 export function resolveNewsCategoryLabel(

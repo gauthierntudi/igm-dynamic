@@ -9,11 +9,7 @@ import {
   getSignalementAcknowledgementCopy,
   resolveSignalementLocale,
 } from "@/lib/email/signalementEmailCopy";
-import {
-  resolveNotifyEmail,
-  sendSmtpMail,
-  smtpConfigured,
-} from "@/lib/email/smtp";
+import { emailConfigured, resolveNotifyEmail, sendMail } from "@/lib/email/sendMail";
 import type { SupportedLocale } from "@/i18n/locales";
 import { getSiteOrigin } from "@/lib/seo/siteOrigin";
 
@@ -137,8 +133,8 @@ export async function sendSignalementSubmissionEmails(
   payload: SignalementEmailPayload,
   siteEmail?: string | null,
 ): Promise<{ acknowledgementSent: boolean; adminNotified: boolean }> {
-  if (!smtpConfigured()) {
-    console.warn("[signalement] SMTP non configuré — e-mails non envoyés.");
+  if (!emailConfigured()) {
+    console.warn("[signalement] Envoi e-mail non configuré — e-mails non envoyés.");
     return { acknowledgementSent: false, adminNotified: false };
   }
 
@@ -160,7 +156,7 @@ export async function sendSignalementSubmissionEmails(
     const adminMail = buildSignalementAdminNotificationEmail(payload, adminUrl);
     const replyTo =
       alerteurEmail && alerteurEmail !== notifyTo ? alerteurEmail : undefined;
-    const result = await sendSmtpMail({
+    const result = await sendMail({
       to: notifyTo,
       subject: adminMail.subject,
       text: adminMail.text,
@@ -176,7 +172,7 @@ export async function sendSignalementSubmissionEmails(
   if (alerteurEmail) {
     console.info(`[signalement] envoi accusé → ${alerteurEmail}`);
     const acknowledgement = buildSignalementAcknowledgementEmail(payload);
-    const result = await sendSmtpMail({
+    const result = await sendMail({
       to: alerteurEmail,
       subject: acknowledgement.subject,
       text: acknowledgement.text,

@@ -2,7 +2,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import type { CollectionAfterChangeHook, GlobalAfterChangeHook } from "payload";
 
 import { localePathPrefix, SUPPORTED_LOCALES } from "@/i18n/locales";
-import { hrefForRoute, hrefForPhotoAlbum } from "@/i18n/paths";
+import { hrefForRoute, hrefForNewsArticle, hrefForPhotoAlbum, hrefForPressReviewArticle } from "@/i18n/paths";
 import { pageHeroRouteKeysForRevalidation } from "@/lib/page-heroes/constants";
 
 function revalidateSite(tags: string[]) {
@@ -77,6 +77,23 @@ export const revalidateFrontCollection: CollectionAfterChangeHook = ({ collectio
     }
   }
 
+  if (collection.slug === "news") {
+    try {
+      revalidatePath(hrefForRoute("news", "fr"));
+      revalidatePath(hrefForRoute("news", "en"));
+      revalidatePath(hrefForRoute("pressReview", "fr"));
+      revalidatePath(hrefForRoute("pressReview", "en"));
+      if (typeof doc.slug === "string" && doc.slug.length > 0) {
+        revalidatePath(hrefForNewsArticle(doc.slug, "fr"));
+        revalidatePath(hrefForNewsArticle(doc.slug, "en"));
+        revalidatePath(hrefForPressReviewArticle(doc.slug, "fr"));
+        revalidatePath(hrefForPressReviewArticle(doc.slug, "en"));
+      }
+    } catch {
+      // Hors contexte Next.js.
+    }
+  }
+
   if (collection.slug === "photo-albums") {
     try {
       revalidatePath(hrefForRoute("photos", "fr"));
@@ -116,6 +133,8 @@ export const revalidateFrontCollection: CollectionAfterChangeHook = ({ collectio
       revalidatePath(hrefForRoute("photos", "en"));
       revalidatePath(hrefForRoute("videos", "fr"));
       revalidatePath(hrefForRoute("videos", "en"));
+      revalidatePath(hrefForRoute("pressKit", "fr"));
+      revalidatePath(hrefForRoute("pressKit", "en"));
       revalidatePath("/");
       for (const locale of SUPPORTED_LOCALES) {
         revalidatePath(localePathPrefix(locale) || "/");
@@ -177,6 +196,15 @@ export const revalidateFrontGlobal: GlobalAfterChangeHook = ({ global, doc }) =>
     try {
       revalidatePath(hrefForRoute("contact", "fr"));
       revalidatePath(hrefForRoute("contact", "en"));
+    } catch {
+      // Hors contexte Next.js.
+    }
+  }
+
+  if (global.slug === "press-kit-page") {
+    try {
+      revalidatePath(hrefForRoute("pressKit", "fr"));
+      revalidatePath(hrefForRoute("pressKit", "en"));
     } catch {
       // Hors contexte Next.js.
     }

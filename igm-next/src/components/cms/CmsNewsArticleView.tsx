@@ -5,7 +5,11 @@ import { HeaderHeroDarkBody } from "@/components/cms/HeaderHeroDarkBody";
 import { NewsCardsSlider } from "@/components/home/news/NewsCardsSlider";
 import { resolveNewsCoverSrc } from "@/components/home/news/resolveNewsMedia";
 import type { SupportedLocale } from "@/i18n/locales";
-import { hrefForRoute } from "@/i18n/paths";
+import {
+  hrefForNewsArticle,
+  hrefForPressReviewArticle,
+  hrefForRoute,
+} from "@/i18n/paths";
 import { formatNewsDate } from "@/lib/cms/formatNewsDate";
 import type { CmsNews } from "@/lib/cms/types";
 import { getMessages } from "@/i18n/messages";
@@ -16,6 +20,7 @@ type Props = {
   article: CmsNews;
   related?: CmsNews[];
   locale: SupportedLocale;
+  variant?: "news" | "pressReview";
 };
 
 function SectionTitle({ title }: { title: string }) {
@@ -48,16 +53,25 @@ function PrevArrow() {
   );
 }
 
-function resolveArticleUrl(newsHref: string, slug: string): string {
-  const path = `${newsHref}/${slug}`;
+function resolveArticleUrl(path: string): string {
   const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL?.replace(/\/$/, "");
   return serverUrl ? `${serverUrl}${path}` : path;
 }
 
-export function CmsNewsArticleView({ article, related = [], locale }: Props) {
+export function CmsNewsArticleView({
+  article,
+  related = [],
+  locale,
+  variant = "news",
+}: Props) {
   const m = getMessages(locale).newsArticle;
   const common = getMessages(locale).common;
-  const newsHref = hrefForRoute("news", locale);
+  const isPressReview = variant === "pressReview";
+  const listingHref = isPressReview
+    ? hrefForRoute("pressReview", locale)
+    : hrefForRoute("news", locale);
+  const backLabel = isPressReview ? m.backToPressReview : m.backToNews;
+  const relatedTitle = isPressReview ? m.relatedPressReviewTitle : m.relatedTitle;
   const coverSrc = resolveNewsCoverSrc(article.cover);
   const category = resolveNewsCategoryLabel(
     article.category,
@@ -69,10 +83,16 @@ export function CmsNewsArticleView({ article, related = [], locale }: Props) {
   const relatedItems = related
     .filter((item) => item.id !== article.id)
     .slice(0, ARTICLE_RELATED_NEWS_MAX_ITEMS);
-  const articleUrl = resolveArticleUrl(newsHref, article.slug);
+  const articlePath = isPressReview
+    ? hrefForPressReviewArticle(article.slug, locale)
+    : hrefForNewsArticle(article.slug, locale);
+  const articleUrl = resolveArticleUrl(articlePath);
 
   return (
-    <main className="igm-news-article" data-igm-page="news">
+    <main
+      className="igm-news-article"
+      data-igm-page={isPressReview ? "press-review" : "news"}
+    >
       <HeaderHeroDarkBody />
       <section
         className="igm-news-article-hero"
@@ -80,9 +100,9 @@ export function CmsNewsArticleView({ article, related = [], locale }: Props) {
       >
         <div className="igm-news-article-hero-overlay" aria-hidden />
         <div className="igm-news-article-hero-inner">
-          <Link href={newsHref} className="igm-news-article-prev">
+          <Link href={listingHref} className="igm-news-article-prev">
             <PrevArrow />
-            {m.backToNews}
+            {backLabel}
           </Link>
 
           <div className="igm-news-article-hero-content">
@@ -135,7 +155,7 @@ export function CmsNewsArticleView({ article, related = [], locale }: Props) {
             <div className="row mb-50">
               <div className="col-lg-12">
                 <div className="section-title2">
-                  <SectionTitle title={m.relatedTitle} />
+                  <SectionTitle title={relatedTitle} />
                 </div>
               </div>
             </div>

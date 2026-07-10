@@ -45,7 +45,7 @@ export const PageHeroes: GlobalConfig = {
   label: "Bannières de pages",
   admin: {
     description:
-      "Images de bannière pour les pages Présentation (IGM), LCFCM, Contact et Médiathèque. Les pages Qui sommes-nous ? (À propos, Historique, Mission) se configurent dans « Page À propos ».",
+      "Images de bannière pour les pages Présentation (IGM), LCFCM, Contact et Multimédia. Les pages Qui sommes-nous ? (À propos, Historique, Mission) se configurent dans « Page À propos ».",
     group: "Contenu",
   },
   access: {

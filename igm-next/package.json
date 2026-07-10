@@ -29,6 +29,7 @@
     "db:sync-legislation": "node --env-file=.env.local scripts/db-sync-legislation.mjs",
     "db:sync-page-heroes": "node --env-file=.env.local scripts/db-sync-page-heroes.mjs",
     "db:sync-contact-page": "node --env-file=.env.local scripts/db-sync-contact-page.mjs",
+    "db:sync-press-kit-page": "node --env-file=.env.local scripts/db-sync-press-kit-page.mjs",
     "db:sync-cartography-settings": "node --env-file=.env.local scripts/db-sync-cartography-settings.mjs",
     "db:sync-media-gallery": "node --env-file=.env.local scripts/db-sync-media-gallery.mjs",
     "db:sync-photo-albums": "node --env-file=.env.local scripts/db-sync-photo-albums.mjs",
@@ -60,7 +61,8 @@
     "media:version-filename": "npx tsx --env-file=.env.local scripts/version-media-filename.ts",
     "media:generate-video-posters": "npx tsx --env-file=.env.local scripts/generate-video-posters.ts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "email:test": "npx tsx --env-file=.env.local scripts/test-email.ts"
   },
   "engines": {
     "node": ">=20.9.0"
@@ -73,6 +75,7 @@
     "@aws-sdk/client-cloudfront": "^3.850.0",
     "@payloadcms/db-postgres": "3.85.1",
     "@payloadcms/email-nodemailer": "^3.85.1",
+    "@payloadcms/email-resend": "^3.85.2",
     "@payloadcms/next": "3.85.1",
     "@payloadcms/richtext-lexical": "3.85.1",
     "@payloadcms/storage-s3": "3.85.1",
@@ -97,6 +100,7 @@
     "react-dom": "^19.2.6",
     "react-pdf": "^10.4.1",
     "react-toastify": "^11.1.0",
+    "resend": "^6.17.2",
     "sharp": "0.34.2",
     "typescript": "^5.9.2",
     "zod": "^4.4.3"

@@ -16,6 +16,8 @@ export type SiteRoute =
   | Routed<"home">
   | Routed<"news-article", { article: CmsNews }>
   | Routed<"news-listing", { page: number; q: string }>
+  | Routed<"press-review-article", { article: CmsNews }>
+  | Routed<"press-review-listing", { page: number; q: string }>
   | Routed<"who-we-are-history">
   | Routed<"who-we-are-section", { section: Exclude<WhoWeAreSectionId, "history"> }>
   | Routed<"photo-album", { albumSlug: string }>
@@ -23,6 +25,7 @@ export type SiteRoute =
   | Routed<"report">
   | Routed<"map">
   | Routed<"contact">
+  | Routed<"press-kit">
   | Routed<"legislation", { category: LegislationCategory }>
   | Routed<"videos">
   | Routed<"org-chart">

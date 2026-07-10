@@ -2823,6 +2823,64 @@ header.header-area.style-4.sticky .igm-lang-switch-link.is-active {
   opacity: 1;
 }
 
+/* Hero statique — Revue de presse (sans slider) */
+.igm-press-review-listing-hero {
+  position: relative;
+  background: #0f2d5c;
+  --igm-news-accent: var(--igm-listing-blue);
+  --igm-news-accent-hover: var(--igm-listing-blue-dark);
+  --igm-news-serif: Georgia, "Times New Roman", Times, serif;
+}
+
+.igm-press-review-listing-hero-banner {
+  position: relative;
+  overflow: hidden;
+  min-height: clamp(420px, 58vh, 560px);
+  background-image: none;
+}
+
+.igm-press-review-listing-hero-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+.igm-press-review-listing-hero-eyebrow {
+  margin: 0 0 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.igm-press-review-listing-hero .igm-news-article-hero-title {
+  max-width: 22ch;
+}
+
+.igm-press-review-listing-hero .igm-news-article-hero-lead {
+  max-width: 58ch;
+}
+
+.igm-news-listing--press-review .igm-news-listing-body {
+  padding-top: 48px;
+}
+
+.igm-news-listing-heading-secondary {
+  font-size: clamp(1.35rem, 2.5vw, 1.85rem);
+  font-weight: 700;
+}
+
+@media (max-width: 575.98px) {
+  .igm-press-review-listing-hero-banner {
+    min-height: clamp(380px, 72svh, 520px);
+  }
+}
+
 /* Body + toolbar */
 .igm-news-listing-body {
   padding: 56px 0 80px;

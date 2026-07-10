@@ -112,6 +112,7 @@ export interface Config {
     legislation: Legislation;
     'page-heroes': PageHero;
     'contact-page': ContactPage;
+    'press-kit-page': PressKitPage;
     'cartography-settings': CartographySetting;
   };
   globalsSelect: {
@@ -121,6 +122,7 @@ export interface Config {
     legislation: LegislationSelect<false> | LegislationSelect<true>;
     'page-heroes': PageHeroesSelect<false> | PageHeroesSelect<true>;
     'contact-page': ContactPageSelect<false> | ContactPageSelect<true>;
+    'press-kit-page': PressKitPageSelect<false> | PressKitPageSelect<true>;
     'cartography-settings': CartographySettingsSelect<false> | CartographySettingsSelect<true>;
   };
   locale: 'fr' | 'en';
@@ -300,7 +302,14 @@ export interface News {
    * Court résumé affiché sur la carte et en tête de l'article.
    */
   excerpt: string;
-  category: 'inspection' | 'cadastre' | 'digitalisation' | 'conformite' | 'communique-presse' | 'custom';
+  category:
+    | 'inspection'
+    | 'cadastre'
+    | 'digitalisation'
+    | 'conformite'
+    | 'communique-presse'
+    | 'revue-de-presse'
+    | 'custom';
   /**
    * Libellé affiché sur la carte et l'article lorsque « Personnaliser » est sélectionné.
    */
@@ -929,6 +938,7 @@ export interface SiteSetting {
               | '/mission'
               | '/vision'
               | '/organigramme'
+              | '/dossier-de-presse'
               | '/cartographie'
               | '/fraude-miniere'
               | '/contrebande-miniere'
@@ -970,6 +980,7 @@ export interface SiteSetting {
                     | '/mission'
                     | '/vision'
                     | '/organigramme'
+                    | '/dossier-de-presse'
                     | '/cartographie'
                     | '/fraude-miniere'
                     | '/contrebande-miniere'
@@ -1011,6 +1022,7 @@ export interface SiteSetting {
                           | '/mission'
                           | '/vision'
                           | '/organigramme'
+                          | '/dossier-de-presse'
                           | '/cartographie'
                           | '/fraude-miniere'
                           | '/contrebande-miniere'
@@ -1065,6 +1077,7 @@ export interface SiteSetting {
                     | '/mission'
                     | '/vision'
                     | '/organigramme'
+                    | '/dossier-de-presse'
                     | '/cartographie'
                     | '/fraude-miniere'
                     | '/contrebande-miniere'
@@ -1116,6 +1129,7 @@ export interface SiteSetting {
               | '/mission'
               | '/vision'
               | '/organigramme'
+              | '/dossier-de-presse'
               | '/cartographie'
               | '/fraude-miniere'
               | '/contrebande-miniere'
@@ -1186,6 +1200,7 @@ export interface Home {
                 | '/mission'
                 | '/vision'
                 | '/organigramme'
+                | '/dossier-de-presse'
                 | '/cartographie'
                 | '/fraude-miniere'
                 | '/contrebande-miniere'
@@ -1221,6 +1236,7 @@ export interface Home {
                 | '/mission'
                 | '/vision'
                 | '/organigramme'
+                | '/dossier-de-presse'
                 | '/cartographie'
                 | '/fraude-miniere'
                 | '/contrebande-miniere'
@@ -1525,6 +1541,7 @@ export interface WhoWeAre {
             | '/mission'
             | '/vision'
             | '/organigramme'
+            | '/dossier-de-presse'
             | '/cartographie'
             | '/fraude-miniere'
             | '/contrebande-miniere'
@@ -1564,6 +1581,7 @@ export interface WhoWeAre {
             | '/mission'
             | '/vision'
             | '/organigramme'
+            | '/dossier-de-presse'
             | '/cartographie'
             | '/fraude-miniere'
             | '/contrebande-miniere'
@@ -1621,7 +1639,7 @@ export interface Legislation {
   createdAt?: string | null;
 }
 /**
- * Images de bannière pour les pages Présentation (IGM), LCFCM, Contact et Médiathèque. Les pages Qui sommes-nous ? (À propos, Historique, Mission) se configurent dans « Page À propos ».
+ * Images de bannière pour les pages Présentation (IGM), LCFCM, Contact et Multimédia. Les pages Qui sommes-nous ? (À propos, Historique, Mission) se configurent dans « Page À propos ».
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "page-heroes".
@@ -1632,6 +1650,10 @@ export interface PageHero {
    * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
    */
   orgChartHeroImage?: (number | null) | Media;
+  /**
+   * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
+   */
+  pressKitHeroImage?: (number | null) | Media;
   /**
    * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
    */
@@ -1698,6 +1720,27 @@ export interface ContactPage {
    * Repli : texte « Contact » du pied de page (Paramètres du site).
    */
   infoLead?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * PDF de présentation de l’IGM affiché sur /dossier-de-presse. L’image de bannière se configure dans « Bannières de pages ».
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "press-kit-page".
+ */
+export interface PressKitPage {
+  id: number;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+  heroTitle?: string | null;
+  heroLead?: string | null;
+  /**
+   * Importez un PDF dans « Médias publics », puis sélectionnez-le ici. Un seul fichier pour toutes les langues.
+   */
+  presentationPdf?: (number | null) | Media;
+  intro?: string | null;
+  downloadLabel?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2158,6 +2201,7 @@ export interface LegislationSelect<T extends boolean = true> {
  */
 export interface PageHeroesSelect<T extends boolean = true> {
   orgChartHeroImage?: T;
+  pressKitHeroImage?: T;
   mapHeroImage?: T;
   fraudHeroImage?: T;
   fraudCtaHeroImage?: T;
@@ -2186,6 +2230,22 @@ export interface ContactPageSelect<T extends boolean = true> {
   formTitle?: T;
   infoTitle?: T;
   infoLead?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "press-kit-page_select".
+ */
+export interface PressKitPageSelect<T extends boolean = true> {
+  seoTitle?: T;
+  seoDescription?: T;
+  heroTitle?: T;
+  heroLead?: T;
+  presentationPdf?: T;
+  intro?: T;
+  downloadLabel?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

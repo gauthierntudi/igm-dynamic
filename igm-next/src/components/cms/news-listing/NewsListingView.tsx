@@ -1,19 +1,22 @@
 import type { SupportedLocale } from "@/i18n/locales";
-import { hrefForNewsListing } from "@/i18n/paths";
+import {
+  hrefForNewsListing,
+  hrefForPressReviewListing,
+} from "@/i18n/paths";
 import { getMessages } from "@/i18n/messages";
 import type { CmsNews } from "@/lib/cms/types";
-import {
-  NEWS_LISTING_HERO_COUNT,
-  NEWS_LISTING_PAGE_SIZE,
-} from "@/lib/newsListing";
 
 import { NewsListingCard } from "./NewsListingCard";
 import { NewsListingHeroSlider } from "./NewsListingHeroSlider";
 import { NewsListingPagination } from "./NewsListingPagination";
+import { PressReviewListingHero } from "./PressReviewListingHero";
+
+export type NewsListingVariant = "news" | "pressReview";
 
 type Props = {
   locale: SupportedLocale;
-  heroArticles: CmsNews[];
+  variant?: NewsListingVariant;
+  heroArticles?: CmsNews[];
   articles: CmsNews[];
   page: number;
   totalPages: number;
@@ -23,28 +26,54 @@ type Props = {
 
 export function NewsListingView({
   locale,
-  heroArticles,
+  variant = "news",
+  heroArticles = [],
   articles,
   page,
   totalPages,
   totalDocs,
   q,
 }: Props) {
-  const m = getMessages(locale).newsListing;
-  const listingHref = hrefForNewsListing(locale);
+  const isPressReview = variant === "pressReview";
+  const m = getMessages(locale)[isPressReview ? "pressReviewListing" : "newsListing"];
+  const listingHref = isPressReview
+    ? hrefForPressReviewListing(locale)
+    : hrefForNewsListing(locale);
+  const showHeroSlider = !isPressReview && heroArticles.length > 0;
 
   return (
-    <main className="igm-news-listing" data-igm-page="news-listing">
-      <NewsListingHeroSlider
-        articles={heroArticles}
-        locale={locale}
-        sectionLabel={m.sectionLabel}
-      />
+    <main
+      className={`igm-news-listing${isPressReview ? " igm-news-listing--press-review" : ""}`}
+      data-igm-page={isPressReview ? "press-review-listing" : "news-listing"}
+    >
+      {showHeroSlider ? (
+        <NewsListingHeroSlider
+          articles={heroArticles}
+          locale={locale}
+          sectionLabel={m.sectionLabel}
+        />
+      ) : null}
+
+      {isPressReview ? (
+        <PressReviewListingHero
+          title={m.exploreTitle}
+          lead={m.heroLead}
+          sectionLabel={m.sectionLabel}
+          eyebrow={m.heroEyebrow}
+          featuredArticle={articles[0]}
+        />
+      ) : null}
 
       <section className="igm-news-listing-body">
         <div className="container">
           <div className="igm-news-listing-toolbar">
-            <h1 className="igm-news-listing-heading">{m.exploreTitle}</h1>
+            {isPressReview ? (
+              <h2 className="igm-news-listing-heading igm-news-listing-heading-secondary">
+                {m.bodyTitle}
+              </h2>
+            ) : (
+              <h1 className="igm-news-listing-heading">{m.exploreTitle}</h1>
+            )}
             <form className="igm-news-listing-search" action={listingHref} method="get" role="search">
               <label className="visually-hidden" htmlFor="igm-news-search">
                 {m.searchPlaceholder}
@@ -83,6 +112,7 @@ export function NewsListingView({
                   article={article}
                   locale={locale}
                   index={index}
+                  variant={variant}
                 />
               ))}
             </div>
@@ -92,6 +122,7 @@ export function NewsListingView({
 
           <NewsListingPagination
             locale={locale}
+            variant={variant}
             page={page}
             totalPages={totalPages}
             q={q}

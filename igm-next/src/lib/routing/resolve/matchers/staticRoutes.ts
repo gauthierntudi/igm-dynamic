@@ -19,6 +19,10 @@ export const matchStaticRoutes: RouteMatcher = (ctx) => {
     return { kind: "contact", ...ctx };
   }
 
+  if (routeKey === "pressKit") {
+    return { kind: "press-kit", ...ctx };
+  }
+
   const legislationCategory = parseLegislationCategory(slug, locale);
   if (legislationCategory) {
     return { kind: "legislation", category: legislationCategory, ...ctx };

@@ -2,6 +2,7 @@ import { unstable_cache } from "next/cache";
 import type { Where } from "payload";
 
 import { DEFAULT_LOCALE, type SupportedLocale } from "@/i18n/locales";
+import { PRESS_REVIEW_CATEGORY } from "@/lib/newsCategories";
 
 import { getPayloadClient } from "./payload";
 import type { CmsHome } from "./home/types";
@@ -56,7 +57,13 @@ async function fetchStats(locale: SupportedLocale): Promise<CmsStat[]> {
 
 async function fetchPublishedNewsPage(
   locale: SupportedLocale,
-  options: { page?: number; limit?: number; q?: string } = {},
+  options: {
+    page?: number;
+    limit?: number;
+    q?: string;
+    category?: string;
+    excludeCategory?: string;
+  } = {},
 ): Promise<{ docs: CmsNews[]; totalDocs: number; totalPages: number; page: number }> {
   if (!hasDatabase()) {
     return { docs: [], totalDocs: 0, totalPages: 0, page: 1 };
@@ -68,10 +75,19 @@ async function fetchPublishedNewsPage(
 
   try {
     const payload = await getPayloadClient();
+    const baseConditions: Where[] = [{ _status: { equals: "published" } }];
+
+    if (options.category) {
+      baseConditions.push({ category: { equals: options.category } });
+    }
+    if (options.excludeCategory) {
+      baseConditions.push({ category: { not_equals: options.excludeCategory } });
+    }
+
     const where: Where = q
       ? {
           and: [
-            { _status: { equals: "published" } },
+            ...baseConditions,
             {
               or: [
                 { title: { contains: q } },
@@ -81,7 +97,7 @@ async function fetchPublishedNewsPage(
             },
           ],
         }
-      : { _status: { equals: "published" } };
+      : { and: baseConditions };
 
     const result = await payload.find({
       collection: "news",
@@ -216,7 +232,12 @@ async function fetchHomePageBundleUncached(maxNews: number, locale: SupportedLoc
         sort: "-publishedAt",
         depth: 1,
         locale,
-        where: { _status: { equals: "published" } },
+        where: {
+          and: [
+            { _status: { equals: "published" } },
+            { category: { not_equals: PRESS_REVIEW_CATEGORY } },
+          ],
+        },
       }),
     ]);
 
@@ -318,15 +339,30 @@ export async function getPublishedNews(
 
 export async function getNewsListing(
   locale: SupportedLocale = DEFAULT_LOCALE,
-  options: { page?: number; limit?: number; q?: string } = {},
+  options: {
+    page?: number;
+    limit?: number;
+    q?: string;
+    category?: string;
+    excludeCategory?: string;
+  } = {},
 ) {
   const page = Math.max(1, options.page ?? 1);
   const limit = options.limit ?? 12;
   const q = options.q?.trim() ?? "";
+  const category = options.category ?? "";
+  const excludeCategory = options.excludeCategory ?? "";
 
   const cached = unstable_cache(
-    () => fetchPublishedNewsPage(locale, { page, limit, q: q || undefined }),
-    ["cms-news-listing", locale, String(page), String(limit), q],
+    () =>
+      fetchPublishedNewsPage(locale, {
+        page,
+        limit,
+        q: q || undefined,
+        category: category || undefined,
+        excludeCategory: excludeCategory || undefined,
+      }),
+    ["cms-news-listing", locale, String(page), String(limit), q, category, excludeCategory],
     {
       tags: ["collection:news", `collection:news:${locale}`, "collection:news:listing"],
     },

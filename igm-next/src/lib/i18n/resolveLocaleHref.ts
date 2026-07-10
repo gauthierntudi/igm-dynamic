@@ -1,10 +1,13 @@
 import { SUPPORTED_LOCALES, parseLocaleFromSegments, type SupportedLocale } from "@/i18n/locales";
 import {
   hrefForNewsArticle,
+  hrefForPressReviewArticle,
   hrefForRoute,
   parseNewsArticleSlug,
+  parsePressReviewArticleSlug,
   switchLocaleHref,
 } from "@/i18n/paths";
+import { PRESS_REVIEW_CATEGORY } from "@/lib/newsCategories";
 import { getNewsById, getNewsByPublishedAt, getNewsBySlug } from "@/lib/cms/client";
 import type { CmsNews } from "@/lib/cms/types";
 
@@ -20,21 +23,30 @@ async function resolveNewsArticleHref(
   targetLocale: SupportedLocale,
 ): Promise<string> {
   const byId = await getNewsById(article.id, targetLocale);
+  const isPressReview = article.category === PRESS_REVIEW_CATEGORY;
+  const hrefForArticle = (slug: string) =>
+    isPressReview
+      ? hrefForPressReviewArticle(slug, targetLocale)
+      : hrefForNewsArticle(slug, targetLocale);
+  const listingFallback = () =>
+    isPressReview
+      ? hrefForRoute("pressReview", targetLocale)
+      : hrefForRoute("news", targetLocale);
 
   if (byId?.slug && (targetLocale === sourceLocale || byId.slug !== article.slug)) {
-    return hrefForNewsArticle(byId.slug, targetLocale);
+    return hrefForArticle(byId.slug);
   }
 
   const sibling = await getNewsByPublishedAt(article.publishedAt, targetLocale, article.id);
   if (sibling?.slug) {
-    return hrefForNewsArticle(sibling.slug, targetLocale);
+    return hrefForArticle(sibling.slug);
   }
 
   if (byId?.slug) {
-    return hrefForNewsArticle(byId.slug, targetLocale);
+    return hrefForArticle(byId.slug);
   }
 
-  return hrefForRoute("news", targetLocale);
+  return listingFallback();
 }
 
 /** URLs FR/EN pour la page courante (résout les slugs d’articles via l’ID Payload). */
@@ -43,7 +55,9 @@ export async function resolveAlternateLocaleHrefs(
 ): Promise<Record<SupportedLocale, string>> {
   const segments = pathname.split("/").filter(Boolean);
   const { locale: currentLocale, pathSegments } = parseLocaleFromSegments(segments);
-  const articleSlug = parseNewsArticleSlug(pathSegments, currentLocale);
+  const articleSlug =
+    parseNewsArticleSlug(pathSegments, currentLocale) ??
+    parsePressReviewArticleSlug(pathSegments, currentLocale);
 
   if (!articleSlug) {
     return hrefsFromSwitch(pathname);
