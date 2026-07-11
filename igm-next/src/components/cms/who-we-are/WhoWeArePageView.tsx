@@ -109,8 +109,14 @@ export function WhoWeArePageView({ locale, activeSection = null, content = null 
             {page.mission.headline ? (
               <p className="about-approach-tagline">{page.mission.headline}</p>
             ) : null}
-            {page.mission.paragraphs[0] ? (
-              <p className="about-approach-text">{page.mission.paragraphs[0]}</p>
+            {page.mission.paragraphs.length > 0 ? (
+              <div className="about-approach-body">
+                {page.mission.paragraphs.map((paragraph) => (
+                  <p key={paragraph.slice(0, 48)} className="about-approach-text">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
             ) : null}
           </div>
         </div>

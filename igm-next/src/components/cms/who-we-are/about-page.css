@@ -367,6 +367,10 @@
   color: rgba(255, 255, 255, 0.85);
 }
 
+.about-approach-body .about-approach-text:last-child {
+  margin-bottom: 0;
+}
+
 .about-approach-pillars {
   display: grid;
   gap: 0.35rem 0.75rem;
