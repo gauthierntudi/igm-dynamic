@@ -26,7 +26,7 @@ export type ResolvedWhoWeArePage = {
   heroImageAlt: string;
   nav: Record<WhoWeAreSectionId, string>;
   about: {
-    title: string;
+    title?: string;
     paragraphs: string[];
     imageSrc: string;
     imageAlt: string;
@@ -39,7 +39,7 @@ export type ResolvedWhoWeArePage = {
     };
   };
   history: {
-    title: string;
+    title?: string;
     lead: string;
     headline: string;
     paragraphs: string[];
@@ -48,18 +48,18 @@ export type ResolvedWhoWeArePage = {
     teaserImages: Array<{ src: string; alt: string }>;
   };
   mission: {
-    title: string;
+    title?: string;
     lead: string;
     headline: string;
     paragraphs: string[];
-    statutoryTitle: string;
+    statutoryTitle?: string;
     statutoryItems: string[];
-    prioritiesTitle: string;
+    prioritiesTitle?: string;
     priorities: string[];
   };
   stats: CmsWhoWeAreStat[];
   team: {
-    title: string;
+    title?: string;
     lead: string;
     members: Array<{
       name: string;
@@ -69,13 +69,13 @@ export type ResolvedWhoWeArePage = {
     }>;
   };
   cta: {
-    title: string;
+    title?: string;
     text: string;
     href: string;
     label: string;
   };
   contact: {
-    title: string;
+    title?: string;
     lead: string;
     primaryHref: string;
     primaryLabel: string;
@@ -129,6 +129,18 @@ function resolveLabels(items: CmsWhoWeAreLabelItem[] | null | undefined): string
 
 function pickText(value: string | null | undefined, fallback: string): string {
   return value?.trim() || fallback;
+}
+
+/** Titre de section : vide en CMS = pas d'affichage ; hors CMS, repli sur le seed. */
+function resolveSectionTitle(
+  cms: CmsWhoWeAre | null | undefined,
+  rawTitle: string | null | undefined,
+  fallback: string,
+): string | undefined {
+  if (!cms) {
+    return fallback.trim() || undefined;
+  }
+  return rawTitle?.trim() || undefined;
 }
 
 function mergeWhoWeAre(
@@ -225,7 +237,11 @@ export function resolveWhoWeArePage(
       mission: pickText(data.navMissionLabel, defaults.navMissionLabel!),
     },
     about: {
-      title: pickText(data.aboutSection?.title, defaults.aboutSection!.title!),
+      title: resolveSectionTitle(
+        cms,
+        cms?.aboutSection?.title,
+        defaults.aboutSection!.title!,
+      ),
       paragraphs: splitParagraphs(data.aboutSection?.body).length
         ? splitParagraphs(data.aboutSection?.body)
         : splitParagraphs(defaults.aboutSection?.body),
@@ -254,7 +270,11 @@ export function resolveWhoWeArePage(
           : undefined,
     },
     history: {
-      title: pickText(data.historySection?.title, defaults.historySection!.title!),
+      title: resolveSectionTitle(
+        cms,
+        cms?.historySection?.title,
+        defaults.historySection!.title!,
+      ),
       lead: pickText(data.historySection?.lead, defaults.historySection!.lead!),
       headline: pickText(
         data.historySection?.headline,
@@ -291,26 +311,36 @@ export function resolveWhoWeArePage(
       ],
     },
     mission: {
-      title: pickText(data.missionSection?.title, defaults.missionSection!.title!),
+      title: resolveSectionTitle(
+        cms,
+        cms?.missionSection?.title,
+        defaults.missionSection!.title!,
+      ),
       lead: pickText(data.missionSection?.lead, defaults.missionSection!.lead!),
       headline: pickText(data.missionSection?.headline, defaults.missionSection!.headline!),
       paragraphs: splitParagraphs(data.missionSection?.body).length
         ? splitParagraphs(data.missionSection?.body)
         : splitParagraphs(defaults.missionSection?.body),
-      statutoryTitle: pickText(
-        data.missionSection?.statutoryTitle,
+      statutoryTitle: resolveSectionTitle(
+        cms,
+        cms?.missionSection?.statutoryTitle,
         defaults.missionSection!.statutoryTitle!,
       ),
       statutoryItems: resolveLabels(data.missionSection?.statutoryItems),
-      prioritiesTitle: pickText(
-        data.missionSection?.prioritiesTitle,
+      prioritiesTitle: resolveSectionTitle(
+        cms,
+        cms?.missionSection?.prioritiesTitle,
         defaults.missionSection!.prioritiesTitle!,
       ),
       priorities: resolveLabels(data.missionSection?.priorities),
     },
     stats: data.statsSection?.items?.filter((item) => item.label && item.value) ?? [],
     team: {
-      title: pickText(data.teamSection?.title, defaults.teamSection!.title!),
+      title: resolveSectionTitle(
+        cms,
+        cms?.teamSection?.title,
+        defaults.teamSection!.title!,
+      ),
       lead: pickText(data.teamSection?.lead, defaults.teamSection!.lead!),
       members:
         data.teamSection?.members
@@ -323,13 +353,17 @@ export function resolveWhoWeArePage(
           })) ?? [],
     },
     cta: {
-      title: pickText(data.ctaSection?.title, defaults.ctaSection!.title!),
+      title: resolveSectionTitle(cms, cms?.ctaSection?.title, defaults.ctaSection!.title!),
       text: pickText(data.ctaSection?.text, defaults.ctaSection!.text!),
       label: pickText(data.ctaSection?.link?.label, defaults.ctaSection!.link!.label!),
       href: ctaHref,
     },
     contact: {
-      title: pickText(data.contactSection?.title, defaults.contactSection!.title!),
+      title: resolveSectionTitle(
+        cms,
+        cms?.contactSection?.title,
+        defaults.contactSection!.title!,
+      ),
       lead: pickText(data.contactSection?.lead, defaults.contactSection!.lead!),
       primaryLabel: pickText(
         data.contactSection?.primaryCta?.label,

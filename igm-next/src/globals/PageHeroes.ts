@@ -1,4 +1,4 @@
-import type { GlobalConfig } from "payload";
+import type { Field, GlobalConfig } from "payload";
 
 import { isAdmin } from "../access/isAdmin";
 import { LOCALIZED } from "../fields/localized";
@@ -19,18 +19,17 @@ import {
 } from "../lib/page-heroes/textDefaults";
 import { revalidateFrontGlobal } from "../hooks/revalidateFront";
 
-const heroImageField = (name: string, label: string, description?: string) =>
-  ({
-    name,
-    type: "upload",
-    relationTo: "media",
-    label,
-    admin: {
-      description:
-        description ??
-        "Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).",
-    },
-  }) as const;
+const heroImageField = (name: string, label: string, description?: string): Field => ({
+  name,
+  type: "upload",
+  relationTo: "media",
+  label,
+  admin: {
+    description:
+      description ??
+      "Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).",
+  },
+});
 
 const ctaHeroImageField = (routeKey: PageHeroCtaRouteKey, label: string) =>
   heroImageField(
@@ -39,8 +38,8 @@ const ctaHeroImageField = (routeKey: PageHeroCtaRouteKey, label: string) =>
     "Image de fond du bandeau « acteur central » en bas de page. Repli : bannière du haut.",
   );
 
-function fieldsForPage(routeKey: PageHeroRouteKey, label: string) {
-  const fields = [heroImageField(PAGE_HERO_FIELD[routeKey], `${label} — bannière`)];
+function fieldsForPage(routeKey: PageHeroRouteKey, label: string): Field[] {
+  const fields: Field[] = [heroImageField(PAGE_HERO_FIELD[routeKey], `${label} — bannière`)];
 
   if (isPageHeroTextRouteKey(routeKey)) {
     fields.push(

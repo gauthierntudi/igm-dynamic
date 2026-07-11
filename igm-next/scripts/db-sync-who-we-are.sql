@@ -26,20 +26,20 @@ CREATE TABLE IF NOT EXISTS "who_we_are_locales" (
   "nav_about_label" varchar DEFAULT 'À propos',
   "nav_history_label" varchar DEFAULT 'Historique',
   "nav_mission_label" varchar DEFAULT 'Mission',
-  "about_section_title" varchar DEFAULT 'À propos de l''IGM',
+  "about_section_title" varchar,
   "about_section_body" varchar,
   "about_section_quote_text" varchar,
   "about_section_quote_author_name" varchar,
   "about_section_quote_author_role" varchar,
-  "history_section_title" varchar DEFAULT 'Historique',
+  "history_section_title" varchar,
   "history_section_lead" varchar,
-  "mission_section_title" varchar DEFAULT 'Mission',
+  "mission_section_title" varchar,
   "mission_section_lead" varchar,
   "mission_section_headline" varchar DEFAULT 'Ensemble, nous renforçons la gouvernance minière',
   "mission_section_body" varchar,
-  "mission_section_statutory_title" varchar DEFAULT 'Missions statutaires',
-  "mission_section_priorities_title" varchar DEFAULT 'Priorités actuelles',
-  "team_section_title" varchar DEFAULT 'Notre équipe de direction',
+  "mission_section_statutory_title" varchar,
+  "mission_section_priorities_title" varchar,
+  "team_section_title" varchar,
   "team_section_lead" varchar,
   "cta_section_title" varchar,
   "cta_section_text" varchar,
@@ -165,6 +165,14 @@ CREATE UNIQUE INDEX IF NOT EXISTS "who_we_are_locales_locale_parent_id_unique" O
 ALTER TABLE "who_we_are_locales" ADD COLUMN IF NOT EXISTS "history_section_body" varchar;
 ALTER TABLE "who_we_are_locales" ADD COLUMN IF NOT EXISTS "history_section_headline" varchar;
 ALTER TABLE "who_we_are_locales" ADD COLUMN IF NOT EXISTS "hero_title" varchar;
+
+-- Titres de section optionnels : pas de valeur par défaut en base
+ALTER TABLE "who_we_are_locales" ALTER COLUMN "about_section_title" DROP DEFAULT;
+ALTER TABLE "who_we_are_locales" ALTER COLUMN "history_section_title" DROP DEFAULT;
+ALTER TABLE "who_we_are_locales" ALTER COLUMN "mission_section_title" DROP DEFAULT;
+ALTER TABLE "who_we_are_locales" ALTER COLUMN "mission_section_statutory_title" DROP DEFAULT;
+ALTER TABLE "who_we_are_locales" ALTER COLUMN "mission_section_priorities_title" DROP DEFAULT;
+ALTER TABLE "who_we_are_locales" ALTER COLUMN "team_section_title" DROP DEFAULT;
 
 INSERT INTO "who_we_are" ("id", "created_at", "updated_at")
 SELECT 1, NOW(), NOW()

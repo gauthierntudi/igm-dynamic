@@ -59,10 +59,12 @@ export function WhoWeArePageView({ locale, activeSection = null, content = null 
       {/* Vision — contenu institutionnel */}
       <section id="igm-wwa-about" className="about-vision">
         <div className="about-wrap">
-          <h2 className="about-section-title">
-            {page.about.title}
-            <span className="about-section-title__line" aria-hidden />
-          </h2>
+          {page.about.title ? (
+            <h2 className="about-section-title">
+              {page.about.title}
+              <span className="about-section-title__line" aria-hidden />
+            </h2>
+          ) : null}
 
           {page.intro ? <p className="about-vision-lead">{page.intro}</p> : null}
 
@@ -109,7 +111,9 @@ export function WhoWeArePageView({ locale, activeSection = null, content = null 
 
         <div className="about-approach-panel">
           <div className="about-approach-panel__inner">
-            <h2 className="about-approach-title">{page.mission.title}</h2>
+            {page.mission.title ? (
+              <h2 className="about-approach-title">{page.mission.title}</h2>
+            ) : null}
             <p className="about-approach-lead">{page.mission.lead}</p>
             {page.mission.headline ? (
               <p className="about-approach-tagline">{page.mission.headline}</p>
@@ -173,7 +177,10 @@ export function WhoWeArePageView({ locale, activeSection = null, content = null 
       </section>
 
       {/* Bandeau charte + contact */}
-      <section className="about-accent-bar" aria-label={page.contact.title}>
+      <section
+        className="about-accent-bar"
+        aria-label={page.contact.title ?? (isEn ? "Contact" : "Contact")}
+      >
         <div className="about-wrap about-accent-bar__inner">
           <p>{page.cta.text}</p>
           <Link href={contactHref} className="about-accent-bar__link">

@@ -122,7 +122,9 @@ export const WhoWeAre: GlobalConfig = {
                   name: "title",
                   type: "text",
                   label: "Titre de section",
-                  defaultValue: "À propos de l'IGM",
+                  admin: {
+                    description: "Optionnel. Laisser vide pour n'afficher aucun titre.",
+                  },
                   ...LOCALIZED,
                 },
                 {
@@ -172,7 +174,9 @@ export const WhoWeAre: GlobalConfig = {
                   name: "title",
                   type: "text",
                   label: "Titre",
-                  defaultValue: "Historique",
+                  admin: {
+                    description: "Optionnel. Laisser vide pour n'afficher aucun titre.",
+                  },
                   ...LOCALIZED,
                 },
                 {
@@ -261,7 +265,9 @@ export const WhoWeAre: GlobalConfig = {
                   name: "title",
                   type: "text",
                   label: "Titre",
-                  defaultValue: "Mission",
+                  admin: {
+                    description: "Optionnel. Laisser vide pour n'afficher aucun titre.",
+                  },
                   ...LOCALIZED,
                 },
                 {
@@ -288,7 +294,9 @@ export const WhoWeAre: GlobalConfig = {
                   name: "statutoryTitle",
                   type: "text",
                   label: "Titre — missions statutaires",
-                  defaultValue: "Missions statutaires",
+                  admin: {
+                    description: "Optionnel. Laisser vide pour n'afficher aucun titre.",
+                  },
                   ...LOCALIZED,
                 },
                 {
@@ -301,7 +309,9 @@ export const WhoWeAre: GlobalConfig = {
                   name: "prioritiesTitle",
                   type: "text",
                   label: "Titre — priorités",
-                  defaultValue: "Priorités actuelles",
+                  admin: {
+                    description: "Optionnel. Laisser vide pour n'afficher aucun titre.",
+                  },
                   ...LOCALIZED,
                 },
                 {
@@ -348,7 +358,9 @@ export const WhoWeAre: GlobalConfig = {
                   name: "title",
                   type: "text",
                   label: "Titre",
-                  defaultValue: "Notre équipe de direction",
+                  admin: {
+                    description: "Optionnel. Laisser vide pour n'afficher aucun titre.",
+                  },
                   ...LOCALIZED,
                 },
                 {
@@ -384,7 +396,15 @@ export const WhoWeAre: GlobalConfig = {
               name: "ctaSection",
               label: "Bloc CTA",
               fields: [
-                { name: "title", type: "text", label: "Titre", ...LOCALIZED },
+                {
+                  name: "title",
+                  type: "text",
+                  label: "Titre",
+                  admin: {
+                    description: "Optionnel. Laisser vide pour n'afficher aucun titre.",
+                  },
+                  ...LOCALIZED,
+                },
                 { name: "text", type: "textarea", label: "Texte", ...LOCALIZED },
                 {
                   type: "group",
@@ -404,7 +424,15 @@ export const WhoWeAre: GlobalConfig = {
               name: "contactSection",
               label: "Bandeau contact",
               fields: [
-                { name: "title", type: "text", label: "Titre", ...LOCALIZED },
+                {
+                  name: "title",
+                  type: "text",
+                  label: "Titre",
+                  admin: {
+                    description: "Optionnel. Laisser vide pour n'afficher aucun titre.",
+                  },
+                  ...LOCALIZED,
+                },
                 { name: "lead", type: "textarea", label: "Texte", ...LOCALIZED },
                 {
                   type: "group",

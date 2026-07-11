@@ -1430,6 +1430,9 @@ export interface WhoWeAre {
   navHistoryLabel?: string | null;
   navMissionLabel?: string | null;
   aboutSection?: {
+    /**
+     * Optionnel. Laisser vide pour n'afficher aucun titre.
+     */
     title?: string | null;
     /**
      * Un paragraphe par ligne.
@@ -1444,6 +1447,9 @@ export interface WhoWeAre {
     };
   };
   historySection?: {
+    /**
+     * Optionnel. Laisser vide pour n'afficher aucun titre.
+     */
     title?: string | null;
     /**
      * Phrase courte affichée dans le bandeau (max. ~70 caractères).
@@ -1476,6 +1482,9 @@ export interface WhoWeAre {
      * Grande image à gauche du bloc Mission sur /a-propos.
      */
     image?: (number | null) | Media;
+    /**
+     * Optionnel. Laisser vide pour n'afficher aucun titre.
+     */
     title?: string | null;
     lead?: string | null;
     headline?: string | null;
@@ -1483,6 +1492,9 @@ export interface WhoWeAre {
      * Un paragraphe par ligne.
      */
     body?: string | null;
+    /**
+     * Optionnel. Laisser vide pour n'afficher aucun titre.
+     */
     statutoryTitle?: string | null;
     statutoryItems?:
       | {
@@ -1490,6 +1502,9 @@ export interface WhoWeAre {
           id?: string | null;
         }[]
       | null;
+    /**
+     * Optionnel. Laisser vide pour n'afficher aucun titre.
+     */
     prioritiesTitle?: string | null;
     priorities?:
       | {
@@ -1508,6 +1523,9 @@ export interface WhoWeAre {
       | null;
   };
   teamSection?: {
+    /**
+     * Optionnel. Laisser vide pour n'afficher aucun titre.
+     */
     title?: string | null;
     lead?: string | null;
     members?:
@@ -1520,6 +1538,9 @@ export interface WhoWeAre {
       | null;
   };
   ctaSection?: {
+    /**
+     * Optionnel. Laisser vide pour n'afficher aucun titre.
+     */
     title?: string | null;
     text?: string | null;
     link?: {
@@ -1560,6 +1581,9 @@ export interface WhoWeAre {
     };
   };
   contactSection?: {
+    /**
+     * Optionnel. Laisser vide pour n'afficher aucun titre.
+     */
     title?: string | null;
     lead?: string | null;
     primaryCta?: {

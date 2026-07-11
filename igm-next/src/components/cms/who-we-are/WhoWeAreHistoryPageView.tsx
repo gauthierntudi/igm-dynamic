@@ -52,7 +52,9 @@ export function WhoWeAreHistoryPageView({ locale, content = null }: Props) {
 
           <article className="about-history-layout__main">
             <header className="about-history-doc-head">
-              <h1 className="about-history-doc-title">{page.history.title}</h1>
+              {page.history.title ? (
+                <h1 className="about-history-doc-title">{page.history.title}</h1>
+              ) : null}
             </header>
 
             {bodyParagraphs.length > 0 ? (
