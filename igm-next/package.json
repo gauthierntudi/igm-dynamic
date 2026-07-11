@@ -42,6 +42,7 @@
     "db:sync-media-poster": "node --env-file=.env.local scripts/db-sync-media-poster.mjs",
     "seed:site-settings": "npx tsx --env-file=.env.local scripts/seed-site-settings.ts",
     "seed:site-settings:force": "npx tsx --env-file=.env.local scripts/seed-site-settings.ts --force",
+    "sync:who-we-are-nav-order": "npx tsx --env-file=.env.local scripts/sync-who-we-are-nav-order.ts",
     "seed:home-strategy": "npx tsx --env-file=.env.local scripts/seed-home-strategy.ts",
     "seed:home-strategy:force": "npx tsx --env-file=.env.local scripts/seed-home-strategy.ts --force",
     "seed:home-action": "npx tsx --env-file=.env.local scripts/seed-home-action.ts",

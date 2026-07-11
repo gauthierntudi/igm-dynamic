@@ -27,8 +27,8 @@ export const MAIN_NAV: NavItem[] = [
         labelKey: "whoWeAre",
         items: [
           { kind: "route", routeKey: "about", labelKey: "about" },
-          { kind: "route", routeKey: "history", labelKey: "history" },
           { kind: "route", routeKey: "mission", labelKey: "mission" },
+          { kind: "route", routeKey: "history", labelKey: "history" },
         ],
       },
       {
