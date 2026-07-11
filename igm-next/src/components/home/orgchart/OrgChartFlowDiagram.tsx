@@ -3,6 +3,7 @@
 import {
   ReactFlow,
   ReactFlowProvider,
+  type CoordinateExtent,
   type Node,
   type ReactFlowInstance,
 } from "@xyflow/react";
@@ -23,6 +24,38 @@ import type { OrgChartNodeData } from "./buildOrgChartFixedLayout";
 
 import "./orgchart-flow.css";
 
+const ORG_CHART_PAN_PADDING = 72;
+
+function getOrgChartTranslateExtent(
+  nodes: Node<OrgChartNodeData>[],
+): CoordinateExtent {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  for (const node of nodes) {
+    const width = node.width ?? 0;
+    const height = node.height ?? 0;
+    minX = Math.min(minX, node.position.x);
+    minY = Math.min(minY, node.position.y);
+    maxX = Math.max(maxX, node.position.x + width);
+    maxY = Math.max(maxY, node.position.y + height);
+  }
+
+  if (!Number.isFinite(minX)) {
+    return [
+      [-Infinity, -Infinity],
+      [Infinity, Infinity],
+    ];
+  }
+
+  return [
+    [minX - ORG_CHART_PAN_PADDING, minY - ORG_CHART_PAN_PADDING],
+    [maxX + ORG_CHART_PAN_PADDING, maxY + ORG_CHART_PAN_PADDING],
+  ];
+}
+
 type Props = {
   locale: SupportedLocale;
 };
@@ -33,6 +66,11 @@ function OrgChartFlowCanvas({ locale }: Props) {
   const { nodes, connectors } = useMemo(
     () => buildOrgChartFixedLayout(content, locale),
     [content, locale],
+  );
+
+  const translateExtent = useMemo(
+    () => getOrgChartTranslateExtent(nodes as Node<OrgChartNodeData>[]),
+    [nodes],
   );
 
   const onInit = useCallback((instance: ReactFlowInstance<Node<OrgChartNodeData>>) => {
@@ -61,6 +99,7 @@ function OrgChartFlowCanvas({ locale }: Props) {
           preventScrolling={false}
           minZoom={0.35}
           maxZoom={1.35}
+          translateExtent={translateExtent}
           proOptions={{ hideAttribution: true }}
         >
           <OrgChartConnectorsLayer connectors={connectors} />
