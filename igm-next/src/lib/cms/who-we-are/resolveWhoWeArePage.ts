@@ -49,8 +49,8 @@ export type ResolvedWhoWeArePage = {
   };
   mission: {
     title?: string;
-    lead: string;
-    headline: string;
+    lead?: string;
+    headline?: string;
     paragraphs: string[];
     statutoryTitle?: string;
     statutoryItems: string[];
@@ -131,16 +131,27 @@ function pickText(value: string | null | undefined, fallback: string): string {
   return value?.trim() || fallback;
 }
 
-/** Titre de section : vide en CMS = pas d'affichage ; hors CMS, repli sur le seed. */
-function resolveSectionTitle(
+/** Texte optionnel : vide en CMS = pas d'affichage ; hors CMS, repli sur le seed. */
+function resolveOptionalCmsText(
   cms: CmsWhoWeAre | null | undefined,
-  rawTitle: string | null | undefined,
+  rawValue: string | null | undefined,
   fallback: string,
 ): string | undefined {
   if (!cms) {
     return fallback.trim() || undefined;
   }
-  return rawTitle?.trim() || undefined;
+  return rawValue?.trim() || undefined;
+}
+
+function resolveOptionalParagraphs(
+  cms: CmsWhoWeAre | null | undefined,
+  rawBody: string | null | undefined,
+  fallbackBody: string | null | undefined,
+): string[] {
+  if (!cms) {
+    return splitParagraphs(fallbackBody);
+  }
+  return splitParagraphs(rawBody);
 }
 
 function mergeWhoWeAre(
@@ -237,7 +248,7 @@ export function resolveWhoWeArePage(
       mission: pickText(data.navMissionLabel, defaults.navMissionLabel!),
     },
     about: {
-      title: resolveSectionTitle(
+      title: resolveOptionalCmsText(
         cms,
         cms?.aboutSection?.title,
         defaults.aboutSection!.title!,
@@ -270,7 +281,7 @@ export function resolveWhoWeArePage(
           : undefined,
     },
     history: {
-      title: resolveSectionTitle(
+      title: resolveOptionalCmsText(
         cms,
         cms?.historySection?.title,
         defaults.historySection!.title!,
@@ -311,23 +322,33 @@ export function resolveWhoWeArePage(
       ],
     },
     mission: {
-      title: resolveSectionTitle(
+      title: resolveOptionalCmsText(
         cms,
         cms?.missionSection?.title,
         defaults.missionSection!.title!,
       ),
-      lead: pickText(data.missionSection?.lead, defaults.missionSection!.lead!),
-      headline: pickText(data.missionSection?.headline, defaults.missionSection!.headline!),
-      paragraphs: splitParagraphs(data.missionSection?.body).length
-        ? splitParagraphs(data.missionSection?.body)
-        : splitParagraphs(defaults.missionSection?.body),
-      statutoryTitle: resolveSectionTitle(
+      lead: resolveOptionalCmsText(
+        cms,
+        cms?.missionSection?.lead,
+        defaults.missionSection!.lead!,
+      ),
+      headline: resolveOptionalCmsText(
+        cms,
+        cms?.missionSection?.headline,
+        defaults.missionSection!.headline!,
+      ),
+      paragraphs: resolveOptionalParagraphs(
+        cms,
+        cms?.missionSection?.body,
+        defaults.missionSection?.body,
+      ),
+      statutoryTitle: resolveOptionalCmsText(
         cms,
         cms?.missionSection?.statutoryTitle,
         defaults.missionSection!.statutoryTitle!,
       ),
       statutoryItems: resolveLabels(data.missionSection?.statutoryItems),
-      prioritiesTitle: resolveSectionTitle(
+      prioritiesTitle: resolveOptionalCmsText(
         cms,
         cms?.missionSection?.prioritiesTitle,
         defaults.missionSection!.prioritiesTitle!,
@@ -336,7 +357,7 @@ export function resolveWhoWeArePage(
     },
     stats: data.statsSection?.items?.filter((item) => item.label && item.value) ?? [],
     team: {
-      title: resolveSectionTitle(
+      title: resolveOptionalCmsText(
         cms,
         cms?.teamSection?.title,
         defaults.teamSection!.title!,
@@ -353,13 +374,13 @@ export function resolveWhoWeArePage(
           })) ?? [],
     },
     cta: {
-      title: resolveSectionTitle(cms, cms?.ctaSection?.title, defaults.ctaSection!.title!),
+      title: resolveOptionalCmsText(cms, cms?.ctaSection?.title, defaults.ctaSection!.title!),
       text: pickText(data.ctaSection?.text, defaults.ctaSection!.text!),
       label: pickText(data.ctaSection?.link?.label, defaults.ctaSection!.link!.label!),
       href: ctaHref,
     },
     contact: {
-      title: resolveSectionTitle(
+      title: resolveOptionalCmsText(
         cms,
         cms?.contactSection?.title,
         defaults.contactSection!.title!,

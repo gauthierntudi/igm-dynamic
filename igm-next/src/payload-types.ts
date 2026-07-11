@@ -1486,10 +1486,16 @@ export interface WhoWeAre {
      * Optionnel. Laisser vide pour n'afficher aucun titre.
      */
     title?: string | null;
+    /**
+     * Optionnel. Laisser vide pour n'afficher aucun texte.
+     */
     lead?: string | null;
+    /**
+     * Optionnel. Laisser vide pour n'afficher aucun texte.
+     */
     headline?: string | null;
     /**
-     * Un paragraphe par ligne.
+     * Optionnel. Un paragraphe par ligne. Laisser vide pour n'afficher aucun texte.
      */
     body?: string | null;
     /**

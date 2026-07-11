@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS "who_we_are_locales" (
   "history_section_lead" varchar,
   "mission_section_title" varchar,
   "mission_section_lead" varchar,
-  "mission_section_headline" varchar DEFAULT 'Ensemble, nous renforçons la gouvernance minière',
+  "mission_section_headline" varchar,
   "mission_section_body" varchar,
   "mission_section_statutory_title" varchar,
   "mission_section_priorities_title" varchar,
@@ -173,6 +173,7 @@ ALTER TABLE "who_we_are_locales" ALTER COLUMN "mission_section_title" DROP DEFAU
 ALTER TABLE "who_we_are_locales" ALTER COLUMN "mission_section_statutory_title" DROP DEFAULT;
 ALTER TABLE "who_we_are_locales" ALTER COLUMN "mission_section_priorities_title" DROP DEFAULT;
 ALTER TABLE "who_we_are_locales" ALTER COLUMN "team_section_title" DROP DEFAULT;
+ALTER TABLE "who_we_are_locales" ALTER COLUMN "mission_section_headline" DROP DEFAULT;
 
 INSERT INTO "who_we_are" ("id", "created_at", "updated_at")
 SELECT 1, NOW(), NOW()

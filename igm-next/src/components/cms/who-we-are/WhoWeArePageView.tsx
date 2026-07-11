@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, MapPin, ShieldCheck, Users } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import type { SupportedLocale } from "@/i18n/locales";
 import { hrefForRoute, type WhoWeAreSectionId } from "@/i18n/paths";
@@ -18,8 +18,6 @@ type Props = {
   content?: CmsWhoWeAre | null;
 };
 
-const APPROACH_ICONS = [MapPin, ShieldCheck, Users] as const;
-
 function stripMarkdown(text: string): string {
   return text.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
 }
@@ -33,15 +31,6 @@ export function WhoWeArePageView({ locale, activeSection = null, content = null 
   const historyTeaser =
     page.history.paragraphs.slice(0, 2).map(stripMarkdown).join(" ") ||
     page.history.lead;
-
-  const approachStats =
-    page.stats.length >= 3
-      ? page.stats.slice(0, 3)
-      : [
-          { label: isEn ? "Provinces covered" : "Provinces couvertes", value: "22" },
-          { label: isEn ? "Statutory missions" : "Missions statutaires", value: "6+" },
-          { label: isEn ? "Dedicated teams" : "Équipes dédiées", value: "100%" },
-        ];
 
   return (
     <main className="igm-about-page" data-igm-page="who-we-are">
@@ -114,26 +103,15 @@ export function WhoWeArePageView({ locale, activeSection = null, content = null 
             {page.mission.title ? (
               <h2 className="about-approach-title">{page.mission.title}</h2>
             ) : null}
-            <p className="about-approach-lead">{page.mission.lead}</p>
+            {page.mission.lead ? (
+              <p className="about-approach-lead">{page.mission.lead}</p>
+            ) : null}
             {page.mission.headline ? (
               <p className="about-approach-tagline">{page.mission.headline}</p>
             ) : null}
             {page.mission.paragraphs[0] ? (
               <p className="about-approach-text">{page.mission.paragraphs[0]}</p>
             ) : null}
-
-            <ul className="about-approach-pillars">
-              {approachStats.map((stat, index) => {
-                const Icon = APPROACH_ICONS[index] ?? ShieldCheck;
-                return (
-                  <li key={`${stat.label}-${stat.value}`}>
-                    <Icon size={20} strokeWidth={1.5} aria-hidden />
-                    <strong>{stat.value}</strong>
-                    <span>{stat.label}</span>
-                  </li>
-                );
-              })}
-            </ul>
           </div>
         </div>
       </section>

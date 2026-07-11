@@ -274,20 +274,28 @@ export const WhoWeAre: GlobalConfig = {
                   name: "lead",
                   type: "textarea",
                   label: "Chapô",
+                  admin: {
+                    description: "Optionnel. Laisser vide pour n'afficher aucun texte.",
+                  },
                   ...LOCALIZED,
                 },
                 {
                   name: "headline",
                   type: "text",
                   label: "Sous-titre",
-                  defaultValue: "Ensemble, nous renforçons la gouvernance minière",
+                  admin: {
+                    description: "Optionnel. Laisser vide pour n'afficher aucun texte.",
+                  },
                   ...LOCALIZED,
                 },
                 {
                   name: "body",
                   type: "textarea",
                   label: "Texte descriptif",
-                  admin: { description: "Un paragraphe par ligne." },
+                  admin: {
+                    description:
+                      "Optionnel. Un paragraphe par ligne. Laisser vide pour n'afficher aucun texte.",
+                  },
                   ...LOCALIZED,
                 },
                 {
