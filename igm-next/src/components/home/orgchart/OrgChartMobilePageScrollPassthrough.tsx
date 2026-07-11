@@ -6,6 +6,7 @@ import { useEffect, useState, type RefObject } from "react";
 const MOBILE_MQ = "(max-width: 767px)";
 const BOUNDARY_EPSILON_PX = 4;
 const PAGE_SCROLL_CLASS = "igm-orgchart-flow__pane--page-scroll";
+const PAGE_SCROLL_CONTAINER_CLASS = "igm-orgchart-flow--page-scroll";
 
 type ViewportState = {
   x: number;
@@ -61,6 +62,21 @@ function shouldPassVerticalScrollToPage(
   return false;
 }
 
+function enableInstantPageScroll(): void {
+  document.documentElement.style.scrollBehavior = "auto";
+  document.body.style.scrollBehavior = "auto";
+}
+
+function restorePageScrollBehavior(): void {
+  document.documentElement.style.scrollBehavior = "";
+  document.body.style.scrollBehavior = "";
+}
+
+function scrollPageByPixels(deltaY: number): void {
+  const scrollElement = document.scrollingElement ?? document.documentElement;
+  scrollElement.scrollTop -= deltaY;
+}
+
 export function OrgChartMobilePageScrollPassthrough({
   containerRef,
   translateExtent,
@@ -99,6 +115,7 @@ export function OrgChartMobilePageScrollPassthrough({
       let pageScrollActive = false;
       let previousClientX = 0;
       let previousClientY = 0;
+      let previousViewportY = 0;
 
       const readViewportState = (): { viewport: ViewportState; height: number } => {
         const { transform, height } = store.getState();
@@ -112,14 +129,29 @@ export function OrgChartMobilePageScrollPassthrough({
         };
       };
 
+      const beginPageScrollGesture = () => {
+        pageScrollActive = true;
+        enableInstantPageScroll();
+        pane.classList.add(PAGE_SCROLL_CLASS);
+        container.classList.add(PAGE_SCROLL_CONTAINER_CLASS);
+        pane.style.touchAction = "pan-y";
+      };
+
+      const endPageScrollGesture = () => {
+        pageScrollActive = false;
+        restorePageScrollBehavior();
+        pane.classList.remove(PAGE_SCROLL_CLASS);
+        container.classList.remove(PAGE_SCROLL_CONTAINER_CLASS);
+        pane.style.touchAction = "";
+      };
+
       const endGesture = (pointerId: number) => {
         if (activePointerId !== pointerId) {
           return;
         }
 
         activePointerId = null;
-        pageScrollActive = false;
-        pane.classList.remove(PAGE_SCROLL_CLASS);
+        endPageScrollGesture();
       };
 
       const onPointerDown = (event: PointerEvent) => {
@@ -131,7 +163,10 @@ export function OrgChartMobilePageScrollPassthrough({
         pageScrollActive = false;
         previousClientX = event.clientX;
         previousClientY = event.clientY;
+        previousViewportY = readViewportState().viewport.y;
         pane.classList.remove(PAGE_SCROLL_CLASS);
+        container.classList.remove(PAGE_SCROLL_CONTAINER_CLASS);
+        pane.style.touchAction = "";
       };
 
       const onPointerMove = (event: PointerEvent) => {
@@ -151,23 +186,29 @@ export function OrgChartMobilePageScrollPassthrough({
         if (pageScrollActive) {
           event.stopImmediatePropagation();
           event.preventDefault();
-          window.scrollBy({ top: -deltaY, left: 0 });
+          scrollPageByPixels(deltaY);
           return;
         }
 
         const { viewport, height } = readViewportState();
+        const verticalAttempt = Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 0;
+        const yClamped = verticalAttempt && Math.abs(viewport.y - previousViewportY) < 0.5;
+        previousViewportY = viewport.y;
+
         const { canPanUp, canPanDown } = getVerticalPanLimits(
           viewport,
           height,
           translateExtent,
         );
 
-        if (!shouldPassVerticalScrollToPage(deltaX, deltaY, canPanUp, canPanDown)) {
+        if (
+          !yClamped &&
+          !shouldPassVerticalScrollToPage(deltaX, deltaY, canPanUp, canPanDown)
+        ) {
           return;
         }
 
-        pageScrollActive = true;
-        pane.classList.add(PAGE_SCROLL_CLASS);
+        beginPageScrollGesture();
         event.stopImmediatePropagation();
         event.preventDefault();
 
@@ -179,7 +220,7 @@ export function OrgChartMobilePageScrollPassthrough({
           // Pointer capture may already be released.
         }
 
-        window.scrollBy({ top: -deltaY, left: 0 });
+        scrollPageByPixels(deltaY);
       };
 
       const onPointerEnd = (event: PointerEvent) => {
@@ -195,7 +236,7 @@ export function OrgChartMobilePageScrollPassthrough({
       pane.addEventListener("pointercancel", onPointerEnd, pointerOptions);
 
       cleanupListeners = () => {
-        pane.classList.remove(PAGE_SCROLL_CLASS);
+        endPageScrollGesture();
         pane.removeEventListener("pointerdown", onPointerDown, pointerOptions);
         pane.removeEventListener("pointermove", onPointerMove, moveOptions);
         pane.removeEventListener("pointerup", onPointerEnd, pointerOptions);
@@ -216,12 +257,14 @@ export function OrgChartMobilePageScrollPassthrough({
         disposed = true;
         cancelAnimationFrame(frameId);
         cleanupListeners?.();
+        restorePageScrollBehavior();
       };
     }
 
     return () => {
       disposed = true;
       cleanupListeners?.();
+      restorePageScrollBehavior();
     };
   }, [containerRef, isMobile, store, translateExtent]);
 
