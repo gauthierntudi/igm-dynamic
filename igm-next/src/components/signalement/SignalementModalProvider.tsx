@@ -18,6 +18,9 @@ import {
   saveSignalementModalOpen,
 } from "@/lib/signalement/signalementFormDraft";
 
+import { useLocale } from "@/components/i18n/LocaleProvider";
+import { getSignalementFormCopy } from "@/lib/signalement/signalementFormCopy";
+
 import modalStyles from "./signalementModal.module.css";
 
 import SignalementForm from "@/components/signalement/SignalementForm";
@@ -47,6 +50,9 @@ function SignalementModalPortal({
   onSubmittingChange: (submitting: boolean) => void;
 }) {
   const { isOpen, close } = useSignalementModal();
+  const { messages, locale } = useLocale();
+  const m = messages.denoncer;
+  const formCopy = getSignalementFormCopy(locale);
   const titleId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
   const [mounted, setMounted] = useState(false);
@@ -101,7 +107,7 @@ function SignalementModalPortal({
           ref={closeRef}
           type="button"
           className={modalStyles.close}
-          aria-label="Fermer le formulaire de signalement"
+          aria-label={formCopy.modalCloseAria}
           disabled={formSubmitting}
           onClick={close}
         >
@@ -109,12 +115,9 @@ function SignalementModalPortal({
         </button>
         <div className={modalStyles.dialogInner}>
           <h2 id={titleId} className={modalStyles.title}>
-            Formulaire de signalement
+            {m.title}
           </h2>
-          <p className={modalStyles.subtitle}>
-            Transmettez des informations sur des infractions ou pratiques irrégulières dans le
-            secteur minier. Les champs marqués d’une astérisque sont obligatoires.
-          </p>
+          <p className={modalStyles.subtitle}>{m.subtitle}</p>
           <SignalementForm onSuccess={close} onSubmittingChange={onSubmittingChange} />
         </div>
       </div>

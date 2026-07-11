@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic";
 
+import { HOME_SHOW_PARTNERS_SECTION } from "@/config/features";
 import { getHomePageBundle } from "@/lib/cms/client";
 import type { SupportedLocale } from "@/i18n/locales";
 
@@ -57,12 +58,14 @@ export async function renderHomePage(locale: SupportedLocale) {
       {bannerSlides.length > 0 ? (
         <HomeBannerSlider slides={bannerSlides} locale={locale} />
       ) : null}
-      {home?.about ? <HomeAboutSection about={home.about} locale={locale} /> : null}
+      {home?.about ? <HomeAboutSection about={home.about} /> : null}
       {home?.strategy ? (
         <HomeStrategySection strategy={home.strategy} locale={locale} />
       ) : null}
       <HomeStatsSection statsSection={home?.statsSection} stats={stats} />
-      <HomePartnersSection partnersSection={home?.partnersSection} />
+      {HOME_SHOW_PARTNERS_SECTION ? (
+        <HomePartnersSection partnersSection={home?.partnersSection} />
+      ) : null}
       <HomeActionSection actionSection={home?.actionSection} locale={locale} />
       <HomeOrgChartSection orgChartSection={home?.orgChartSection} locale={locale} />
       <HomeNewsSection newsSection={home?.newsSection} news={news} locale={locale} />

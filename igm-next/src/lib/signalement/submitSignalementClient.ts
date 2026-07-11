@@ -1,6 +1,7 @@
 import { withDeployedBase } from "@/lib/deployBasePath";
 import type { SupportedLocale } from "@/i18n/locales";
 import { TURNSTILE_FORM_FIELD } from "@/lib/security/turnstile";
+import { getSignalementFormCopy, formatSignalementUploadProgressLabel } from "@/lib/signalement/signalementFormCopy";
 
 import { prepareSignalementUploadFile } from "./compressSignalementImage";
 import { MAX_SIGNALEMENT_FILES, MAX_SIGNALEMENT_TOTAL_BYTES, maxSignalementFileBytes } from "./constants";
@@ -53,21 +54,8 @@ export function computeSignalementUploadOverallPercent(
   return Math.min(99, Math.round(base + (progress.filePercent / 100) * stepWeight));
 }
 
-export function formatSignalementUploadProgressLabel(progress: UploadProgress): string {
-  if (progress.phase === "final") {
-    return "Finalisation du signalement…";
-  }
 
-  if (
-    progress.uploadAttempt &&
-    progress.uploadAttempt > 1 &&
-    progress.maxUploadAttempts
-  ) {
-    return `Nouvelle tentative (${progress.uploadAttempt}/${progress.maxUploadAttempts})…`;
-  }
-
-  return `Envoi du fichier ${progress.fileIndex} / ${progress.fileTotal}`;
-}
+export { formatSignalementUploadProgressLabel } from "@/lib/signalement/signalementFormCopy";
 
 type JsonResult = { ok?: boolean; error?: string; message?: string; id?: number };
 
@@ -84,6 +72,7 @@ function submitMetadataWithProgress(
   pieceIds: number[],
   onProgress: (percent: number) => void,
 ): Promise<{ message?: string }> {
+  const t = getSignalementFormCopy(fields.locale).toast;
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open("POST", withDeployedBase("/api/signalement"));
@@ -104,11 +93,11 @@ function submitMetadataWithProgress(
         resolve({ message: data.message });
         return;
       }
-      reject(new Error(data.error || "Échec de l’envoi."));
+      reject(new Error(data.error || t.uploadFailed));
     };
 
-    xhr.onerror = () => reject(new Error("Erreur réseau."));
-    xhr.onabort = () => reject(new Error("Envoi annulé."));
+    xhr.onerror = () => reject(new Error(getSignalementFormCopy(fields.locale).error.network));
+    xhr.onabort = () => reject(new Error(t.uploadCancelled));
 
     const fd = new FormData();
     fd.set("description", fields.description);
@@ -133,7 +122,8 @@ function submitMetadataWithProgress(
   });
 }
 
-async function prepareUploadFiles(files: File[]): Promise<File[]> {
+async function prepareUploadFiles(files: File[], locale: SupportedLocale): Promise<File[]> {
+  const t = getSignalementFormCopy(locale).toast;
   const prepared = await Promise.all(files.map((file) => prepareSignalementUploadFile(file)));
 
   let totalSize = 0;
@@ -141,13 +131,13 @@ async function prepareUploadFiles(files: File[]): Promise<File[]> {
     const maxBytes = maxSignalementFileBytes(file.type, file.name);
     if (file.size > maxBytes) {
       const limitMb = Math.round(maxBytes / (1024 * 1024));
-      throw new Error(`Après compression, un fichier dépasse ${limitMb} Mo.`);
+      throw new Error(t.fileTooLargeAfterCompression(limitMb));
     }
     totalSize += file.size;
   }
 
   if (totalSize > MAX_SIGNALEMENT_TOTAL_BYTES) {
-    throw new Error("Pièces jointes trop lourdes.");
+    throw new Error(t.attachmentsTooHeavy);
   }
 
   return prepared;
@@ -158,11 +148,12 @@ export async function submitSignalementWithProgress(
   fields: SignalementSubmitFields,
   onProgress: (progress: UploadProgress) => void,
 ): Promise<{ message?: string }> {
+  const t = getSignalementFormCopy(fields.locale).toast;
   if (files.length > MAX_SIGNALEMENT_FILES) {
-    throw new Error(`Maximum ${MAX_SIGNALEMENT_FILES} fichiers.`);
+    throw new Error(t.maxFilesServer(MAX_SIGNALEMENT_FILES));
   }
 
-  const preparedFiles = await prepareUploadFiles(files);
+  const preparedFiles = await prepareUploadFiles(files, fields.locale);
   const pieceIds: number[] = [];
 
   for (let index = 0; index < preparedFiles.length; index += 1) {

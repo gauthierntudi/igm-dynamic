@@ -6,6 +6,7 @@ import {
   getSignalementAcknowledgementCopy,
   resolveSignalementLocale,
 } from "@/lib/email/signalementEmailCopy";
+import { getSignalementFormCopy } from "@/lib/signalement/signalementFormCopy";
 import { TURNSTILE_FORM_FIELD, verifyTurnstileToken } from "@/lib/security/turnstile";
 
 import { assertOrphanSignalementPieces } from "./assertOrphanSignalementPieces";
@@ -124,9 +125,12 @@ export async function submitSignalement(
     return { ok: false, error: captcha.error, status: 400 };
   }
 
+  const locale = resolveSignalementLocale(String(formData.get("locale") ?? "fr"));
+  const copy = getSignalementFormCopy(locale);
+
   const description = String(formData.get("description") ?? "").trim();
   if (!description) {
-    return { ok: false, error: "Description obligatoire.", status: 400 };
+    return { ok: false, error: copy.validation.descriptionRequired, status: 400 };
   }
 
   const alerteurNom = trimOrUndefined(String(formData.get("alerteur_nom") ?? ""));
@@ -134,7 +138,7 @@ export async function submitSignalement(
   const alerteurTel = trimOrUndefined(String(formData.get("alerteur_tel") ?? ""));
 
   if (alerteurEmail && !isValidEmail(alerteurEmail)) {
-    return { ok: false, error: "Adresse e-mail invalide.", status: 400 };
+    return { ok: false, error: copy.validation.emailInvalid, status: 400 };
   }
 
   const provinceRaw = String(formData.get("province") ?? "").trim();
@@ -147,8 +151,6 @@ export async function submitSignalement(
   const typeInfraction =
     typeRaw && isTypeInfraction(typeRaw) ? typeRaw : undefined;
 
-  const locale = resolveSignalementLocale(String(formData.get("locale") ?? "fr"));
-
   const pieceIds = parsePieceIds(formData);
   const inlineFiles = formData
     .getAll("pieces")
@@ -157,7 +159,7 @@ export async function submitSignalement(
   if (pieceIds.length > 0 && inlineFiles.length > 0) {
     return {
       ok: false,
-      error: "Envoi invalide : fichiers en double.",
+      error: copy.toast.duplicateFiles,
       status: 400,
     };
   }
@@ -169,7 +171,7 @@ export async function submitSignalement(
     if (pieceIds.length > MAX_SIGNALEMENT_FILES) {
       return {
         ok: false,
-        error: `Maximum ${MAX_SIGNALEMENT_FILES} fichiers.`,
+        error: copy.toast.maxFilesServer(MAX_SIGNALEMENT_FILES),
         status: 400,
       };
     }
@@ -274,7 +276,7 @@ export async function submitSignalement(
     console.error("[signalement] submit failed", error);
     return {
       ok: false,
-      error: "Impossible d'enregistrer le signalement. Réessayez plus tard.",
+      error: copy.toast.uploadFailed,
       status: 500,
     };
   }

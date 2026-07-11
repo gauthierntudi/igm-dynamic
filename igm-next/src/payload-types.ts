@@ -938,7 +938,6 @@ export interface SiteSetting {
               | '/mission'
               | '/vision'
               | '/organigramme'
-              | '/dossier-de-presse'
               | '/cartographie'
               | '/fraude-miniere'
               | '/contrebande-miniere'
@@ -951,6 +950,7 @@ export interface SiteSetting {
               | '/decisions'
               | '/photos'
               | '/videos'
+              | '/dossier-de-presse'
               | '/revue-de-presse'
               | '/contact'
               | '__custom__'
@@ -980,7 +980,6 @@ export interface SiteSetting {
                     | '/mission'
                     | '/vision'
                     | '/organigramme'
-                    | '/dossier-de-presse'
                     | '/cartographie'
                     | '/fraude-miniere'
                     | '/contrebande-miniere'
@@ -993,6 +992,7 @@ export interface SiteSetting {
                     | '/decisions'
                     | '/photos'
                     | '/videos'
+                    | '/dossier-de-presse'
                     | '/revue-de-presse'
                     | '/contact'
                     | '__custom__'
@@ -1022,7 +1022,6 @@ export interface SiteSetting {
                           | '/mission'
                           | '/vision'
                           | '/organigramme'
-                          | '/dossier-de-presse'
                           | '/cartographie'
                           | '/fraude-miniere'
                           | '/contrebande-miniere'
@@ -1035,6 +1034,7 @@ export interface SiteSetting {
                           | '/decisions'
                           | '/photos'
                           | '/videos'
+                          | '/dossier-de-presse'
                           | '/revue-de-presse'
                           | '/contact'
                           | '__custom__'
@@ -1077,7 +1077,6 @@ export interface SiteSetting {
                     | '/mission'
                     | '/vision'
                     | '/organigramme'
-                    | '/dossier-de-presse'
                     | '/cartographie'
                     | '/fraude-miniere'
                     | '/contrebande-miniere'
@@ -1090,6 +1089,7 @@ export interface SiteSetting {
                     | '/decisions'
                     | '/photos'
                     | '/videos'
+                    | '/dossier-de-presse'
                     | '/revue-de-presse'
                     | '/contact'
                     | '__custom__'
@@ -1129,7 +1129,6 @@ export interface SiteSetting {
               | '/mission'
               | '/vision'
               | '/organigramme'
-              | '/dossier-de-presse'
               | '/cartographie'
               | '/fraude-miniere'
               | '/contrebande-miniere'
@@ -1142,6 +1141,7 @@ export interface SiteSetting {
               | '/decisions'
               | '/photos'
               | '/videos'
+              | '/dossier-de-presse'
               | '/revue-de-presse'
               | '/contact'
               | '__custom__'
@@ -1200,7 +1200,6 @@ export interface Home {
                 | '/mission'
                 | '/vision'
                 | '/organigramme'
-                | '/dossier-de-presse'
                 | '/cartographie'
                 | '/fraude-miniere'
                 | '/contrebande-miniere'
@@ -1213,6 +1212,7 @@ export interface Home {
                 | '/decisions'
                 | '/photos'
                 | '/videos'
+                | '/dossier-de-presse'
                 | '/revue-de-presse'
                 | '/contact'
                 | '__custom__'
@@ -1236,7 +1236,6 @@ export interface Home {
                 | '/mission'
                 | '/vision'
                 | '/organigramme'
-                | '/dossier-de-presse'
                 | '/cartographie'
                 | '/fraude-miniere'
                 | '/contrebande-miniere'
@@ -1249,6 +1248,7 @@ export interface Home {
                 | '/decisions'
                 | '/photos'
                 | '/videos'
+                | '/dossier-de-presse'
                 | '/revue-de-presse'
                 | '/contact'
                 | '__custom__'
@@ -1264,16 +1264,6 @@ export interface Home {
     | null;
   about?: {
     title?: string | null;
-    mission?: {
-      title?: string | null;
-      text?: string | null;
-      href?: string | null;
-    };
-    vision?: {
-      title?: string | null;
-      text?: string | null;
-      href?: string | null;
-    };
     leadText?: string | null;
     detailText?: string | null;
     signatureName?: string | null;
@@ -1541,7 +1531,6 @@ export interface WhoWeAre {
             | '/mission'
             | '/vision'
             | '/organigramme'
-            | '/dossier-de-presse'
             | '/cartographie'
             | '/fraude-miniere'
             | '/contrebande-miniere'
@@ -1554,6 +1543,7 @@ export interface WhoWeAre {
             | '/decisions'
             | '/photos'
             | '/videos'
+            | '/dossier-de-presse'
             | '/revue-de-presse'
             | '/contact'
             | '__custom__'
@@ -1581,7 +1571,6 @@ export interface WhoWeAre {
             | '/mission'
             | '/vision'
             | '/organigramme'
-            | '/dossier-de-presse'
             | '/cartographie'
             | '/fraude-miniere'
             | '/contrebande-miniere'
@@ -1594,6 +1583,7 @@ export interface WhoWeAre {
             | '/decisions'
             | '/photos'
             | '/videos'
+            | '/dossier-de-presse'
             | '/revue-de-presse'
             | '/contact'
             | '__custom__'
@@ -1932,20 +1922,6 @@ export interface HomeSelect<T extends boolean = true> {
     | T
     | {
         title?: T;
-        mission?:
-          | T
-          | {
-              title?: T;
-              text?: T;
-              href?: T;
-            };
-        vision?:
-          | T
-          | {
-              title?: T;
-              text?: T;
-              href?: T;
-            };
         leadText?: T;
         detailText?: T;
         signatureName?: T;

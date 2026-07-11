@@ -42,7 +42,6 @@ export const MAIN_NAV: NavItem[] = [
         ],
       },
       { kind: "route", routeKey: "orgChart", labelKey: "orgChart" },
-      { kind: "route", routeKey: "pressKit", labelKey: "pressKit" },
       { kind: "route", routeKey: "map", labelKey: "map" },
     ],
   },
@@ -65,6 +64,7 @@ export const MAIN_NAV: NavItem[] = [
     items: [
       { kind: "route", routeKey: "photos", labelKey: "photos" },
       { kind: "route", routeKey: "videos", labelKey: "videos" },
+      { kind: "route", routeKey: "pressKit", labelKey: "pressKit" },
       { kind: "route", routeKey: "pressReview", labelKey: "pressReview" },
     ],
   },
@@ -90,6 +90,7 @@ export const MAIN_NAV: NavItem[] = [
         items: [
           { kind: "route", routeKey: "photos", labelKey: "photos" },
           { kind: "route", routeKey: "videos", labelKey: "videos" },
+          { kind: "route", routeKey: "pressKit", labelKey: "pressKit" },
           { kind: "route", routeKey: "pressReview", labelKey: "pressReview" },
         ],
       },

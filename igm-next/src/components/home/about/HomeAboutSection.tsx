@@ -1,12 +1,9 @@
-import type { SupportedLocale } from "@/i18n/locales";
 import type { CmsHomeAbout } from "@/lib/cms/home/types";
 
-import { MissionVisionSlider } from "./MissionVisionSlider";
 import { resolveAboutImageAlt, resolveAboutImageSrc } from "./resolveAboutMedia";
 
 type Props = {
   about: CmsHomeAbout | null | undefined;
-  locale: SupportedLocale;
 };
 
 export function hasAboutContent(about: CmsHomeAbout | null | undefined): about is CmsHomeAbout {
@@ -15,8 +12,6 @@ export function hasAboutContent(about: CmsHomeAbout | null | undefined): about i
     about.title?.trim() ||
       about.leadText?.trim() ||
       about.detailText?.trim() ||
-      about.mission?.title?.trim() ||
-      about.vision?.title?.trim() ||
       about.signatureName?.trim() ||
       (about.image && typeof about.image === "object"),
   );
@@ -36,7 +31,7 @@ function DetailText({ text }: { text: string }) {
   );
 }
 
-export function HomeAboutSection({ about, locale }: Props) {
+export function HomeAboutSection({ about }: Props) {
   if (!hasAboutContent(about)) return null;
 
   const signatureName = about.signatureName?.trim();
@@ -56,32 +51,19 @@ export function HomeAboutSection({ about, locale }: Props) {
           >
             <div className="about-content">
               {about.title?.trim() ? <h1>{about.title.trim()}</h1> : null}
-              <div className="row">
-                <div className="col-md-4">
-                  <div className="mission-side mt-20">
-                    <MissionVisionSlider
-                      mission={about.mission}
-                      vision={about.vision}
-                      locale={locale}
-                    />
+              <div className="main-text">
+                {about.leadText?.trim() ? (
+                  <p className="lead-text">{about.leadText.trim()}</p>
+                ) : null}
+                {about.detailText?.trim() ? (
+                  <DetailText text={about.detailText.trim()} />
+                ) : null}
+                {hasSignature ? (
+                  <div className="signature d-lg-block d-none">
+                    <h3>{signatureName}</h3>
+                    <span>{signatureRole}</span>
                   </div>
-                </div>
-                <div className="col-md-8">
-                  <div className="main-text">
-                    {about.leadText?.trim() ? (
-                      <p className="lead-text">{about.leadText.trim()}</p>
-                    ) : null}
-                    {about.detailText?.trim() ? (
-                      <DetailText text={about.detailText.trim()} />
-                    ) : null}
-                    {hasSignature ? (
-                      <div className="signature d-lg-block d-none">
-                        <h3>{signatureName}</h3>
-                        <span>{signatureRole}</span>
-                      </div>
-                    ) : null}
-                  </div>
-                </div>
+                ) : null}
               </div>
             </div>
           </div>

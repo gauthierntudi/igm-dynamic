@@ -120,43 +120,6 @@ export const Home: GlobalConfig = {
               label: "Section à propos",
               fields: [
                 { name: "title", type: "text", label: "Titre principal", ...LOCALIZED },
-                {
-                  type: "row",
-                  fields: [
-                    {
-                      name: "mission",
-                      type: "group",
-                      label: "Mission",
-                      fields: [
-                        {
-                          name: "title",
-                          type: "text",
-                          label: "Titre",
-                          defaultValue: "Notre Mission",
-                          ...LOCALIZED,
-                        },
-                        { name: "text", type: "textarea", label: "Texte", ...LOCALIZED },
-                        { name: "href", type: "text", label: "Lien", defaultValue: "/mission", ...LOCALIZED },
-                      ],
-                    },
-                    {
-                      name: "vision",
-                      type: "group",
-                      label: "Vision",
-                      fields: [
-                        {
-                          name: "title",
-                          type: "text",
-                          label: "Titre",
-                          defaultValue: "Notre Vision",
-                          ...LOCALIZED,
-                        },
-                        { name: "text", type: "textarea", label: "Texte", ...LOCALIZED },
-                        { name: "href", type: "text", label: "Lien", defaultValue: "/vision", ...LOCALIZED },
-                      ],
-                    },
-                  ],
-                },
                 { name: "leadText", type: "textarea", label: "Chapô", ...LOCALIZED },
                 { name: "detailText", type: "textarea", label: "Texte détaillé", ...LOCALIZED },
                 {

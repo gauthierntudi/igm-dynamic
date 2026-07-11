@@ -16,7 +16,6 @@ import {
 } from "@/lib/signalement/signalementFormDraft";
 import {
   computeSignalementUploadOverallPercent,
-  formatSignalementUploadProgressLabel,
   submitSignalementWithProgress,
   type UploadProgress,
 } from "@/lib/signalement/submitSignalementClient";
@@ -30,6 +29,13 @@ import {
   MAX_SIGNALEMENT_VIDEO_FILE_BYTES,
   maxSignalementFileBytes,
 } from "@/lib/signalement/constants";
+import {
+  formatSignalementBytes,
+  formatSignalementGeolocationLine,
+  formatSignalementUploadProgressLabel,
+  getSignalementFormCopy,
+  getSignalementInfractionOptions,
+} from "@/lib/signalement/signalementFormCopy";
 
 import styles from "./SignalementForm.module.css";
 
@@ -37,66 +43,14 @@ const MAX_FILES = MAX_SIGNALEMENT_FILES;
 const ACCEPT_PHOTOS_VIDEOS = "image/jpeg,image/png,video/*,.mp4,.mov,.m4v,.avi,.mkv,.webm";
 const ACCEPT_AUDIO = "audio/*,.webm,.mp3,.wav,.m4a,.ogg";
 
-const PROVINCES_RDC = [
-  "",
-  "Bas-Uele",
-  "Équateur",
-  "Haut-Katanga",
-  "Haut-Lomami",
-  "Haut-Uele",
-  "Ituri",
-  "Kasaï",
-  "Kasaï-Central",
-  "Kasaï-Oriental",
-  "Kinshasa",
-  "Kongo-Central",
-  "Kwango",
-  "Kwilu",
-  "Lomami",
-  "Lualaba",
-  "Mai-Ndombe",
-  "Maniema",
-  "Mongala",
-  "Nord-Kivu",
-  "Nord-Ubangi",
-  "Sankuru",
-  "Sud-Kivu",
-  "Sud-Ubangi",
-  "Tanganyika",
-  "Tshopo",
-  "Tshuapa",
-];
-
-const TYPES_INFRACTION = [
-  "",
-  "Exploitation illégale",
-  "Contrebande",
-  "Sous-déclaration",
-  "Corruption",
-  "Non-respect des obligations légales",
-  "Autre",
-];
-
-const STEP_DEFINITIONS = [
-  { short: "Lanceur", title: "Informations sur le lanceur d’alerte" },
-  { short: "Description", title: "Description de l’infraction" },
-  { short: "Lieu", title: "Localisation" },
-  { short: "Type", title: "Type d’infraction" },
-  { short: "Fichiers", title: "Pièces jointes" },
-] as const;
-
-const LAST_STEP_INDEX = STEP_DEFINITIONS.length - 1;
-
 type Attachment = {
   id: string;
   file: File;
   previewUrl: string;
 };
 
-function formatBytes(n: number): string {
-  if (n < 1024) return `${n} o`;
-  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} Ko`;
-  return `${(n / (1024 * 1024)).toFixed(1)} Mo`;
+function formatBytes(n: number, locale: ReturnType<typeof useLocale>["locale"]): string {
+  return formatSignalementBytes(n, locale);
 }
 
 function formatAudioTime(seconds: number): string {
@@ -110,32 +64,11 @@ function uid(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
-type IgmSpeechRecognitionCtor = new () => {
-  lang: string;
-  continuous: boolean;
-  interimResults: boolean;
-  onresult: ((ev: Event) => void) | null;
-  onerror: ((ev: Event) => void) | null;
-  onend: (() => void) | null;
-  start: () => void;
-  stop: () => void;
-};
-
-function getSpeechRecognitionCtor(): IgmSpeechRecognitionCtor | null {
-  const w = window as typeof window & {
-    SpeechRecognition?: IgmSpeechRecognitionCtor;
-    webkitSpeechRecognition?: IgmSpeechRecognitionCtor;
-  };
-  return w.SpeechRecognition || w.webkitSpeechRecognition || null;
-}
-
-function formatGeolocationLine(pos: GeolocationPosition): string {
-  const { latitude, longitude, accuracy } = pos.coords;
-  const core = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
-  if (typeof accuracy === "number" && accuracy > 0 && accuracy < 15000) {
-    return `${core} (précision ~${Math.round(accuracy)} m)`;
-  }
-  return core;
+function formatGeolocationLine(
+  pos: GeolocationPosition,
+  locale: ReturnType<typeof useLocale>["locale"],
+): string {
+  return formatSignalementGeolocationLine(pos, locale);
 }
 
 type SignalementFormProps = {
@@ -150,20 +83,21 @@ function validateNonAnonymousContact(
   nom: string,
   email: string,
   tel: string,
+  copy: ReturnType<typeof getSignalementFormCopy>,
 ): string | null {
   if (!nom.trim()) {
-    return "Indiquez votre nom et prénom.";
+    return copy.validation.nameRequired;
   }
 
   const emailTrimmed = email.trim();
   const telTrimmed = tel.trim();
 
   if (!emailTrimmed && !telTrimmed) {
-    return "Indiquez un e-mail ou un numéro de téléphone.";
+    return copy.validation.contactRequired;
   }
 
   if (emailTrimmed && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrimmed)) {
-    return "Adresse e-mail invalide.";
+    return copy.validation.emailInvalid;
   }
 
   return null;
@@ -171,6 +105,10 @@ function validateNonAnonymousContact(
 
 export default function SignalementForm({ onSuccess, onSubmittingChange }: SignalementFormProps = {}) {
   const { locale } = useLocale();
+  const t = getSignalementFormCopy(locale);
+  const steps = t.steps;
+  const lastStepIndex = steps.length - 1;
+  const infractionOptions = getSignalementInfractionOptions(locale);
   const formId = useId();
   const mediaInputRef = useRef<HTMLInputElement>(null);
   const audioPickRef = useRef<HTMLInputElement>(null);
@@ -191,12 +129,6 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
   const previewAudioRefs = useRef<Record<string, HTMLAudioElement | null>>({});
   const [previewAudioPlayingId, setPreviewAudioPlayingId] = useState<string | null>(null);
   const [previewAudioUiTick, setPreviewAudioUiTick] = useState(0);
-
-  const [dictationSupported, setDictationSupported] = useState(false);
-  const [dictationActive, setDictationActive] = useState(false);
-  const recognitionRef = useRef<{ start: () => void; stop: () => void } | null>(null);
-  /** L’utilisateur a activé la dictée (reste vrai jusqu’au toggle off, pour survivre aux `onend` du moteur). */
-  const dictationWantedRef = useRef(false);
 
   const [recordingState, setRecordingState] = useState<"idle" | "recording">("idle");
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -226,7 +158,7 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
       setVilleSite(draft.villeSite);
       setCoords(draft.coords);
       setTypeInfraction(draft.typeInfraction);
-      setActiveStep(Math.min(draft.activeStep, LAST_STEP_INDEX));
+      setActiveStep(Math.min(draft.activeStep, lastStepIndex));
     }
     draftHydratedRef.current = true;
   }, []);
@@ -309,18 +241,14 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
     return () => window.clearTimeout(timer);
   }, [dismissSubmitSuccess, submitSuccessMessage]);
 
-  useEffect(() => {
-    setDictationSupported(!!getSpeechRecognitionCtor());
-  }, []);
-
   const handleTurnstileExpire = useCallback(() => {
     setTurnstileToken(null);
   }, []);
 
   const handleTurnstileError = useCallback(() => {
     setTurnstileToken(null);
-    toast.error("Contrôle de sécurité indisponible. Réessayez.");
-  }, []);
+    toast.error(t.toast.captchaUnavailable);
+  }, [t.toast.captchaUnavailable]);
 
   const stopStream = useCallback(() => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
@@ -334,12 +262,6 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
     return () => {
       stopStream();
       attachmentsRef.current.forEach((a) => URL.revokeObjectURL(a.previewUrl));
-      dictationWantedRef.current = false;
-      try {
-        recognitionRef.current?.stop();
-      } catch {
-        /* ignore */
-      }
     };
   }, [stopStream]);
 
@@ -348,17 +270,17 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
     setAttachments((prev) => {
       let err: string | null = null;
       if (prev.length + list.length > MAX_FILES) {
-        err = `Max. ${MAX_FILES} fichiers.`;
+        err = t.toast.maxFiles(MAX_FILES);
       } else {
         for (const f of list) {
           const mime = f.type || "application/octet-stream";
           const maxBytes = maxSignalementFileBytes(mime, f.name);
           if (f.size > maxBytes) {
-            err = `Fichier trop lourd (max ${formatBytes(maxBytes)}).`;
+            err = t.toast.fileTooLarge(formatBytes(maxBytes, locale));
             break;
           }
           if (!isAllowedSignalementMime(mime, f.name)) {
-            err = "Type de fichier non autorisé (photos, audio ou vidéo).";
+            err = t.toast.fileTypeNotAllowed;
             break;
           }
         }
@@ -374,7 +296,7 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
       }));
       return [...prev, ...added];
     });
-  }, []);
+  }, [locale, t.toast]);
 
   const removeAttachment = useCallback((id: string) => {
     const el = previewAudioRefs.current[id];
@@ -432,15 +354,15 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
           setPreviewAudioUiTick((n) => n + 1);
         })
         .catch(() => {
-          toast.error("Lecture impossible.");
+          toast.error(t.toast.playbackFailed);
           setPreviewAudioPlayingId(null);
         });
     },
-    [],
+    [t.toast.playbackFailed],
   );
 
   useEffect(() => {
-    if (activeStep !== LAST_STEP_INDEX) {
+    if (activeStep !== lastStepIndex) {
       pauseAllPreviewAudios();
     }
   }, [activeStep, pauseAllPreviewAudios]);
@@ -458,99 +380,9 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
     };
   }, [previewAudioPlayingId]);
 
-  const toggleDictation = useCallback(() => {
-    const Ctor = getSpeechRecognitionCtor();
-    if (!Ctor) {
-      toast.error("Dictée non prise en charge.");
-      return;
-    }
-
-    if (dictationActive || dictationWantedRef.current) {
-      dictationWantedRef.current = false;
-      try {
-        recognitionRef.current?.stop();
-      } catch {
-        /* ignore */
-      }
-      recognitionRef.current = null;
-      setDictationActive(false);
-      return;
-    }
-
-    dictationWantedRef.current = true;
-    const rec = new Ctor();
-    recognitionRef.current = rec;
-    rec.lang = "fr-FR";
-    rec.continuous = true;
-    rec.interimResults = true;
-
-    rec.onresult = (event: Event) => {
-      const ev = event as unknown as {
-        resultIndex: number;
-        results: { length: number; [i: number]: { 0: { transcript: string } } };
-      };
-      let chunk = "";
-      for (let i = ev.resultIndex; i < ev.results.length; i++) {
-        const part = ev.results[i]?.[0];
-        if (part?.transcript) chunk += part.transcript;
-      }
-      if (chunk) {
-        setDescription((d) => (d ? `${d} ${chunk}` : chunk));
-      }
-    };
-
-    rec.onerror = (event: Event) => {
-      const code = (event as unknown as { error?: string }).error ?? "";
-      if (code === "no-speech" && dictationWantedRef.current) {
-        try {
-          rec.start();
-        } catch {
-          /* ignore — onend reprendra ou l’utilisateur arrêtera */
-        }
-        return;
-      }
-      if (code === "aborted" && !dictationWantedRef.current) {
-        return;
-      }
-      dictationWantedRef.current = false;
-      setDictationActive(false);
-      recognitionRef.current = null;
-      if (code === "not-allowed" || code === "service-not-allowed") {
-        toast.error("Micro ou dictée refusé.");
-      } else if (code === "network") {
-        toast.error("Dictée : erreur réseau.");
-      } else {
-        toast.error("Dictée : erreur.");
-      }
-    };
-
-    rec.onend = () => {
-      if (!dictationWantedRef.current) {
-        setDictationActive(false);
-        recognitionRef.current = null;
-        return;
-      }
-      try {
-        rec.start();
-      } catch {
-        dictationWantedRef.current = false;
-        setDictationActive(false);
-        recognitionRef.current = null;
-      }
-    };
-
-    try {
-      rec.start();
-      setDictationActive(true);
-    } catch {
-      dictationWantedRef.current = false;
-      toast.error("Dictée indisponible.");
-    }
-  }, [dictationActive]);
-
   const startRecording = useCallback(async () => {
     if (!window.MediaRecorder) {
-      toast.error("Enregistrement audio indisponible.");
+      toast.error(t.toast.audioRecordingUnavailable);
       return;
     }
     try {
@@ -582,9 +414,9 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
       mr.start(200);
       setRecordingState("recording");
     } catch {
-      toast.error("Micro refusé.");
+      toast.error(t.toast.micDenied);
     }
-  }, [addAttachments, stopStream]);
+  }, [addAttachments, stopStream, t.toast.micDenied]);
 
   const stopRecording = useCallback(() => {
     const mr = mediaRecorderRef.current;
@@ -597,38 +429,25 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
   }, [stopStream]);
 
   useEffect(() => {
-    if (activeStep !== 1) {
-      dictationWantedRef.current = false;
-      try {
-        recognitionRef.current?.stop();
-      } catch {
-        /* ignore */
-      }
-      recognitionRef.current = null;
-      setDictationActive(false);
-    }
-  }, [activeStep]);
-
-  useEffect(() => {
-    if (activeStep !== LAST_STEP_INDEX && recordingState === "recording") {
+    if (activeStep !== lastStepIndex && recordingState === "recording") {
       stopRecording();
     }
   }, [activeStep, recordingState, stopRecording]);
 
   const goNext = useCallback(() => {
     if (activeStep === 0 && !anonymousMode) {
-      const contactError = validateNonAnonymousContact(nom, email, tel);
+      const contactError = validateNonAnonymousContact(nom, email, tel, t);
       if (contactError) {
         toast.error(contactError);
         return;
       }
     }
     if (activeStep === 1 && !description.trim()) {
-      toast.error("Décrivez les faits d’abord.");
+      toast.error(t.validation.describeFactsFirst);
       return;
     }
-    setActiveStep((s) => Math.min(s + 1, LAST_STEP_INDEX));
-  }, [activeStep, anonymousMode, description, email, nom, tel]);
+    setActiveStep((s) => Math.min(s + 1, lastStepIndex));
+  }, [activeStep, anonymousMode, description, email, nom, t, tel]);
 
   const goPrev = useCallback(() => {
     setActiveStep((s) => Math.max(0, s - 1));
@@ -642,7 +461,7 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
   const requestGeolocation = useCallback((opts: { silent: boolean }) => {
     if (!navigator.geolocation) {
       if (!opts.silent) {
-        toast.error("Géolocalisation indisponible.");
+        toast.error(t.toast.geoUnavailable);
       }
       return;
     }
@@ -651,7 +470,7 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
     }
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setCoords(formatGeolocationLine(pos));
+        setCoords(formatGeolocationLine(pos, locale));
         if (!opts.silent) setGeoLoading(false);
       },
       (err) => {
@@ -659,19 +478,19 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
           setGeoLoading(false);
           const code = (err as GeolocationPositionError).code;
           if (code === 1) {
-            toast.error("Localisation refusée.");
+            toast.error(t.toast.geoDenied);
           } else if (code === 2) {
-            toast.error("Position indisponible.");
+            toast.error(t.toast.geoUnavailablePosition);
           } else if (code === 3) {
-            toast.error("Délai dépassé.");
+            toast.error(t.toast.geoTimeout);
           } else {
-            toast.error("Localisation impossible.");
+            toast.error(t.toast.geoFailed);
           }
         }
       },
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
     );
-  }, []);
+  }, [locale, t.toast]);
 
   useEffect(() => {
     if (activeStep !== 2) {
@@ -686,17 +505,17 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (activeStep !== LAST_STEP_INDEX) {
+    if (activeStep !== lastStepIndex) {
       return;
     }
     const desc = description.trim();
     if (!desc) {
-      toast.error("Description obligatoire.");
+      toast.error(t.validation.descriptionRequired);
       setActiveStep(1);
       return;
     }
     if (!anonymousMode) {
-      const contactError = validateNonAnonymousContact(nom, email, tel);
+      const contactError = validateNonAnonymousContact(nom, email, tel, t);
       if (contactError) {
         toast.error(contactError);
         setActiveStep(0);
@@ -705,7 +524,7 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
     }
 
     if (turnstileEnabled && !turnstileToken) {
-      toast.error("Veuillez valider le contrôle de sécurité.");
+      toast.error(t.validation.captchaRequired);
       return;
     }
 
@@ -755,7 +574,7 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
           ? rawMessage
           : rawMessage
             ? `${rawMessage.slice(0, 117)}…`
-            : "Votre signalement a bien été envoyé.";
+            : t.success.defaultMessage;
 
       setSubmitSuccessMessage(successMessage);
     } catch (error) {
@@ -766,7 +585,7 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
           ? error.message.trim().length > 120
             ? `${error.message.trim().slice(0, 117)}…`
             : error.message.trim()
-          : "Erreur réseau.";
+          : t.error.network;
       setSubmitErrorMessage(message);
     } finally {
       setSubmitting(false);
@@ -779,16 +598,20 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
     attachments.length,
   );
 
+  const photoMaxLabel = formatBytes(MAX_SIGNALEMENT_FILE_BYTES, locale);
+  const videoMaxLabel = formatBytes(MAX_SIGNALEMENT_VIDEO_FILE_BYTES, locale);
+  const totalMaxLabel = formatBytes(MAX_SIGNALEMENT_TOTAL_BYTES, locale);
+
   const stepNavInCardEl = (
     <div className={styles.stepNavInCard}>
       <div className={styles.stepNavActions}>
         {activeStep > 0 ? (
           <button type="button" className={`${styles.btn} ${styles.stepBtnGhost}`} onClick={goPrev}>
-            ← Retour
+            {t.back}
           </button>
         ) : null}
         <button type="button" className={`${styles.btn} ${styles.stepBtnNext}`} onClick={goNext}>
-          Suivant →
+          {t.next}
         </button>
       </div>
     </div>
@@ -796,9 +619,9 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
 
   return (
     <form id={formId} className={styles.form} onSubmit={handleSubmit} noValidate>
-      <nav className={styles.progressWrap} aria-label="Progression du formulaire">
+      <nav className={styles.progressWrap} aria-label={t.progressAria}>
         <div className={styles.progressLabels}>
-          {STEP_DEFINITIONS.map((def, i) => (
+          {steps.map((def, i) => (
             <span
               key={def.short}
               className={`${styles.progressLabel} ${i === activeStep ? styles.progressLabelActive : ""} ${i < activeStep ? styles.progressLabelDone : ""}`}
@@ -811,12 +634,12 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
           <div
             className={styles.progressFill}
             style={{
-              width: `${((activeStep + 1) / STEP_DEFINITIONS.length) * 100}%`,
+              width: `${((activeStep + 1) / steps.length) * 100}%`,
             }}
           />
         </div>
         <div className={styles.stepDots}>
-          {STEP_DEFINITIONS.map((def, i) => (
+          {steps.map((def, i) => (
             <button
               key={def.short}
               type="button"
@@ -825,7 +648,7 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
               disabled={i > activeStep}
               aria-current={activeStep === i ? "step" : undefined}
               aria-controls={`${formId}-panel-${i}`}
-              aria-label={`Étape ${i + 1} : ${def.title}`}
+              aria-label={t.stepAria(i, def.title)}
               onClick={() => {
                 if (i < activeStep) goToStep(i);
               }}
@@ -845,29 +668,25 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
       >
         <section className={styles.section} aria-labelledby={`${formId}-step-0`}>
           <h2 className={styles.sectionTitle} id={`${formId}-step-0`}>
-            Informations sur le{" "}
-            <span className={styles.sectionTitleAccent}>lanceur d’alerte</span>{" "}
+            {t.step0.titlePrefix}{" "}
+            <span className={styles.sectionTitleAccent}>{t.step0.titleAccent}</span>{" "}
             {anonymousMode ? (
-              <span className={styles.optional}>(optionnel)</span>
+              <span className={styles.optional}>{t.optional}</span>
             ) : (
-              <span className={styles.requiredMark} title="Obligatoire">
+              <span className={styles.requiredMark} title={t.requiredTitle}>
                 *
               </span>
             )}
           </h2>
           <p className={styles.sectionHint}>
-            {anonymousMode
-              ? "Vous pouvez passer à l’étape suivante sans renseigner d’identité. Désactivez le switch pour indiquer vos coordonnées."
-              : "Le nom est obligatoire. Indiquez au moins un e-mail ou un numéro de téléphone."}
+            {anonymousMode ? t.step0.hintAnonymous : t.step0.hintIdentified}
           </p>
           <div className={`${styles.dictToggleRow} ${styles.dictToggleRowAnon}`}>
             <span
               className={`${styles.dictToggleLabel} ${styles.dictToggleLabelSentence}`}
               id={`${formId}-anon-label`}
             >
-              {anonymousMode
-                ? "Le signalement peut être effectué de manière totalement anonyme."
-                : "Je souhaite renseigner mes coordonnées pour un éventuel suivi."}
+              {anonymousMode ? t.step0.anonymousOn : t.step0.anonymousOff}
             </span>
             <button
               type="button"
@@ -895,7 +714,7 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
           <div className={styles.grid2}>
             <div className={styles.pillField}>
               <label className={styles.pillLabel} htmlFor={`${formId}-nom`}>
-                Nom et prénom <span className={styles.requiredMark}>*</span>
+                {t.step0.nameLabel} <span className={styles.requiredMark}>*</span>
               </label>
               <input
                 id={`${formId}-nom`}
@@ -905,12 +724,12 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
                 autoComplete="name"
                 value={nom}
                 onChange={(e) => setNom(e.target.value)}
-                placeholder="Ex. : Jean Mukendi"
+                placeholder={t.step0.namePlaceholder}
               />
             </div>
             <div className={styles.pillField}>
               <label className={styles.pillLabel} htmlFor={`${formId}-email`}>
-                Adresse e-mail
+                {t.step0.emailLabel}
               </label>
               <input
                 id={`${formId}-email`}
@@ -920,12 +739,12 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="exemple@email.com"
+                placeholder={t.step0.emailPlaceholder}
               />
             </div>
             <div className={`${styles.pillField} ${styles.span2}`}>
               <label className={styles.pillLabel} htmlFor={`${formId}-tel`}>
-                Numéro de téléphone
+                {t.step0.phoneLabel}
               </label>
               <input
                 id={`${formId}-tel`}
@@ -935,11 +754,11 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
                 autoComplete="tel"
                 value={tel}
                 onChange={(e) => setTel(e.target.value)}
-                placeholder="Ex. : +243 900 000 000"
+                placeholder={t.step0.phonePlaceholder}
               />
             </div>
             <p className={`${styles.dictHintBelow} ${styles.span2}`}>
-              Au moins l’un des deux moyens de contact ci-dessus est requis.
+              {t.step0.contactRequiredHint}
             </p>
           </div>
           ) : null}
@@ -956,20 +775,17 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
       >
         <section className={styles.section} aria-labelledby={`${formId}-step-1`}>
           <h2 className={styles.sectionTitle} id={`${formId}-step-1`}>
-            Description{" "}
-            <span className={styles.sectionTitleAccent}>de l’infraction</span>{" "}
-            <span className={styles.requiredMark} title="Obligatoire">
+            {t.step1.titlePrefix}{" "}
+            <span className={styles.sectionTitleAccent}>{t.step1.titleAccent}</span>{" "}
+            <span className={styles.requiredMark} title={t.requiredTitle}>
               *
             </span>
           </h2>
-          <p className={styles.sectionHint}>
-            Décrivez les faits avec précision (obligatoire). Vous pouvez activer la dictée vocale
-            (interrupteur « Dicter : voix → texte ») si votre navigateur la prend en charge.
-          </p>
+          <p className={styles.sectionHint}>{t.step1.hint}</p>
           <div className={styles.grid2}>
             <div className={`${styles.pillField} ${styles.pillTextareaWrap} ${styles.span2}`}>
               <label className={styles.pillLabel} htmlFor={`${formId}-desc`}>
-                Description des faits <span className={styles.requiredMark}>*</span>
+                {t.step1.descriptionLabel} <span className={styles.requiredMark}>*</span>
               </label>
               <textarea
                 id={`${formId}-desc`}
@@ -977,45 +793,10 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
                 name="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Contexte, dates, personnes ou entreprises concernées, ce que vous avez observé…"
+                placeholder={t.step1.descriptionPlaceholder}
               />
             </div>
           </div>
-          <div className={styles.dictToggleRow}>
-            <span className={styles.dictToggleLabel} id={`${formId}-dict-label`}>
-              Dicter : voix → texte
-            </span>
-            <button
-              type="button"
-              id={`${formId}-dict-toggle`}
-              className={`${styles.dictSwitch} ${dictationActive ? styles.dictSwitchOn : ""}`}
-              role="switch"
-              aria-checked={dictationActive}
-              aria-labelledby={`${formId}-dict-label`}
-              disabled={!dictationSupported}
-              onClick={toggleDictation}
-            >
-              <span className={styles.dictSwitchTrack} aria-hidden>
-                <span className={styles.dictSwitchThumb} />
-              </span>
-            </button>
-          </div>
-          {!dictationSupported ? (
-            <p className={styles.dictHintBelow} role="status">
-              Dictée non disponible sur ce navigateur.
-            </p>
-          ) : dictationActive ? (
-            <p className={styles.dictHintBelow} role="status">
-              Parlez : le texte s’ajoute à la description.
-            </p>
-          ) : (
-            <p className={styles.dictHow}>
-              <strong>Pour que ça fonctionne :</strong> utilisez de préférence{" "}
-              <strong>Chrome</strong> ou <strong>Edge</strong> (connexion HTTPS). Activez
-              l’interrupteur, acceptez l’accès au <strong>microphone</strong> si le navigateur le
-              demande, puis parlez en français — le texte s’insère dans la zone de description.
-            </p>
-          )}
           {stepNavInCardEl}
         </section>
       </div>
@@ -1029,17 +810,14 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
       >
         <section className={styles.section} aria-labelledby={`${formId}-step-2`}>
           <h2 className={styles.sectionTitle} id={`${formId}-step-2`}>
-            <span className={styles.sectionTitleAccent}>Localisation</span>{" "}
-            <span className={styles.optional}>(optionnel, recommandé)</span>
+            <span className={styles.sectionTitleAccent}>{t.step2.titleAccent}</span>{" "}
+            <span className={styles.optional}>{t.step2.titleOptional}</span>
           </h2>
-          <p className={styles.sectionHint}>
-            Ces informations facilitent la localisation des faits signalés. Vous pouvez passer à
-            l’étape suivante sans les renseigner.
-          </p>
+          <p className={styles.sectionHint}>{t.step2.hint}</p>
           <div className={styles.grid2}>
             <div className={styles.pillField}>
               <label className={styles.pillLabel} htmlFor={`${formId}-prov`}>
-                Province
+                {t.step2.provinceLabel}
               </label>
               <select
                 id={`${formId}-prov`}
@@ -1048,8 +826,8 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
                 value={province}
                 onChange={(e) => setProvince(e.target.value)}
               >
-                <option value="">Facultatif — choisir une province</option>
-                {PROVINCES_RDC.filter(Boolean).map((p) => (
+                <option value="">{t.step2.provincePlaceholder}</option>
+                {t.provinces.map((p) => (
                   <option key={p} value={p}>
                     {p}
                   </option>
@@ -1058,7 +836,7 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
             </div>
             <div className={styles.pillField}>
               <label className={styles.pillLabel} htmlFor={`${formId}-ville`}>
-                Ville / site minier
+                {t.step2.cityLabel}
               </label>
               <input
                 id={`${formId}-ville`}
@@ -1067,12 +845,12 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
                 name="ville_site"
                 value={villeSite}
                 onChange={(e) => setVilleSite(e.target.value)}
-                placeholder="Facultatif — ex. : Kolwezi, site minier…"
+                placeholder={t.step2.cityPlaceholder}
               />
             </div>
             <div className={`${styles.pillField} ${styles.span2}`}>
               <label className={styles.pillLabel} htmlFor={`${formId}-coords`}>
-                Coordonnées géographiques
+                {t.step2.coordsLabel}
               </label>
               <input
                 id={`${formId}-coords`}
@@ -1081,7 +859,7 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
                 name="coords"
                 value={coords}
                 onChange={(e) => setCoords(e.target.value)}
-                placeholder="Facultatif — latitude, longitude (ex. : -10.723, 25.472)"
+                placeholder={t.step2.coordsPlaceholder}
               />
             </div>
           </div>
@@ -1092,11 +870,9 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
               onClick={() => requestGeolocation({ silent: false })}
               disabled={geoLoading}
             >
-              {geoLoading ? "Localisation…" : "Remplir automatiquement les coordonnées"}
+              {geoLoading ? t.step2.geoLoading : t.step2.geoButton}
             </button>
-            <span className={styles.dictHint}>
-              Remplissage auto à l’ouverture de cette étape si le navigateur l’autorise.
-            </span>
+            <span className={styles.dictHint}>{t.step2.geoAutoHint}</span>
           </div>
           {stepNavInCardEl}
         </section>
@@ -1111,16 +887,15 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
       >
         <section className={styles.section} aria-labelledby={`${formId}-step-3`}>
           <h2 className={styles.sectionTitle} id={`${formId}-step-3`}>
-            Type <span className={styles.sectionTitleAccent}>d’infraction</span>{" "}
-            <span className={styles.optional}>(optionnel)</span>
+            {t.step3.titlePrefix}{" "}
+            <span className={styles.sectionTitleAccent}>{t.step3.titleAccent}</span>{" "}
+            <span className={styles.optional}>{t.step3.titleOptional}</span>
           </h2>
-          <p className={styles.sectionHint}>
-            Précisez la nature des faits si vous le souhaitez. Ce champ n’est pas obligatoire.
-          </p>
+          <p className={styles.sectionHint}>{t.step3.hint}</p>
           <div className={styles.grid2}>
             <div className={`${styles.pillField} ${styles.span2}`}>
               <label className={styles.pillLabel} htmlFor={`${formId}-type`}>
-                Type d’infraction
+                {t.step3.typeLabel}
               </label>
               <select
                 id={`${formId}-type`}
@@ -1129,10 +904,10 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
                 value={typeInfraction}
                 onChange={(e) => setTypeInfraction(e.target.value)}
               >
-                <option value="">Facultatif — sélectionner un type</option>
-                {TYPES_INFRACTION.filter(Boolean).map((t) => (
-                  <option key={t} value={t}>
-                    {t}
+                <option value="">{t.step3.typePlaceholder}</option>
+                {infractionOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
                   </option>
                 ))}
               </select>
@@ -1151,20 +926,18 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
       >
         <section className={styles.section} aria-labelledby={`${formId}-step-4`}>
           <h2 className={styles.sectionTitle} id={`${formId}-step-4`}>
-            Pièces <span className={styles.sectionTitleAccent}>jointes</span>{" "}
-            <span className={styles.optional}>(optionnel)</span>
+            {t.step4.titlePrefix}{" "}
+            {t.step4.titleAccent ? (
+              <span className={styles.sectionTitleAccent}>{t.step4.titleAccent}</span>
+            ) : null}{" "}
+            <span className={styles.optional}>{t.step4.titleOptional}</span>
           </h2>
-          <p className={styles.sectionHint}>
-            Photos et vidéos (import), ou audio (fichier ou micro). Aperçu avant envoi.
-          </p>
+          <p className={styles.sectionHint}>{t.step4.hint}</p>
           <p className={styles.limits}>
-            <strong>{formatBytes(MAX_SIGNALEMENT_FILE_BYTES)}</strong> (photos/audio) ·{" "}
-            <strong>{formatBytes(MAX_SIGNALEMENT_VIDEO_FILE_BYTES)}</strong> (vidéos) ·{" "}
-            <strong>{MAX_FILES}</strong> fichiers max ·{" "}
-            <strong>{formatBytes(MAX_SIGNALEMENT_TOTAL_BYTES)}</strong> au total
+            {t.step4.limits(photoMaxLabel, videoMaxLabel, MAX_FILES, totalMaxLabel)}
           </p>
 
-          <div className={styles.attachmentActions} role="group" aria-label="Ajouter des pièces jointes">
+          <div className={styles.attachmentActions} role="group" aria-label={t.step4.attachmentsAria}>
             <button
               type="button"
               className={styles.attachmentAction}
@@ -1177,8 +950,8 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
                   <path d="M21 15l-4-4-3.5 3.5L11 11l-5 5" />
                 </svg>
               </span>
-              <span className={styles.attachmentActionLabel}>Photos &amp; vidéos</span>
-              <span className={styles.attachmentActionHint}>JPG · PNG · MP4…</span>
+              <span className={styles.attachmentActionLabel}>{t.step4.photosVideos}</span>
+              <span className={styles.attachmentActionHint}>{t.step4.photosVideosHint}</span>
             </button>
             <input
               ref={mediaInputRef}
@@ -1203,8 +976,8 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
                   <circle cx="18" cy="16" r="3" />
                 </svg>
               </span>
-              <span className={styles.attachmentActionLabel}>Audio fichier</span>
-              <span className={styles.attachmentActionHint}>Import</span>
+              <span className={styles.attachmentActionLabel}>{t.step4.audioFile}</span>
+              <span className={styles.attachmentActionHint}>{t.step4.audioImport}</span>
             </button>
             <input
               ref={audioPickRef}
@@ -1227,8 +1000,8 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
                     <rect x="7" y="7" width="10" height="10" rx="1.5" />
                   </svg>
                 </span>
-                <span className={styles.attachmentActionLabel}>Stop</span>
-                <span className={styles.attachmentActionHint}>Fin enregistrement</span>
+                <span className={styles.attachmentActionLabel}>{t.step4.stop}</span>
+                <span className={styles.attachmentActionHint}>{t.step4.stopHint}</span>
               </button>
             ) : (
               <button type="button" className={styles.attachmentAction} onClick={startRecording}>
@@ -1238,8 +1011,8 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
                     <path d="M19 10a7 7 0 0 1-14 0M12 18v3M8 22h8" />
                   </svg>
                 </span>
-                <span className={styles.attachmentActionLabel}>Micro</span>
-                <span className={styles.attachmentActionHint}>Enregistrer</span>
+                <span className={styles.attachmentActionLabel}>{t.step4.mic}</span>
+                <span className={styles.attachmentActionHint}>{t.step4.micHint}</span>
               </button>
             )}
           </div>
@@ -1273,7 +1046,7 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
                           playsInline
                           preload="metadata"
                           className={styles.previewVideo}
-                          aria-label={`Aperçu vidéo ${a.file.name}`}
+                          aria-label={t.step4.videoPreviewAria(a.file.name)}
                         />
                       ) : isAud ? (
                         <>
@@ -1296,7 +1069,7 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
                               type="button"
                               className={`${styles.previewAudioPlayBtn} ${audioPlaying ? styles.previewAudioPlayBtnPlaying : ""}`}
                               onClick={() => togglePreviewAudio(a.id)}
-                              aria-label={audioPlaying ? "Pause" : "Lire l’audio"}
+                              aria-label={audioPlaying ? t.step4.audioPauseAria : t.step4.audioPlayAria}
                             >
                               {audioPlaying ? (
                                 <svg
@@ -1337,16 +1110,16 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
                       <button
                         type="button"
                         className={styles.removeAttachmentPill}
-                        aria-label={`Supprimer ${a.file.name}`}
+                        aria-label={t.step4.removeAttachment(a.file.name)}
                         onClick={() => removeAttachment(a.id)}
                       >
-                        Supprimer
+                        {t.step4.remove}
                       </button>
                     </div>
                     <div className={styles.previewCaption}>
                       {a.file.name}
                       <br />
-                      <span style={{ opacity: 0.85 }}>{formatBytes(a.file.size)}</span>
+                      <span style={{ opacity: 0.85 }}>{formatBytes(a.file.size, locale)}</span>
                     </div>
                   </div>
                 );
@@ -1368,31 +1141,30 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
           <div className={styles.stepNavInCard}>
             <div className={styles.stepNavActions}>
               <button type="button" className={`${styles.btn} ${styles.stepBtnGhost}`} onClick={goPrev}>
-                ← Retour
+                {t.back}
               </button>
               <button
                 type="submit"
                 className={`${styles.btn} ${styles.stepBtnNext}`}
                 disabled={submitting || (turnstileEnabled && !turnstileToken)}
               >
-                {submitting ? "Envoi…" : "Envoyer"}
+                {submitting ? t.submitting : t.submit}
               </button>
             </div>
           </div>
         </section>
       </div>
 
-      {activeStep === LAST_STEP_INDEX ? (
+      {activeStep === lastStepIndex ? (
         <div className={styles.formFooter}>
           <div className={styles.footerLeft}>
             <p className={styles.footerNote}>
-              Accusé de réception par e-mail si une adresse est renseignée. PJ : {formatBytes(MAX_SIGNALEMENT_FILE_BYTES)} (photos/audio),{" "}
-              {formatBytes(MAX_SIGNALEMENT_VIDEO_FILE_BYTES)} (vidéos), {MAX_FILES} max.
+              {t.footer.note(photoMaxLabel, videoMaxLabel, MAX_FILES)}
             </p>
             <p className={styles.footerLegal}>
-              Envoyer = vous confirmez le contenu.{" "}
-              <a href="/conditions-generales" target="_blank" rel="noreferrer">
-                Conditions générales
+              {t.footer.legalPrefix}{" "}
+              <a href={t.footer.termsHref} target="_blank" rel="noreferrer">
+                {t.footer.legalLink}
               </a>
               .
             </p>
@@ -1405,20 +1177,20 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
           className={`${styles.submitOverlay} ${styles.submitOverlaySuccess}`}
           role="status"
           aria-live="polite"
-          aria-label="Signalement envoyé avec succès"
+          aria-label={t.success.aria}
         >
           <div className={styles.submitOverlayInner}>
             <div className={styles.submitSuccessIcon} aria-hidden>
               ✓
             </div>
-            <p className={styles.submitOverlayTitle}>Signalement envoyé</p>
+            <p className={styles.submitOverlayTitle}>{t.success.title}</p>
             <p className={styles.submitOverlayLabel}>{submitSuccessMessage}</p>
             <button
               type="button"
               className={`${styles.btn} ${styles.stepBtnNext} ${styles.submitOverlayBtn}`}
               onClick={dismissSubmitSuccess}
             >
-              Fermer
+              {t.success.close}
             </button>
           </div>
         </div>
@@ -1429,14 +1201,14 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
           aria-live="assertive"
         >
           <div className={styles.submitOverlayInner}>
-            <p className={styles.submitOverlayTitle}>Échec de l’envoi</p>
+            <p className={styles.submitOverlayTitle}>{t.error.title}</p>
             <p className={styles.submitOverlayLabel}>{submitErrorMessage}</p>
             <button
               type="button"
               className={`${styles.btn} ${styles.stepBtnNext} ${styles.submitOverlayBtn}`}
               onClick={() => setSubmitErrorMessage(null)}
             >
-              Réessayer
+              {t.error.retry}
             </button>
           </div>
         </div>
@@ -1446,15 +1218,15 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
           role="status"
           aria-live="polite"
           aria-busy="true"
-          aria-label="Envoi du signalement en cours"
+          aria-label={t.uploading.aria}
         >
           <div className={styles.submitOverlayInner}>
             <div className={styles.submitSpinner} aria-hidden />
-            <p className={styles.submitOverlayTitle}>Envoi en cours</p>
+            <p className={styles.submitOverlayTitle}>{t.uploading.title}</p>
             <p className={styles.submitOverlayLabel}>
               {uploadProgress
-                ? formatSignalementUploadProgressLabel(uploadProgress)
-                : "Préparation de l’envoi…"}
+                ? formatSignalementUploadProgressLabel(uploadProgress, locale)
+                : t.uploading.preparing}
             </p>
             <div className={styles.submitProgressTrack} aria-hidden>
               <div
@@ -1463,9 +1235,7 @@ export default function SignalementForm({ onSuccess, onSubmittingChange }: Signa
               />
             </div>
             <p className={styles.submitOverlayPercent}>{overallUploadPercent}%</p>
-            <p className={styles.submitOverlayHint}>
-              Ne fermez pas cette page pendant l’envoi.
-            </p>
+            <p className={styles.submitOverlayHint}>{t.uploading.doNotClose}</p>
           </div>
         </div>
       ) : null}

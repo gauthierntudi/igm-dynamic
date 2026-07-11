@@ -22,8 +22,6 @@ export type CmsHomeBannerSlide = {
 
 export type CmsHomeAbout = {
   title?: string | null;
-  mission?: { title?: string | null; text?: string | null; href?: string | null } | null;
-  vision?: { title?: string | null; text?: string | null; href?: string | null } | null;
   leadText?: string | null;
   detailText?: string | null;
   signatureName?: string | null;

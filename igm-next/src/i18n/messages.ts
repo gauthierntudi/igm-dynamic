@@ -450,7 +450,7 @@ const en = {
   },
   denoncer: {
     backHome: "← Back to home",
-    title: "Report form",
+    title: "Whistleblowing report form",
     subtitle:
       "Submit information about offences or irregular practices in the mining sector. Fields marked with an asterisk are required.",
     metaTitle: "Report — IGM",
