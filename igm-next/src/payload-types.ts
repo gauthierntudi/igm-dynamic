@@ -1411,7 +1411,11 @@ export interface WhoWeAre {
   seoTitle?: string | null;
   seoDescription?: string | null;
   /**
-   * Grand titre en haut de page (colonne gauche).
+   * Titre principal affiché dans le bandeau et dans le fil d'Ariane sur /a-propos.
+   */
+  heroTitle?: string | null;
+  /**
+   * Phrase d'accroche sous le titre principal (bandeau /a-propos).
    */
   headline?: string | null;
   /**
@@ -1735,7 +1739,7 @@ export interface PressKitPage {
   createdAt?: string | null;
 }
 /**
- * Les provinces déployées sur la carte sont listées automatiquement. Ajoutez les inspecteurs (nom obligatoire ; titre, photo et minerais optionnels) pour chaque province.
+ * Les provinces déployées sur la carte sont listées automatiquement. Pour chaque province, renseignez l'adresse physique, le téléphone et les inspecteurs (nom obligatoire ; titre, photo et minerais optionnels).
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "cartography-settings".
@@ -1743,7 +1747,7 @@ export interface PressKitPage {
 export interface CartographySetting {
   id: number;
   /**
-   * Une ligne par province couverte sur la carte. Vous ne choisissez pas la province : elle est fixée. Renseignez seulement les inspecteurs.
+   * Une ligne par province couverte sur la carte. Vous ne choisissez pas la province : elle est fixée. Renseignez l'adresse, le téléphone et les inspecteurs.
    */
   provinceAssignments?:
     | {
@@ -1770,6 +1774,8 @@ export interface CartographySetting {
           | 'Nord-Kivu'
           | 'Bas-Uele'
           | 'Haut-Uele';
+        physicalAddress?: string | null;
+        phone?: string | null;
         inspectors?:
           | {
               name: string;
@@ -2044,6 +2050,7 @@ export interface HomeSelect<T extends boolean = true> {
 export interface WhoWeAreSelect<T extends boolean = true> {
   seoTitle?: T;
   seoDescription?: T;
+  heroTitle?: T;
   headline?: T;
   intro?: T;
   heroImage?: T;
@@ -2235,6 +2242,8 @@ export interface CartographySettingsSelect<T extends boolean = true> {
     | T
     | {
         province?: T;
+        physicalAddress?: T;
+        phone?: T;
         inspectors?:
           | T
           | {

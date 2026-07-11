@@ -19,6 +19,7 @@ import type { CmsMedia } from "../types";
 export type ResolvedWhoWeArePage = {
   seoTitle: string;
   seoDescription: string;
+  heroTitle: string;
   headline: string;
   intro: string;
   heroImageSrc: string;
@@ -213,6 +214,7 @@ export function resolveWhoWeArePage(
   return {
     seoTitle: pickText(data.seoTitle, defaults.seoTitle!),
     seoDescription: pickText(data.seoDescription, defaults.seoDescription!),
+    heroTitle: pickText(data.heroTitle, defaults.heroTitle!),
     headline: pickText(data.headline, defaults.headline!),
     intro: pickText(data.intro, defaults.intro!),
     heroImageSrc: resolveMediaSrc(data.heroImage, "/assets/img/img-07.jpg"),

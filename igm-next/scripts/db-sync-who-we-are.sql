@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS "who_we_are" (
 CREATE TABLE IF NOT EXISTS "who_we_are_locales" (
   "seo_title" varchar DEFAULT 'Qui sommes-nous ? — IGM',
   "seo_description" varchar,
+  "hero_title" varchar DEFAULT 'Qui sommes-nous ?',
   "headline" varchar,
   "intro" varchar,
   "nav_about_label" varchar DEFAULT 'À propos',
@@ -163,6 +164,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS "who_we_are_locales_locale_parent_id_unique" O
 
 ALTER TABLE "who_we_are_locales" ADD COLUMN IF NOT EXISTS "history_section_body" varchar;
 ALTER TABLE "who_we_are_locales" ADD COLUMN IF NOT EXISTS "history_section_headline" varchar;
+ALTER TABLE "who_we_are_locales" ADD COLUMN IF NOT EXISTS "hero_title" varchar;
 
 INSERT INTO "who_we_are" ("id", "created_at", "updated_at")
 SELECT 1, NOW(), NOW()

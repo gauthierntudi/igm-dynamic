@@ -45,11 +45,22 @@ export const WhoWeAre: GlobalConfig = {
           label: "Introduction",
           fields: [
             {
+              name: "heroTitle",
+              type: "text",
+              label: "Titre de la bannière (H1)",
+              admin: {
+                description:
+                  "Titre principal affiché dans le bandeau et dans le fil d'Ariane sur /a-propos.",
+              },
+              defaultValue: "Qui sommes-nous ?",
+              ...LOCALIZED,
+            },
+            {
               name: "headline",
               type: "textarea",
-              label: "Titre principal",
+              label: "Sous-titre de la bannière",
               admin: {
-                description: "Grand titre en haut de page (colonne gauche).",
+                description: "Phrase d'accroche sous le titre principal (bandeau /a-propos).",
               },
               ...LOCALIZED,
             },

@@ -16,16 +16,29 @@ export function getDeployedMapProvinces(): DrcMapProvince[] {
 export function mergeDeployedProvinceAssignments(
   existing?: CmsCartographyProvinceAssignment[] | null,
 ): CmsCartographyProvinceAssignment[] {
-  const byProvince = new Map<DrcMapProvince, CmsCartographyInspector[]>();
+  const byProvince = new Map<
+    DrcMapProvince,
+    Pick<CmsCartographyProvinceAssignment, "inspectors" | "physicalAddress" | "phone">
+  >();
 
   for (const row of existing ?? []) {
     if (!row?.province || !isDrcMapProvince(row.province) || !isProvinceDeployed(row.province)) continue;
     const inspectors = (row.inspectors ?? []).filter((item) => item?.name?.trim());
-    byProvince.set(row.province, inspectors);
+    byProvince.set(row.province, {
+      inspectors,
+      physicalAddress: row.physicalAddress?.trim() || null,
+      phone: row.phone?.trim() || null,
+    });
   }
 
-  return getDeployedMapProvinces().map((province) => ({
-    province,
-    inspectors: byProvince.get(province) ?? [],
-  }));
+  return getDeployedMapProvinces().map((province) => {
+    const assignment = byProvince.get(province);
+
+    return {
+      province,
+      inspectors: assignment?.inspectors ?? [],
+      physicalAddress: assignment?.physicalAddress ?? null,
+      phone: assignment?.phone ?? null,
+    };
+  });
 }

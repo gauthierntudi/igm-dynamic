@@ -165,6 +165,8 @@ export function CartographyPageView({ locale, heroImageSrc, cartographySettings 
           <CartographyProvincePanel
             locale={locale}
             province={selected}
+            physicalAddress={selectedAssignment?.physicalAddress}
+            phone={selectedAssignment?.phone}
             inspectors={inspectors}
             onClose={() => setSelected(null)}
           />

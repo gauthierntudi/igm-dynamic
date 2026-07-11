@@ -9,8 +9,16 @@ CREATE TABLE IF NOT EXISTS "cartography_settings_province_assignments" (
   "_order" integer NOT NULL,
   "_parent_id" integer NOT NULL,
   "id" varchar PRIMARY KEY NOT NULL,
-  "province" varchar NOT NULL
+  "province" varchar NOT NULL,
+  "physical_address" varchar,
+  "phone" varchar
 );
+
+ALTER TABLE "cartography_settings_province_assignments"
+  ADD COLUMN IF NOT EXISTS "physical_address" varchar;
+
+ALTER TABLE "cartography_settings_province_assignments"
+  ADD COLUMN IF NOT EXISTS "phone" varchar;
 
 CREATE INDEX IF NOT EXISTS "cartography_settings_province_assignments_order_idx"
   ON "cartography_settings_province_assignments" ("_order");

@@ -22,7 +22,7 @@ export const CartographySettings: GlobalConfig = {
   admin: {
     group: "Contenu",
     description:
-      "Les provinces déployées sur la carte sont listées automatiquement. Ajoutez les inspecteurs (nom obligatoire ; titre, photo et minerais optionnels) pour chaque province.",
+      "Les provinces déployées sur la carte sont listées automatiquement. Pour chaque province, renseignez l'adresse physique, le téléphone et les inspecteurs (nom obligatoire ; titre, photo et minerais optionnels).",
   },
   access: {
     read: () => true,
@@ -50,7 +50,7 @@ export const CartographySettings: GlobalConfig = {
           RowLabel: "@/components/admin/CartographyProvinceRowLabel#CartographyProvinceRowLabel",
         },
         description:
-          "Une ligne par province couverte sur la carte. Vous ne choisissez pas la province : elle est fixée. Renseignez seulement les inspecteurs.",
+          "Une ligne par province couverte sur la carte. Vous ne choisissez pas la province : elle est fixée. Renseignez l'adresse, le téléphone et les inspecteurs.",
       },
       fields: [
         {
@@ -62,6 +62,18 @@ export const CartographySettings: GlobalConfig = {
           admin: {
             readOnly: true,
           },
+        },
+        {
+          name: "physicalAddress",
+          label: "Adresse physique",
+          type: "textarea",
+          required: false,
+        },
+        {
+          name: "phone",
+          label: "Téléphone",
+          type: "text",
+          required: false,
         },
         {
           name: "inspectors",

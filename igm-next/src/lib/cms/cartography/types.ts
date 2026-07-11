@@ -15,6 +15,8 @@ export type CmsCartographyInspector = {
 
 export type CmsCartographyProvinceAssignment = {
   province: DrcMapProvince;
+  physicalAddress?: string | null;
+  phone?: string | null;
   inspectors?: CmsCartographyInspector[] | null;
 };
 

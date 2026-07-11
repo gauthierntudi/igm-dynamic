@@ -27,6 +27,7 @@ export type CmsWhoWeAreCta = {
 export type CmsWhoWeAre = {
   seoTitle?: string | null;
   seoDescription?: string | null;
+  heroTitle?: string | null;
   headline?: string | null;
   intro?: string | null;
   heroImage?: CmsMedia | number | null;

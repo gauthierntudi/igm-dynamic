@@ -5,6 +5,7 @@ export const DEFAULT_WHO_WE_ARE_FR: CmsWhoWeAre = {
   seoTitle: "Qui sommes-nous ? — IGM",
   seoDescription:
     "Découvrez l'Inspection Générale des Mines : son rôle, son histoire et sa mission au service de la gouvernance minière en RDC.",
+  heroTitle: "Qui sommes-nous ?",
   headline: "Une inspection rigoureuse pour un secteur minier transparent et durable",
   intro: "",
   navAboutLabel: "Qui sommes-nous ?",
@@ -111,6 +112,7 @@ export const DEFAULT_WHO_WE_ARE_EN: CmsWhoWeAre = {
   seoTitle: "Who we are — IGM",
   seoDescription:
     "Learn about the General Inspectorate of Mines: its role, history and mission in support of mining governance in the DRC.",
+  heroTitle: "Who we are",
   headline: "Rigorous inspection for a transparent and sustainable mining sector",
   intro: "",
   navAboutLabel: "Who we are",

@@ -2,7 +2,6 @@ import Link from "next/link";
 import { ArrowRight, MapPin, ShieldCheck, Users } from "lucide-react";
 
 import type { SupportedLocale } from "@/i18n/locales";
-import { getMessages } from "@/i18n/messages";
 import { hrefForRoute, type WhoWeAreSectionId } from "@/i18n/paths";
 import type { CmsWhoWeAre } from "@/lib/cms/who-we-are/types";
 import { resolveWhoWeArePage } from "@/lib/cms/who-we-are/resolveWhoWeArePage";
@@ -27,7 +26,6 @@ function stripMarkdown(text: string): string {
 
 export function WhoWeArePageView({ locale, activeSection = null, content = null }: Props) {
   const page = resolveWhoWeArePage(content, locale);
-  const messages = getMessages(locale);
   const historyHref = hrefForRoute("history", locale);
   const contactHref = page.contact.primaryHref;
   const isEn = locale === "en";
@@ -53,7 +51,7 @@ export function WhoWeArePageView({ locale, activeSection = null, content = null 
 
       <AboutBreadcrumbHero
         locale={locale}
-        title={messages.nav.whoWeAre}
+        title={page.heroTitle}
         subtitle={page.headline}
         heroImageSrc={page.heroImageSrc}
       />

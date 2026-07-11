@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin, X } from "lucide-react";
+import { MapPin, Phone, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -20,15 +20,26 @@ function inspectorMinerals(inspector: CmsCartographyInspector): string[] {
 type Props = {
   locale: SupportedLocale;
   province: DrcMapProvince;
+  physicalAddress?: string | null;
+  phone?: string | null;
   inspectors: CmsCartographyInspector[];
   onClose: () => void;
 };
 
-export function CartographyProvincePanel({ locale, province, inspectors, onClose }: Props) {
+export function CartographyProvincePanel({
+  locale,
+  province,
+  physicalAddress,
+  phone,
+  inspectors,
+  onClose,
+}: Props) {
   const m = getMessages(locale).cartography;
   const pinSrc = withDeployedBase("/assets/img/pin-carte.png");
   const label = provinceLabel(province, locale);
   const capital = provinceChefLieu(province, locale);
+  const address = physicalAddress?.trim() || null;
+  const phoneNumber = phone?.trim() || null;
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -98,6 +109,38 @@ export function CartographyProvincePanel({ locale, province, inspectors, onClose
         </header>
 
         <div className="igm-cartography-province-panel__body">
+          {address || phoneNumber ? (
+            <div className="igm-cartography-province-panel__contact">
+              {address ? (
+                <div className="igm-cartography-province-panel__contact-item">
+                  <MapPin size={16} strokeWidth={2} aria-hidden />
+                  <div>
+                    <span className="igm-cartography-province-panel__contact-label">
+                      {m.physicalAddressLabel}
+                    </span>
+                    <p className="igm-cartography-province-panel__contact-value">{address}</p>
+                  </div>
+                </div>
+              ) : null}
+              {phoneNumber ? (
+                <div className="igm-cartography-province-panel__contact-item">
+                  <Phone size={16} strokeWidth={2} aria-hidden />
+                  <div>
+                    <span className="igm-cartography-province-panel__contact-label">
+                      {m.phoneLabel}
+                    </span>
+                    <a
+                      className="igm-cartography-province-panel__contact-value igm-cartography-province-panel__contact-link"
+                      href={`tel:${phoneNumber.replace(/\s+/g, "")}`}
+                    >
+                      {phoneNumber}
+                    </a>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
           <div className="igm-cartography-province-panel__inspectors-head">
             <h3 className="igm-cartography-province-panel__inspectors-title">{m.inspectorsTitle}</h3>
             {inspectors.length > 0 ? (
