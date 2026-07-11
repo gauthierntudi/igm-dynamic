@@ -60,7 +60,7 @@ export const WhoWeAre: GlobalConfig = {
               type: "textarea",
               label: "Sous-titre de la bannière",
               admin: {
-                description: "Phrase d'accroche sous le titre principal (bandeau /a-propos).",
+                description: "Optionnel. Laisser vide pour n'afficher aucun sous-titre.",
               },
               ...LOCALIZED,
             },

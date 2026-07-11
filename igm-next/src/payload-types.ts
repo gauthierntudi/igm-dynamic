@@ -1415,7 +1415,7 @@ export interface WhoWeAre {
    */
   heroTitle?: string | null;
   /**
-   * Phrase d'accroche sous le titre principal (bandeau /a-propos).
+   * Optionnel. Laisser vide pour n'afficher aucun sous-titre.
    */
   headline?: string | null;
   /**
@@ -1606,7 +1606,7 @@ export interface WhoWeAre {
   createdAt?: string | null;
 }
 /**
- * Images de bannière des pages Ordonnances, Lois, Décrets et Décisions (/ordonnances, /lois, etc.).
+ * Bannières des pages Ordonnances, Lois, Décrets et Décisions : image, titre (H1) et sous-titre.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "legislation".
@@ -1618,22 +1618,54 @@ export interface Legislation {
    */
   ordinancesHeroImage?: (number | null) | Media;
   /**
+   * Titre principal et fil d'Ariane.
+   */
+  ordinancesHeroTitle?: string | null;
+  /**
+   * Optionnel. Laisser vide pour n'afficher aucun sous-titre.
+   */
+  ordinancesHeroSubtitle?: string | null;
+  /**
    * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
    */
   lawsHeroImage?: (number | null) | Media;
+  /**
+   * Titre principal et fil d'Ariane.
+   */
+  lawsHeroTitle?: string | null;
+  /**
+   * Optionnel. Laisser vide pour n'afficher aucun sous-titre.
+   */
+  lawsHeroSubtitle?: string | null;
   /**
    * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
    */
   decreesHeroImage?: (number | null) | Media;
   /**
+   * Titre principal et fil d'Ariane.
+   */
+  decreesHeroTitle?: string | null;
+  /**
+   * Optionnel. Laisser vide pour n'afficher aucun sous-titre.
+   */
+  decreesHeroSubtitle?: string | null;
+  /**
    * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
    */
   decisionsHeroImage?: (number | null) | Media;
+  /**
+   * Titre principal et fil d'Ariane.
+   */
+  decisionsHeroTitle?: string | null;
+  /**
+   * Optionnel. Laisser vide pour n'afficher aucun sous-titre.
+   */
+  decisionsHeroSubtitle?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
 /**
- * Images de bannière pour les pages Présentation (IGM), LCFCM, Contact et Multimédia. Les pages Qui sommes-nous ? (À propos, Historique, Mission) se configurent dans « Page À propos ».
+ * Bannières des pages Présentation, LCFCM et Multimédia : image, titre (H1) et sous-titre. Contact et Dossier de presse : textes dans leurs globals dédiés. Pages À propos : global « Page À propos ».
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "page-heroes".
@@ -1645,6 +1677,14 @@ export interface PageHero {
    */
   orgChartHeroImage?: (number | null) | Media;
   /**
+   * Titre principal et fil d'Ariane.
+   */
+  orgChartHeroTitle?: string | null;
+  /**
+   * Optionnel. Laisser vide pour n'afficher aucun sous-titre.
+   */
+  orgChartHeroSubtitle?: string | null;
+  /**
    * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
    */
   pressKitHeroImage?: (number | null) | Media;
@@ -1653,9 +1693,25 @@ export interface PageHero {
    */
   mapHeroImage?: (number | null) | Media;
   /**
+   * Titre principal et fil d'Ariane.
+   */
+  mapHeroTitle?: string | null;
+  /**
+   * Optionnel. Laisser vide pour n'afficher aucun sous-titre.
+   */
+  mapHeroSubtitle?: string | null;
+  /**
    * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
    */
   fraudHeroImage?: (number | null) | Media;
+  /**
+   * Titre principal et fil d'Ariane.
+   */
+  fraudHeroTitle?: string | null;
+  /**
+   * Optionnel. Laisser vide pour n'afficher aucun sous-titre.
+   */
+  fraudHeroSubtitle?: string | null;
   /**
    * Image de fond du bandeau « acteur central » en bas de page. Repli : bannière du haut.
    */
@@ -1665,6 +1721,14 @@ export interface PageHero {
    */
   smugglingHeroImage?: (number | null) | Media;
   /**
+   * Titre principal et fil d'Ariane.
+   */
+  smugglingHeroTitle?: string | null;
+  /**
+   * Optionnel. Laisser vide pour n'afficher aucun sous-titre.
+   */
+  smugglingHeroSubtitle?: string | null;
+  /**
    * Image de fond du bandeau « acteur central » en bas de page. Repli : bannière du haut.
    */
   smugglingCtaHeroImage?: (number | null) | Media;
@@ -1672,6 +1736,14 @@ export interface PageHero {
    * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
    */
   sanctionsHeroImage?: (number | null) | Media;
+  /**
+   * Titre principal et fil d'Ariane.
+   */
+  sanctionsHeroTitle?: string | null;
+  /**
+   * Optionnel. Laisser vide pour n'afficher aucun sous-titre.
+   */
+  sanctionsHeroSubtitle?: string | null;
   /**
    * Image de fond du bandeau « acteur central » en bas de page. Repli : bannière du haut.
    */
@@ -1681,6 +1753,14 @@ export interface PageHero {
    */
   reportHeroImage?: (number | null) | Media;
   /**
+   * Titre principal et fil d'Ariane.
+   */
+  reportHeroTitle?: string | null;
+  /**
+   * Optionnel. Laisser vide pour n'afficher aucun sous-titre.
+   */
+  reportHeroSubtitle?: string | null;
+  /**
    * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
    */
   contactHeroImage?: (number | null) | Media;
@@ -1689,9 +1769,25 @@ export interface PageHero {
    */
   photosHeroImage?: (number | null) | Media;
   /**
+   * Titre principal et fil d'Ariane.
+   */
+  photosHeroTitle?: string | null;
+  /**
+   * Optionnel. Laisser vide pour n'afficher aucun sous-titre.
+   */
+  photosHeroSubtitle?: string | null;
+  /**
    * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
    */
   videosHeroImage?: (number | null) | Media;
+  /**
+   * Titre principal et fil d'Ariane.
+   */
+  videosHeroTitle?: string | null;
+  /**
+   * Optionnel. Laisser vide pour n'afficher aucun sous-titre.
+   */
+  videosHeroSubtitle?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1706,6 +1802,9 @@ export interface ContactPage {
   seoTitle?: string | null;
   seoDescription?: string | null;
   heroTitle?: string | null;
+  /**
+   * Optionnel. Laisser vide pour n'afficher aucun sous-titre.
+   */
   heroLead?: string | null;
   eyebrow?: string | null;
   formTitle?: string | null;
@@ -1728,6 +1827,9 @@ export interface PressKitPage {
   seoTitle?: string | null;
   seoDescription?: string | null;
   heroTitle?: string | null;
+  /**
+   * Optionnel. Laisser vide pour n'afficher aucun sous-titre.
+   */
   heroLead?: string | null;
   /**
    * Importez un PDF dans « Médias publics », puis sélectionnez-le ici. Un seul fichier pour toutes les langues.
@@ -2171,9 +2273,17 @@ export interface WhoWeAreSelect<T extends boolean = true> {
  */
 export interface LegislationSelect<T extends boolean = true> {
   ordinancesHeroImage?: T;
+  ordinancesHeroTitle?: T;
+  ordinancesHeroSubtitle?: T;
   lawsHeroImage?: T;
+  lawsHeroTitle?: T;
+  lawsHeroSubtitle?: T;
   decreesHeroImage?: T;
+  decreesHeroTitle?: T;
+  decreesHeroSubtitle?: T;
   decisionsHeroImage?: T;
+  decisionsHeroTitle?: T;
+  decisionsHeroSubtitle?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -2184,18 +2294,34 @@ export interface LegislationSelect<T extends boolean = true> {
  */
 export interface PageHeroesSelect<T extends boolean = true> {
   orgChartHeroImage?: T;
+  orgChartHeroTitle?: T;
+  orgChartHeroSubtitle?: T;
   pressKitHeroImage?: T;
   mapHeroImage?: T;
+  mapHeroTitle?: T;
+  mapHeroSubtitle?: T;
   fraudHeroImage?: T;
+  fraudHeroTitle?: T;
+  fraudHeroSubtitle?: T;
   fraudCtaHeroImage?: T;
   smugglingHeroImage?: T;
+  smugglingHeroTitle?: T;
+  smugglingHeroSubtitle?: T;
   smugglingCtaHeroImage?: T;
   sanctionsHeroImage?: T;
+  sanctionsHeroTitle?: T;
+  sanctionsHeroSubtitle?: T;
   sanctionsCtaHeroImage?: T;
   reportHeroImage?: T;
+  reportHeroTitle?: T;
+  reportHeroSubtitle?: T;
   contactHeroImage?: T;
   photosHeroImage?: T;
+  photosHeroTitle?: T;
+  photosHeroSubtitle?: T;
   videosHeroImage?: T;
+  videosHeroTitle?: T;
+  videosHeroSubtitle?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

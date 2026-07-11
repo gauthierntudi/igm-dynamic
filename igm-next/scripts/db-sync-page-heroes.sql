@@ -40,3 +40,51 @@ CREATE INDEX IF NOT EXISTS "page_heroes_audios_hero_image_idx" ON "page_heroes" 
 INSERT INTO "page_heroes" ("id", "created_at", "updated_at")
 SELECT 1, NOW(), NOW()
 WHERE NOT EXISTS (SELECT 1 FROM "page_heroes" WHERE "id" = 1);
+
+CREATE TABLE IF NOT EXISTS "page_heroes_locales" (
+  "org_chart_hero_title" varchar,
+  "org_chart_hero_subtitle" varchar,
+  "map_hero_title" varchar,
+  "map_hero_subtitle" varchar,
+  "fraud_hero_title" varchar,
+  "fraud_hero_subtitle" varchar,
+  "smuggling_hero_title" varchar,
+  "smuggling_hero_subtitle" varchar,
+  "sanctions_hero_title" varchar,
+  "sanctions_hero_subtitle" varchar,
+  "report_hero_title" varchar,
+  "report_hero_subtitle" varchar,
+  "photos_hero_title" varchar,
+  "photos_hero_subtitle" varchar,
+  "videos_hero_title" varchar,
+  "videos_hero_subtitle" varchar,
+  "id" serial PRIMARY KEY NOT NULL,
+  "_locale" "_locales" NOT NULL,
+  "_parent_id" integer NOT NULL
+);
+
+DO $$ BEGIN
+  ALTER TABLE "page_heroes_locales"
+    ADD CONSTRAINT "page_heroes_locales_parent_id_fk"
+    FOREIGN KEY ("_parent_id") REFERENCES "page_heroes"("id") ON DELETE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+CREATE UNIQUE INDEX IF NOT EXISTS "page_heroes_locales_locale_parent_id_unique"
+  ON "page_heroes_locales" ("_locale", "_parent_id");
+
+ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "org_chart_hero_title" varchar;
+ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "org_chart_hero_subtitle" varchar;
+ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "map_hero_title" varchar;
+ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "map_hero_subtitle" varchar;
+ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "fraud_hero_title" varchar;
+ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "fraud_hero_subtitle" varchar;
+ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "smuggling_hero_title" varchar;
+ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "smuggling_hero_subtitle" varchar;
+ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "sanctions_hero_title" varchar;
+ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "sanctions_hero_subtitle" varchar;
+ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "report_hero_title" varchar;
+ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "report_hero_subtitle" varchar;
+ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "photos_hero_title" varchar;
+ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "photos_hero_subtitle" varchar;
+ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "videos_hero_title" varchar;
+ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "videos_hero_subtitle" varchar;

@@ -52,7 +52,7 @@ export function WhoWeArePageView({ locale, activeSection = null, content = null 
       <AboutBreadcrumbHero
         locale={locale}
         title={page.heroTitle}
-        subtitle={page.headline}
+        subtitle={content?.headline?.trim() || undefined}
         heroImageSrc={page.heroImageSrc}
       />
 

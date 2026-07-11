@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { CartographyPageView } from "@/components/cartography/CartographyPageView";
 import { getCartographySettings } from "@/lib/cms/cartography/getCartographySettings";
 import { getPageHeroesSettings } from "@/lib/cms/page-heroes/getPageHeroesSettings";
+import { resolvePageHeroBanner } from "@/lib/cms/page-heroes/resolvePageHeroText";
 import { resolvePageHeroImage } from "@/lib/cms/page-heroes/resolvePageHero";
 import { getMessages } from "@/i18n/messages";
 
@@ -17,10 +18,13 @@ export async function renderMapRoute(route: MapRoute) {
     getCartographySettings(route.locale),
   ]);
   const heroImageSrc = resolvePageHeroImage(pageHeroes, "map");
+  const heroBanner = resolvePageHeroBanner(pageHeroes, "map", route.locale);
   return (
     <CartographyPageView
       locale={route.locale}
       heroImageSrc={heroImageSrc}
+      heroTitle={heroBanner.title}
+      heroSubtitle={heroBanner.subtitle}
       cartographySettings={cartographySettings}
     />
   );

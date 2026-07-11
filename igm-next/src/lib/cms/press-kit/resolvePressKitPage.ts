@@ -41,7 +41,7 @@ export function resolvePressKitPage(
     seoTitle: pickText(cms?.seoTitle, t.metaTitle),
     seoDescription: pickText(cms?.seoDescription, t.metaDescription),
     heroTitle: pickText(cms?.heroTitle, t.heroTitle),
-    heroLead: pickText(cms?.heroLead, t.heroLead),
+    heroLead: cms?.heroLead?.trim() || undefined,
     intro: pickText(cms?.intro, t.intro),
     downloadLabel: pickText(cms?.downloadLabel, t.downloadLabel),
     pdfTitle: pdf?.title ?? t.pdfTitle,

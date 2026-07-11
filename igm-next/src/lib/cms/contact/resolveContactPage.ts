@@ -17,7 +17,7 @@ export function resolveContactPage(
     seoTitle: pickText(cms?.seoTitle, t.metaTitle),
     seoDescription: pickText(cms?.seoDescription, t.metaDescription),
     heroTitle: pickText(cms?.heroTitle, t.heroTitle),
-    heroLead: pickText(cms?.heroLead, t.heroLead),
+    heroLead: cms?.heroLead?.trim() || undefined,
     eyebrow: pickText(cms?.eyebrow, t.eyebrow),
     formTitle: pickText(cms?.formTitle, t.formTitle),
     infoTitle: pickText(cms?.infoTitle, t.infoTitle),

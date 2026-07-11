@@ -9,6 +9,7 @@ import { getHome } from "@/lib/cms/client";
 import { getPageContent } from "@/lib/cms/getPageContent";
 import { getLegislationSettings } from "@/lib/cms/legislation/getLegislationSettings";
 import { getPageHeroesSettings } from "@/lib/cms/page-heroes/getPageHeroesSettings";
+import { resolvePageHeroBanner } from "@/lib/cms/page-heroes/resolvePageHeroText";
 import { resolvePageHeroImage } from "@/lib/cms/page-heroes/resolvePageHero";
 import { getPhotoAlbumBySlug, getPhotoAlbums } from "@/lib/cms/photo-albums/getPhotoAlbums";
 import {
@@ -36,7 +37,15 @@ export async function renderPhotoAlbumRoute(route: PhotoAlbumRoute) {
   if (!resolved) notFound();
 
   const heroImageSrc = resolved.coverSrc ?? resolvePageHeroImage(pageHeroes, "photos");
-  return <PhotoAlbumPageView locale={locale} album={resolved} heroImageSrc={heroImageSrc} />;
+  const photosHeroTitle = resolvePageHeroBanner(pageHeroes, "photos", locale).title;
+  return (
+    <PhotoAlbumPageView
+      locale={locale}
+      album={resolved}
+      heroImageSrc={heroImageSrc}
+      photosHeroTitle={photosHeroTitle}
+    />
+  );
 }
 
 export async function renderPhotosListingRoute(route: PhotosListingRoute) {
@@ -46,11 +55,14 @@ export async function renderPhotosListingRoute(route: PhotosListingRoute) {
     getPageHeroesSettings(locale),
   ]);
   const heroImageSrc = resolvePageHeroImage(pageHeroes, "photos");
+  const heroBanner = resolvePageHeroBanner(pageHeroes, "photos", locale);
   return (
     <PhotoAlbumsPageView
       locale={locale}
       albums={resolvePhotoAlbumSummaries(albums)}
       heroImageSrc={heroImageSrc}
+      heroTitle={heroBanner.title}
+      heroSubtitle={heroBanner.subtitle}
     />
   );
 }

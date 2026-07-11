@@ -4,6 +4,7 @@ import { VideoGalleryPageView } from "@/components/media-gallery/VideoGalleryPag
 import { getMediaGalleryVideos } from "@/lib/cms/media-gallery/getMediaGalleryItems";
 import { resolveMediaGalleryItems } from "@/lib/cms/media-gallery/resolveMediaGalleryItem";
 import { getPageHeroesSettings } from "@/lib/cms/page-heroes/getPageHeroesSettings";
+import { resolvePageHeroBanner } from "@/lib/cms/page-heroes/resolvePageHeroText";
 import { resolvePageHeroImage } from "@/lib/cms/page-heroes/resolvePageHero";
 import { getMessages } from "@/i18n/messages";
 
@@ -19,9 +20,16 @@ export async function renderVideosRoute(route: VideosRoute) {
     getPageHeroesSettings(locale),
   ]);
   const heroImageSrc = resolvePageHeroImage(pageHeroes, "videos");
+  const heroBanner = resolvePageHeroBanner(pageHeroes, "videos", locale);
   const resolvedItems = resolveMediaGalleryItems(items);
   return (
-    <VideoGalleryPageView locale={locale} items={resolvedItems} heroImageSrc={heroImageSrc} />
+    <VideoGalleryPageView
+      locale={locale}
+      items={resolvedItems}
+      heroImageSrc={heroImageSrc}
+      heroTitle={heroBanner.title}
+      heroSubtitle={heroBanner.subtitle}
+    />
   );
 }
 

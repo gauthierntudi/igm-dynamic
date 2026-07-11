@@ -9,28 +9,22 @@ import type { PageHeroRouteKey } from "@/lib/page-heroes/constants";
 
 import "@/components/cms/who-we-are/about-page.css";
 
-const ROUTE_NAV_LABEL: Record<PageHeroRouteKey, keyof ReturnType<typeof getMessages>["nav"]> = {
-  orgChart: "orgChart",
-  pressKit: "pressKit",
-  map: "map",
-  fraud: "miningFraud",
-  smuggling: "miningSmuggling",
-  sanctions: "sanctions",
-  report: "report",
-  contact: "contact",
-  photos: "photos",
-  videos: "videos",
-};
-
 type Props = {
   locale: SupportedLocale;
   routeKey: PageHeroRouteKey;
   heroImageSrc: string;
+  heroTitle: string;
+  heroSubtitle?: string;
 };
 
-export function PageHeroPlaceholderView({ locale, routeKey, heroImageSrc }: Props) {
+export function PageHeroPlaceholderView({
+  locale,
+  routeKey,
+  heroImageSrc,
+  heroTitle,
+  heroSubtitle,
+}: Props) {
   const messages = getMessages(locale);
-  const title = messages.nav[ROUTE_NAV_LABEL[routeKey]];
   const m = messages.underConstruction;
   const homeHref = hrefForRoute("home", locale);
 
@@ -40,9 +34,10 @@ export function PageHeroPlaceholderView({ locale, routeKey, heroImageSrc }: Prop
 
       <AboutBreadcrumbHero
         locale={locale}
-        title={title}
-        breadcrumbTitle={title}
+        title={heroTitle}
+        breadcrumbTitle={heroTitle}
         heroImageSrc={heroImageSrc}
+        subtitle={heroSubtitle}
       />
 
       <section className="igm-under-construction" role="status" aria-live="polite">

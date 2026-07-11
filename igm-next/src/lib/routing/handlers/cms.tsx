@@ -5,7 +5,9 @@ import { PageHeroPlaceholderView } from "@/components/cms/PageHeroPlaceholderVie
 import { tryResolveHeroMediaSrc } from "@/lib/cms/resolveHeroMediaSrc";
 import { getPageHeroesSettings } from "@/lib/cms/page-heroes/getPageHeroesSettings";
 import { resolvePageCtaHeroImage, resolvePageHeroImage } from "@/lib/cms/page-heroes/resolvePageHero";
+import { resolvePageHeroBanner, resolvePageHeroTitle } from "@/lib/cms/page-heroes/resolvePageHeroText";
 import { isPageHeroCtaRouteKey, isPageHeroRouteKey } from "@/lib/page-heroes/constants";
+import { isPageHeroTextRouteKey } from "@/lib/page-heroes/textDefaults";
 
 import { cmsMediaForOg, siteMeta } from "../siteMeta";
 import type { SiteRoute } from "../types";
@@ -40,8 +42,17 @@ export async function renderPageHeroPlaceholderRoute(route: PageHeroPlaceholderR
   const { locale, routeKey } = route;
   const pageHeroes = await getPageHeroesSettings(locale);
   const heroImageSrc = resolvePageHeroImage(pageHeroes, routeKey);
+  const heroBanner = isPageHeroTextRouteKey(routeKey)
+    ? resolvePageHeroBanner(pageHeroes, routeKey, locale)
+    : null;
   return (
-    <PageHeroPlaceholderView locale={locale} routeKey={routeKey} heroImageSrc={heroImageSrc} />
+    <PageHeroPlaceholderView
+      locale={locale}
+      routeKey={routeKey}
+      heroImageSrc={heroImageSrc}
+      heroTitle={heroBanner?.title ?? resolvePageHeroTitle(pageHeroes, routeKey, locale)}
+      heroSubtitle={heroBanner?.subtitle}
+    />
   );
 }
 

@@ -1,6 +1,7 @@
 import type { GlobalConfig } from "payload";
 
 import { isAdmin } from "../access/isAdmin";
+import { LOCALIZED } from "../fields/localized";
 import {
   PAGE_HERO_CTA_ROUTE_KEYS,
   PAGE_HERO_CTA_FIELD,
@@ -10,6 +11,12 @@ import {
   type PageHeroCtaRouteKey,
   type PageHeroRouteKey,
 } from "../lib/page-heroes/constants";
+import {
+  getDefaultPageHeroTitle,
+  isPageHeroTextRouteKey,
+  PAGE_HERO_SUBTITLE_FIELD,
+  PAGE_HERO_TITLE_FIELD,
+} from "../lib/page-heroes/textDefaults";
 import { revalidateFrontGlobal } from "../hooks/revalidateFront";
 
 const heroImageField = (name: string, label: string, description?: string) =>
@@ -34,6 +41,31 @@ const ctaHeroImageField = (routeKey: PageHeroCtaRouteKey, label: string) =>
 
 function fieldsForPage(routeKey: PageHeroRouteKey, label: string) {
   const fields = [heroImageField(PAGE_HERO_FIELD[routeKey], `${label} — bannière`)];
+
+  if (isPageHeroTextRouteKey(routeKey)) {
+    fields.push(
+      {
+        name: PAGE_HERO_TITLE_FIELD[routeKey],
+        type: "text",
+        label: `${label} — titre bannière (H1)`,
+        admin: {
+          description: "Titre principal et fil d'Ariane.",
+        },
+        defaultValue: getDefaultPageHeroTitle(routeKey, "fr"),
+        ...LOCALIZED,
+      },
+      {
+        name: PAGE_HERO_SUBTITLE_FIELD[routeKey],
+        type: "textarea",
+        label: `${label} — sous-titre bannière`,
+        admin: {
+          description: "Optionnel. Laisser vide pour n'afficher aucun sous-titre.",
+        },
+        ...LOCALIZED,
+      },
+    );
+  }
+
   if ((PAGE_HERO_CTA_ROUTE_KEYS as readonly string[]).includes(routeKey)) {
     fields.push(ctaHeroImageField(routeKey as PageHeroCtaRouteKey, label));
   }
@@ -45,7 +77,7 @@ export const PageHeroes: GlobalConfig = {
   label: "Bannières de pages",
   admin: {
     description:
-      "Images de bannière pour les pages Présentation (IGM), LCFCM, Contact et Multimédia. Les pages Qui sommes-nous ? (À propos, Historique, Mission) se configurent dans « Page À propos ».",
+      "Bannières des pages Présentation, LCFCM et Multimédia : image, titre (H1) et sous-titre. Contact et Dossier de presse : textes dans leurs globals dédiés. Pages À propos : global « Page À propos ».",
     group: "Contenu",
   },
   access: {

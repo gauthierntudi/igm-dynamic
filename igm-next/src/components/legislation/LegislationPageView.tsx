@@ -17,11 +17,19 @@ type Props = {
   category: LegislationCategory;
   documents: CmsLegislationDocument[];
   heroImageSrc: string;
+  heroTitle: string;
+  heroSubtitle?: string;
 };
 
-export function LegislationPageView({ locale, category, documents, heroImageSrc }: Props) {
+export function LegislationPageView({
+  locale,
+  category,
+  documents,
+  heroImageSrc,
+  heroTitle,
+  heroSubtitle,
+}: Props) {
   const t = getMessages(locale).legislationPage;
-  const categoryMeta = t.categories[category];
   const categoryLabels = Object.fromEntries(
     LEGISLATION_CATEGORIES.map((key) => [key, t.categories[key].tabLabel]),
   ) as Record<LegislationCategory, string>;
@@ -32,10 +40,10 @@ export function LegislationPageView({ locale, category, documents, heroImageSrc 
 
       <AboutBreadcrumbHero
         locale={locale}
-        title={categoryMeta.title}
-        breadcrumbTitle={categoryMeta.title}
+        title={heroTitle}
+        breadcrumbTitle={heroTitle}
         heroImageSrc={heroImageSrc}
-        subtitle={categoryMeta.lead}
+        subtitle={heroSubtitle}
         tagline={LEGISLATION_CATEGORY_LABELS[category][locale]}
       />
 
@@ -49,8 +57,8 @@ export function LegislationPageView({ locale, category, documents, heroImageSrc 
             filterLabel={t.filtersLabel}
             searchPlaceholder={t.searchPlaceholder}
             eyebrow={t.eyebrow}
-            heading={categoryMeta.documentsTitle}
-            lead={categoryMeta.documentsLead}
+            heading={t.categories[category].documentsTitle}
+            lead={t.categories[category].documentsLead}
           />
         </div>
       </section>

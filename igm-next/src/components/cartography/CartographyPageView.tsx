@@ -37,10 +37,18 @@ const CartographyMap = dynamic(
 type Props = {
   locale: SupportedLocale;
   heroImageSrc: string;
+  heroTitle: string;
+  heroSubtitle?: string;
   cartographySettings: CmsCartographySettings | null;
 };
 
-export function CartographyPageView({ locale, heroImageSrc, cartographySettings }: Props) {
+export function CartographyPageView({
+  locale,
+  heroImageSrc,
+  heroTitle,
+  heroSubtitle,
+  cartographySettings,
+}: Props) {
   const m = getMessages(locale).cartography;
   const [selected, setSelected] = useState<DrcMapProvince | null>(null);
   const pinSrc = withDeployedBase("/assets/img/pin-carte.png");
@@ -62,8 +70,8 @@ export function CartographyPageView({ locale, heroImageSrc, cartographySettings 
 
       <AboutBreadcrumbHero
         locale={locale}
-        title={m.title}
-        subtitle={m.subtitle}
+        title={heroTitle}
+        subtitle={heroSubtitle}
         heroImageSrc={heroImageSrc}
       />
 

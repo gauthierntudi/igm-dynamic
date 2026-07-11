@@ -13,7 +13,7 @@ export type ResolvedContactPage = {
   seoTitle: string;
   seoDescription: string;
   heroTitle: string;
-  heroLead: string;
+  heroLead?: string;
   eyebrow: string;
   formTitle: string;
   infoTitle: string;

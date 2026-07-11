@@ -14,7 +14,7 @@ export type ResolvedPressKitPage = {
   seoTitle: string;
   seoDescription: string;
   heroTitle: string;
-  heroLead: string;
+  heroLead?: string;
   intro: string;
   downloadLabel: string;
   pdfTitle: string;

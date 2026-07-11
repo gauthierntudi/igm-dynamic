@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { OrgChartPageView } from "@/components/orgchart/OrgChartPageView";
 import { getHome } from "@/lib/cms/client";
 import { getPageHeroesSettings } from "@/lib/cms/page-heroes/getPageHeroesSettings";
+import { resolvePageHeroBanner } from "@/lib/cms/page-heroes/resolvePageHeroText";
 import { resolvePageHeroImage } from "@/lib/cms/page-heroes/resolvePageHero";
 import { getMessages } from "@/i18n/messages";
 
@@ -15,11 +16,14 @@ export async function renderOrgChartRoute(route: OrgChartRoute) {
   const { locale } = route;
   const [home, pageHeroes] = await Promise.all([getHome(locale), getPageHeroesSettings(locale)]);
   const heroImageSrc = resolvePageHeroImage(pageHeroes, "orgChart");
+  const heroBanner = resolvePageHeroBanner(pageHeroes, "orgChart", locale);
   return (
     <OrgChartPageView
       locale={locale}
       orgChartSection={home?.orgChartSection}
       heroImageSrc={heroImageSrc}
+      heroTitle={heroBanner.title}
+      heroSubtitle={heroBanner.subtitle}
     />
   );
 }

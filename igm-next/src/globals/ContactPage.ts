@@ -55,7 +55,9 @@ export const ContactPage: GlobalConfig = {
               name: "heroLead",
               type: "textarea",
               label: "Sous-titre bannière",
-              defaultValue: "Une question, une demande d'information ? Écrivez-nous.",
+              admin: {
+                description: "Optionnel. Laisser vide pour n'afficher aucun sous-titre.",
+              },
               ...LOCALIZED,
             },
           ],

@@ -55,8 +55,9 @@ export const PressKitPage: GlobalConfig = {
               name: "heroLead",
               type: "textarea",
               label: "Sous-titre bannière",
-              defaultValue:
-                "Téléchargez la présentation officielle de l’Inspection Générale des Mines.",
+              admin: {
+                description: "Optionnel. Laisser vide pour n'afficher aucun sous-titre.",
+              },
               ...LOCALIZED,
             },
           ],

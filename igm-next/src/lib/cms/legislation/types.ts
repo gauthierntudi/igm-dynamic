@@ -2,12 +2,20 @@ import type { LegislationCategory } from "@/lib/legislation/constants";
 
 import type { CmsMedia } from "../types";
 
-export type CmsLegislationSettings = {
+type LegislationHeroImageFields = {
   ordinancesHeroImage?: CmsMedia | number | null;
   lawsHeroImage?: CmsMedia | number | null;
   decreesHeroImage?: CmsMedia | number | null;
   decisionsHeroImage?: CmsMedia | number | null;
 };
+
+type LegislationHeroTextFields = {
+  [K in LegislationCategory as `${K}HeroTitle`]?: string | null;
+} & {
+  [K in LegislationCategory as `${K}HeroSubtitle`]?: string | null;
+};
+
+export type CmsLegislationSettings = LegislationHeroImageFields & LegislationHeroTextFields;
 
 export type CmsLegislationDocument = {
   id: number;
