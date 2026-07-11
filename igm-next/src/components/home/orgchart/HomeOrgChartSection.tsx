@@ -8,7 +8,6 @@ import {
   resolveOrgChartImageAlt,
   resolveOrgChartImageSrc,
 } from "./resolveOrgChartMedia";
-import { TeamSectionArrow } from "./TeamSectionArrow";
 
 type Props = {
   orgChartSection?: CmsHomeOrgChartSection | null;
@@ -116,7 +115,6 @@ export function HomeOrgChartSection({
                       data-wow-duration="1500ms"
                     >
                       <div className="button-area">
-                        <TeamSectionArrow />
                         {ctaSidebarTitle ? <h5>{ctaSidebarTitle}</h5> : null}
                         {ctaHref && ctaLabel ? (
                           <a className="primary-btn4 black-bg" href={ctaHref}>
