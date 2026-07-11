@@ -242,4 +242,8 @@
     height: min(82vh, 820px);
     min-height: 480px;
   }
+
+  .igm-orgchart-flow .react-flow__pane.igm-orgchart-flow__pane--page-scroll {
+    touch-action: pan-y;
+  }
 }

@@ -8,7 +8,7 @@ import {
   type ReactFlowInstance,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 
 import type { SupportedLocale } from "@/i18n/locales";
 
@@ -19,6 +19,7 @@ import {
   OrgChartZoomControls,
 } from "./OrgChartZoomControls";
 import { getOrgChartDecreeContent } from "./orgChartDecreeData";
+import { OrgChartMobilePageScrollPassthrough } from "./OrgChartMobilePageScrollPassthrough";
 import { orgChartFlowNodeTypes } from "./OrgChartFlowNode";
 import type { OrgChartNodeData } from "./buildOrgChartFixedLayout";
 
@@ -61,6 +62,7 @@ type Props = {
 };
 
 function OrgChartFlowCanvas({ locale }: Props) {
+  const flowContainerRef = useRef<HTMLDivElement>(null);
   const content = useMemo(() => getOrgChartDecreeContent(locale), [locale]);
 
   const { nodes, connectors } = useMemo(
@@ -83,7 +85,7 @@ function OrgChartFlowCanvas({ locale }: Props) {
     <figure className="igm-orgchart-decree">
       <figcaption>{content.caption}</figcaption>
 
-      <div className="igm-orgchart-flow">
+      <div className="igm-orgchart-flow" ref={flowContainerRef}>
         <ReactFlow
           nodes={nodes as Node<OrgChartNodeData>[]}
           edges={[]}
@@ -103,6 +105,10 @@ function OrgChartFlowCanvas({ locale }: Props) {
           proOptions={{ hideAttribution: true }}
         >
           <OrgChartConnectorsLayer connectors={connectors} />
+          <OrgChartMobilePageScrollPassthrough
+            containerRef={flowContainerRef}
+            translateExtent={translateExtent}
+          />
           <OrgChartZoomControls locale={locale} />
         </ReactFlow>
       </div>
