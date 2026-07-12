@@ -45,25 +45,71 @@ export function hrefForRoute(routeKey: RouteKey, locale: SupportedLocale = DEFAU
   return `${prefix}/${slug}`;
 }
 
+/** Ancre de la section Historique sur /a-propos. */
+export const WHO_WE_ARE_HISTORY_SECTION_ID = "igm-wwa-history";
+
+/** Lien menu vers la frise Historique (section de la page À propos). */
+export function hrefForAboutHistorySection(locale: SupportedLocale = DEFAULT_LOCALE): string {
+  return `${hrefForRoute("about", locale)}#${WHO_WE_ARE_HISTORY_SECTION_ID}`;
+}
+
+function splitHrefHash(href: string): { path: string; hash: string } {
+  const hashIndex = href.indexOf("#");
+  if (hashIndex < 0) return { path: href, hash: "" };
+  return { path: href.slice(0, hashIndex), hash: href.slice(hashIndex) };
+}
+
+/** True si l’URL cible l’ancienne page Historique (/historique, /history). */
+export function isHistoryPageHref(href: string): boolean {
+  const { path } = splitHrefHash(href.trim());
+  const normalized = path.replace(/\/$/, "") || "/";
+  return (
+    normalized === "/historique" ||
+    normalized === "/history" ||
+    normalized === "/en/history" ||
+    normalized === "/en/historique"
+  );
+}
+
+/** Résout un lien menu Historique vers la section de /a-propos. */
+export function resolveHistoryNavHref(
+  href: string,
+  locale: SupportedLocale = DEFAULT_LOCALE,
+): string {
+  if (isHistoryPageHref(href)) {
+    return hrefForAboutHistorySection(locale);
+  }
+  return localizeHref(href, locale);
+}
+
 /** Préfixe un chemin interne avec la locale (mappe les routes connues). */
 export function localizeHref(href: string, locale: SupportedLocale = DEFAULT_LOCALE): string {
   const trimmed = href.trim();
-  if (!trimmed || /^(https?:|mailto:|tel:|javascript:|#)/i.test(trimmed)) {
+  if (!trimmed || /^(https?:|mailto:|tel:|javascript:)/i.test(trimmed)) {
     return trimmed;
   }
+  if (trimmed.startsWith("#")) return trimmed;
 
-  const path = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+  const { path: pathPart, hash: hashPart } = splitHrefHash(trimmed);
+  const path = pathPart.startsWith("/") ? pathPart : `/${pathPart}`;
   const segments = path.split("/").filter(Boolean);
   const { locale: hrefLocale, pathSegments } = parseLocaleFromSegments(segments);
   const slug = pathSegments.join("/");
 
-  if (!slug) return hrefForRoute("home", locale);
+  let localized: string;
+  if (!slug) {
+    localized = hrefForRoute("home", locale);
+  } else {
+    const routeKey = findRouteKey(slug, hrefLocale);
+    if (routeKey) {
+      localized = hrefForRoute(routeKey, locale);
+    } else {
+      const prefix = localePathPrefix(locale);
+      localized = prefix ? `${prefix}/${slug}` : `/${slug}`;
+    }
+  }
 
-  const routeKey = findRouteKey(slug, hrefLocale);
-  if (routeKey) return hrefForRoute(routeKey, locale);
-
-  const prefix = localePathPrefix(locale);
-  return prefix ? `${prefix}/${slug}` : `/${slug}`;
+  return `${localized}${hashPart}`;
 }
 
 /** Slug d’article actualités si l’URL est `actualites/{slug}` ou `news/{slug}`. */

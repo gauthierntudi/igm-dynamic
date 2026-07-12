@@ -1,7 +1,7 @@
 import { getMessages } from "@/i18n/messages";
 import { MAIN_NAV, navNestedIconStyle, type NavItem } from "@/i18n/navigation";
 import type { SupportedLocale } from "@/i18n/locales";
-import { hrefForRoute } from "@/i18n/paths";
+import { hrefForAboutHistorySection, hrefForRoute } from "@/i18n/paths";
 
 import type {
   CmsFooterColumn,
@@ -85,10 +85,14 @@ function defaultNavItemToRuntime(item: NavItem, locale: SupportedLocale): Runtim
 
   if (item.kind === "route") {
     const labelKey = item.labelKey ?? "home";
+    const href =
+      item.routeKey === "history"
+        ? hrefForAboutHistorySection(locale)
+        : hrefForRoute(item.routeKey, locale);
     return {
       kind: "link",
       label: messages.nav[labelKey],
-      href: hrefForRoute(item.routeKey, locale),
+      href,
       className: item.className,
     };
   }

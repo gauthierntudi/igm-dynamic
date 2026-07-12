@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  hrefForAboutHistorySection,
   hrefForNewsArticle,
   hrefForNewsListing,
   hrefForRoute,
+  isHistoryPageHref,
   localizeHref,
+  resolveHistoryNavHref,
   switchLocaleHref,
 } from "../paths";
 
@@ -44,9 +47,41 @@ describe("localizeHref", () => {
     expect(localizeHref("/en/laws", "fr")).toBe("/lois");
   });
 
+  it("preserves hash fragments on internal paths", () => {
+    expect(localizeHref("/a-propos#igm-wwa-history", "en")).toBe("/en/about#igm-wwa-history");
+    expect(localizeHref("/en/about#igm-wwa-history", "fr")).toBe("/a-propos#igm-wwa-history");
+  });
+
   it("leaves external URLs unchanged", () => {
     expect(localizeHref("https://example.com", "en")).toBe("https://example.com");
     expect(localizeHref("mailto:contact@igm.cd", "fr")).toBe("mailto:contact@igm.cd");
+  });
+});
+
+describe("resolveHistoryNavHref", () => {
+  it("maps legacy history page links to the about section anchor", () => {
+    expect(resolveHistoryNavHref("/historique", "fr")).toBe("/a-propos#igm-wwa-history");
+    expect(resolveHistoryNavHref("/historique", "en")).toBe("/en/about#igm-wwa-history");
+    expect(resolveHistoryNavHref("/en/history", "fr")).toBe("/a-propos#igm-wwa-history");
+  });
+
+  it("leaves other internal links unchanged aside from locale mapping", () => {
+    expect(resolveHistoryNavHref("/mission", "en")).toBe("/en/mission");
+  });
+});
+
+describe("hrefForAboutHistorySection", () => {
+  it("builds localized about page anchors", () => {
+    expect(hrefForAboutHistorySection("fr")).toBe("/a-propos#igm-wwa-history");
+    expect(hrefForAboutHistorySection("en")).toBe("/en/about#igm-wwa-history");
+  });
+});
+
+describe("isHistoryPageHref", () => {
+  it("detects legacy history routes", () => {
+    expect(isHistoryPageHref("/historique")).toBe(true);
+    expect(isHistoryPageHref("/en/history")).toBe(true);
+    expect(isHistoryPageHref("/a-propos#igm-wwa-history")).toBe(false);
   });
 });
 

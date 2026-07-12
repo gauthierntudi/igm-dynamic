@@ -1,7 +1,7 @@
 import { getMessages } from "@/i18n/messages";
 import { MAIN_NAV, navNestedIconStyle, type NavItem } from "@/i18n/navigation";
 import type { RouteKey } from "@/i18n/paths";
-import { ROUTE_KEYS } from "@/i18n/paths";
+import { ROUTE_KEYS, WHO_WE_ARE_HISTORY_SECTION_ID } from "@/i18n/paths";
 import { CUSTOM_NAV_LINK_VALUE } from "@/lib/siteNavLinks";
 
 type LocalizedText = { fr: string; en: string };
@@ -71,6 +71,15 @@ function navItemToSeed(item: NavItem, depth: 1 | 2): SeedNavItem {
 
   if (item.kind === "route") {
     const labelKey = item.labelKey ?? "home";
+    if (item.routeKey === "history") {
+      return {
+        itemType: "link",
+        label: navLabel(labelKey),
+        navLink: CUSTOM_NAV_LINK_VALUE,
+        customHref: `/a-propos#${WHO_WE_ARE_HISTORY_SECTION_ID}`,
+        cssClass: item.className,
+      };
+    }
     return {
       itemType: "link",
       label: navLabel(labelKey),

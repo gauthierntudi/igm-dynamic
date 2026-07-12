@@ -2,7 +2,7 @@
 export const SITE_NAV_LINKS = [
   { label: "Accueil", value: "/" },
   { label: "Présentation — À propos", value: "/a-propos" },
-  { label: "Présentation — Historique", value: "/historique" },
+  { label: "Présentation — Historique (section À propos)", value: "/historique" },
   { label: "Présentation — Mission", value: "/mission" },
   { label: "Présentation — Vision", value: "/vision" },
   { label: "Présentation — Organigramme", value: "/organigramme" },
