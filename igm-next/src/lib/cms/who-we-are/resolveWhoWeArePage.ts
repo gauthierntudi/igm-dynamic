@@ -11,10 +11,25 @@ import {
 import type {
   CmsWhoWeAre,
   CmsWhoWeAreLabelItem,
+  CmsWhoWeAreMilestone,
   CmsWhoWeAreStat,
   CmsWhoWeAreTeamMember,
 } from "./types";
 import type { CmsMedia } from "../types";
+
+export type ResolvedHistoryMilestone = {
+  id: string;
+  /** Date complète saisie en admin (ex. « 2 juin 2003 »). */
+  date: string;
+  /** Année extraite pour l'affichage sur le segment de la frise. */
+  year: string;
+  title: string;
+  description?: string;
+  link?: {
+    label: string;
+    href: string;
+  };
+};
 
 export type ResolvedWhoWeArePage = {
   seoTitle: string;
@@ -40,12 +55,14 @@ export type ResolvedWhoWeArePage = {
   };
   history: {
     title?: string;
-    lead: string;
+    introLead?: string;
+    introParagraphs: string[];
     headline: string;
     paragraphs: string[];
     heroImageSrc: string;
     ctaImageSrc: string;
     teaserImages: Array<{ src: string; alt: string }>;
+    milestones: ResolvedHistoryMilestone[];
   };
   mission: {
     title?: string;
@@ -127,6 +144,49 @@ function resolveLabels(items: CmsWhoWeAreLabelItem[] | null | undefined): string
   return items?.map((item) => item.label?.trim()).filter(Boolean) as string[] ?? [];
 }
 
+function extractYearFromMilestoneDate(date: string): string {
+  const trimmed = date.trim();
+  const trailingYear = trimmed.match(/(\d{4})\s*$/);
+  if (trailingYear) return trailingYear[1];
+  const anyYear = trimmed.match(/\b(19|20)\d{2}\b/);
+  if (anyYear) return anyYear[0];
+  return trimmed;
+}
+
+function resolveMilestoneLink(
+  locale: SupportedLocale,
+  link: CmsWhoWeAreMilestone["link"],
+): ResolvedHistoryMilestone["link"] {
+  const label = link?.label?.trim();
+  const href = resolveBannerCtaHref(link, locale);
+  if (!label || !href || href === "#") return undefined;
+  return { label, href };
+}
+
+function resolveMilestones(
+  locale: SupportedLocale,
+  cms: CmsWhoWeAre | null | undefined,
+  items: CmsWhoWeAreMilestone[] | null | undefined,
+  fallbackItems: CmsWhoWeAreMilestone[] | null | undefined,
+): ResolvedHistoryMilestone[] {
+  const source = cms ? items : fallbackItems;
+  return (
+    source
+      ?.filter((item) => item.year?.trim() && item.title?.trim())
+      .map((item, index) => {
+        const date = item.year!.trim();
+        return {
+          id: item.id ?? `milestone-${index}-${date}`,
+          date,
+          year: extractYearFromMilestoneDate(date),
+          title: item.title!.trim(),
+          description: item.text?.trim() || undefined,
+          link: resolveMilestoneLink(locale, item.link),
+        };
+      }) ?? []
+  );
+}
+
 function pickText(value: string | null | undefined, fallback: string): string {
   return value?.trim() || fallback;
 }
@@ -175,6 +235,10 @@ function mergeWhoWeAre(
     historySection: {
       ...defaults.historySection,
       ...cms.historySection,
+      milestones:
+        cms.historySection?.milestones?.length
+          ? cms.historySection.milestones
+          : defaults.historySection?.milestones,
     },
     missionSection: {
       ...defaults.missionSection,
@@ -286,7 +350,16 @@ export function resolveWhoWeArePage(
         cms?.historySection?.title,
         defaults.historySection!.title!,
       ),
-      lead: pickText(data.historySection?.lead, defaults.historySection!.lead!),
+      introLead: resolveOptionalCmsText(
+        cms,
+        cms?.historySection?.lead,
+        defaults.historySection!.lead!,
+      ),
+      introParagraphs: resolveOptionalParagraphs(
+        cms,
+        cms?.historySection?.timelineIntro,
+        defaults.historySection?.timelineIntro,
+      ),
       headline: pickText(
         data.historySection?.headline,
         defaults.historySection!.headline!,
@@ -320,6 +393,12 @@ export function resolveWhoWeArePage(
           ),
         },
       ],
+      milestones: resolveMilestones(
+        locale,
+        cms,
+        cms?.historySection?.milestones,
+        defaults.historySection?.milestones,
+      ),
     },
     mission: {
       title: resolveOptionalCmsText(

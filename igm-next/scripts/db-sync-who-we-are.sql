@@ -1,5 +1,6 @@
 -- Global Payload « who-we-are » (page À propos)
 DO $$ BEGIN CREATE TYPE "enum_who_we_are_cta_section_link_nav_link" AS ENUM ('/','/a-propos','/historique','/mission','/vision','/organigramme','/cartographie','/fraude-miniere','/contrebande-miniere','/denoncer','/sanctions','/actualites','/ordonnances','/lois','/decrets','/decisions','/photos','/videos','/audios','/contact','__custom__'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE "enum_who_we_are_history_section_milestones_link_nav_link" AS ENUM ('/','/a-propos','/historique','/mission','/vision','/organigramme','/cartographie','/fraude-miniere','/contrebande-miniere','/denoncer','/sanctions','/actualites','/ordonnances','/lois','/decrets','/decisions','/photos','/videos','/dossier-de-presse','/revue-de-presse','/contact','__custom__'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN CREATE TYPE "enum_who_we_are_contact_section_primary_cta_nav_link" AS ENUM ('/','/a-propos','/historique','/mission','/vision','/organigramme','/cartographie','/fraude-miniere','/contrebande-miniere','/denoncer','/sanctions','/actualites','/ordonnances','/lois','/decrets','/decisions','/photos','/videos','/audios','/contact','__custom__'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 CREATE TABLE IF NOT EXISTS "who_we_are" (
@@ -174,6 +175,12 @@ ALTER TABLE "who_we_are_locales" ALTER COLUMN "mission_section_statutory_title" 
 ALTER TABLE "who_we_are_locales" ALTER COLUMN "mission_section_priorities_title" DROP DEFAULT;
 ALTER TABLE "who_we_are_locales" ALTER COLUMN "team_section_title" DROP DEFAULT;
 ALTER TABLE "who_we_are_locales" ALTER COLUMN "mission_section_headline" DROP DEFAULT;
+
+ALTER TABLE "who_we_are_history_section_milestones" ADD COLUMN IF NOT EXISTS "link_nav_link" "enum_who_we_are_history_section_milestones_link_nav_link";
+ALTER TABLE "who_we_are_history_section_milestones" ADD COLUMN IF NOT EXISTS "link_custom_href" varchar;
+ALTER TABLE "who_we_are_history_section_milestones_locales" ADD COLUMN IF NOT EXISTS "link_label" varchar;
+
+ALTER TABLE "who_we_are_locales" ADD COLUMN IF NOT EXISTS "history_section_timeline_intro" varchar;
 
 INSERT INTO "who_we_are" ("id", "created_at", "updated_at")
 SELECT 1, NOW(), NOW()

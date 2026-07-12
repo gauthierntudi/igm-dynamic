@@ -29,6 +29,10 @@ export const DEFAULT_WHO_WE_ARE_FR: CmsWhoWeAre = {
     headline: "Un acteur central de la gouvernance minière",
     lead:
       "Ces réformes ont mis en évidence la nécessité d'un organe indépendant, doté de pouvoirs renforcés, capable d'assurer la transparence, la conformité, la traçabilité et la bonne gouvernance dans un secteur stratégique pour l'économie nationale.",
+    timelineIntro: [
+      "L'Inspection Générale des Mines (IGM) est un service public spécialisé de l'État congolais, créé par le Décret n°23/19 du 09 juin 2023. ([Consultez le décret ici](/decrets))",
+      "La création de l'IGM s'inscrit dans la dynamique des grandes réformes du secteur minier initiées par le Gouvernement de la République Démocratique du Congo, notamment celles découlant du Code minier et du Règlement minier.",
+    ].join("\n"),
     body: [
       "L'Inspection Générale des Mines (IGM) est un service public spécialisé de l'État congolais, créé par le Décret n°23/19 du 09 juin 2023. ([Consultez le décret ici](/decrets)) Elle est dotée d'autonomie administrative et financière et placée sous l'autorité du Ministre ayant les Mines dans ses attributions, conformément à l'article 1er dudit Décret.",
       "La création de l'IGM s'inscrit dans la dynamique des grandes réformes du secteur minier initiées par le Gouvernement de la République Démocratique du Congo, notamment celles découlant du Code minier ([Consultez le Code minier ici](/lois)) (Loi n°007/2002 modifiée par la Loi n°18/001 du 09 mars 2018) et du ([Consultez le Règlement minier ici](/decrets)) (Décret n°038/2003 modifié par le Décret Règlement minier n°18/024 du 08 juin 2018).",
@@ -46,6 +50,24 @@ export const DEFAULT_WHO_WE_ARE_FR: CmsWhoWeAre = {
       "• La coordination interservices avec la DGDA, la PNC, la CENAREF, Interpol, le CEEC et d'autres institutions spécialisées.",
       "Aujourd'hui, l'Inspection Générale des Mines s'impose comme un acteur central de la gouvernance minière, travaillant en étroite collaboration avec les institutions nationales, les provinces, les services spécialisés et les partenaires.",
     ].join("\n"),
+    milestones: [
+      {
+        year: "2002",
+        title: "Code minier",
+        text: "Adoption de la Loi n°007/2002 portant Code minier, fondement de la régulation du secteur minier en RDC.",
+      },
+      {
+        year: "9 mars 2018",
+        title: "Réformes minières",
+        text: "La Loi n°18/001 du 09 mars 2018 modifie le Code minier et renforce les exigences de transparence et de conformité.",
+      },
+      {
+        year: "9 juin 2023",
+        title: "Création de l'IGM",
+        text: "Le Décret n°23/19 du 09 juin 2023 crée l'Inspection Générale des Mines, service public autonome rattaché au Ministère des Mines.",
+        link: { label: "Lire l'historique complet", navLink: "/historique" },
+      },
+    ],
   },
   missionSection: {
     title: "Mission",
@@ -136,6 +158,10 @@ export const DEFAULT_WHO_WE_ARE_EN: CmsWhoWeAre = {
     headline: "A central actor in mining governance",
     lead:
       "These reforms highlighted the need for an independent body with strengthened powers, capable of ensuring transparency, compliance, traceability and good governance in a sector that is strategic for the national economy.",
+    timelineIntro: [
+      "The General Inspectorate of Mines (IGM) is a specialised public service of the Congolese State, created by Decree No. 23/19 of 9 June 2023. ([Consult the decree here](/decrets))",
+      "The creation of the IGM is part of the major reforms of the mining sector initiated by the Government of the Democratic Republic of Congo, in particular those arising from the Mining Code and Mining Regulations.",
+    ].join("\n"),
     body: [
       "The General Inspectorate of Mines (IGM) is a specialised public service of the Congolese State, created by Decree No. 23/19 of 9 June 2023. ([Consult the decree here](/decrets)) It has administrative and financial autonomy and is placed under the authority of the Minister responsible for Mines, in accordance with Article 1 of the said Decree.",
       "The creation of the IGM is part of the major reforms of the mining sector initiated by the Government of the Democratic Republic of Congo, in particular those arising from the Mining Code ([Consult the Mining Code here](/lois)) (Law No. 007/2002 as amended by Law No. 18/001 of 9 March 2018) and the ([Consult the Mining Regulations here](/decrets)) (Decree No. 038/2003 as amended by Mining Regulations Decree No. 18/024 of 8 June 2018).",
@@ -153,6 +179,24 @@ export const DEFAULT_WHO_WE_ARE_EN: CmsWhoWeAre = {
       "• Inter-agency coordination with DGDA, PNC, CENAREF, Interpol, CEEC and other specialised institutions.",
       "Today, the General Inspectorate of Mines stands as a central actor in mining governance, working closely with national institutions, provinces, specialised services and partners.",
     ].join("\n"),
+    milestones: [
+      {
+        year: "2002",
+        title: "Mining Code",
+        text: "Adoption of Law No. 007/2002 establishing the Mining Code, the foundation of mining sector regulation in the DRC.",
+      },
+      {
+        year: "9 March 2018",
+        title: "Mining reforms",
+        text: "Law No. 18/001 of 9 March 2018 amends the Mining Code and strengthens transparency and compliance requirements.",
+      },
+      {
+        year: "9 June 2023",
+        title: "Creation of the IGM",
+        text: "Decree No. 23/19 of 9 June 2023 establishes the General Inspectorate of Mines as an autonomous public service under the Ministry of Mines.",
+        link: { label: "Read our full history", navLink: "/historique" },
+      },
+    ],
   },
   missionSection: {
     title: "Mission",

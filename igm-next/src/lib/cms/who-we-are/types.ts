@@ -12,6 +12,14 @@ export type CmsWhoWeAreTeamMember = {
   id?: string | null;
 };
 
+export type CmsWhoWeAreMilestone = {
+  year?: string | null;
+  title?: string | null;
+  text?: string | null;
+  link?: CmsWhoWeAreCta | null;
+  id?: string | null;
+};
+
 export type CmsWhoWeAreStat = {
   label?: string | null;
   value?: string | null;
@@ -48,12 +56,14 @@ export type CmsWhoWeAre = {
   historySection?: {
     title?: string | null;
     lead?: string | null;
+    timelineIntro?: string | null;
     headline?: string | null;
     body?: string | null;
     heroImage?: CmsMedia | number | null;
     ctaImage?: CmsMedia | number | null;
     teaserImage1?: CmsMedia | number | null;
     teaserImage2?: CmsMedia | number | null;
+    milestones?: CmsWhoWeAreMilestone[] | null;
   } | null;
   missionSection?: {
     title?: string | null;

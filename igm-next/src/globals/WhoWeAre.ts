@@ -191,18 +191,77 @@ export const WhoWeAre: GlobalConfig = {
                 {
                   name: "lead",
                   type: "textarea",
-                  label: "Chapô",
+                  label: "Chapô avant la frise (/a-propos)",
+                  admin: {
+                    description:
+                      "Optionnel. Court texte d'introduction affiché au-dessus de la frise chronologique sur /a-propos.",
+                  },
+                  ...LOCALIZED,
+                },
+                {
+                  name: "timelineIntro",
+                  type: "textarea",
+                  label: "Texte d'introduction avant la frise (/a-propos)",
+                  admin: {
+                    description:
+                      "Optionnel. Un paragraphe par ligne. Lignes « • » pour les listes. Liens : [libellé](/chemin).",
+                  },
                   ...LOCALIZED,
                 },
                 {
                   name: "body",
                   type: "textarea",
-                  label: "Texte",
+                  label: "Texte page Historique (/historique)",
                   admin: {
                     description:
                       "Un paragraphe par ligne. Lignes commençant par « • » pour les listes. Liens : [libellé](/chemin).",
                   },
                   ...LOCALIZED,
+                },
+                {
+                  name: "milestones",
+                  type: "array",
+                  label: "Frise chronologique (/a-propos)",
+                  admin: {
+                    description:
+                      "Événements affichés dans la frise horizontale sur /a-propos. Cliquer sur l'année ou le titre ouvre la description.",
+                  },
+                  fields: [
+                    {
+                      name: "year",
+                      type: "text",
+                      label: "Date de l'événement",
+                      admin: {
+                        description:
+                          "Date complète (ex. 2 juin 2003). L'année s'affiche sur la frise ; la date entière dans le modal.",
+                      },
+                    },
+                    {
+                      name: "title",
+                      type: "text",
+                      label: "Titre de l'événement",
+                      ...LOCALIZED,
+                    },
+                    {
+                      name: "text",
+                      type: "textarea",
+                      label: "Description (modal)",
+                      admin: {
+                        description: "Texte affiché dans la fenêtre au clic sur l'année ou le titre.",
+                      },
+                      ...LOCALIZED,
+                    },
+                    {
+                      name: "link",
+                      type: "group",
+                      label: "Lien optionnel (modal)",
+                      admin: {
+                        description:
+                          "Bouton affiché sous la description si le libellé et la destination sont renseignés.",
+                      },
+                      fields: bannerCtaFields,
+                    },
+                  ],
                 },
                 {
                   name: "heroImage",
@@ -311,7 +370,7 @@ export const WhoWeAre: GlobalConfig = {
                   name: "statutoryItems",
                   type: "array",
                   label: "Missions statutaires",
-                  fields: [{ name: "label", type: "text", label: "Libellé", required: true, ...LOCALIZED }],
+                  fields: [{ name: "label", type: "text", label: "Libellé", ...LOCALIZED }],
                 },
                 {
                   name: "prioritiesTitle",
@@ -326,7 +385,7 @@ export const WhoWeAre: GlobalConfig = {
                   name: "priorities",
                   type: "array",
                   label: "Priorités",
-                  fields: [{ name: "label", type: "text", label: "Libellé", required: true, ...LOCALIZED }],
+                  fields: [{ name: "label", type: "text", label: "Libellé", ...LOCALIZED }],
                 },
               ],
             },
@@ -346,8 +405,8 @@ export const WhoWeAre: GlobalConfig = {
                   label: "Indicateurs",
                   maxRows: 4,
                   fields: [
-                    { name: "label", type: "text", label: "Libellé", required: true, ...LOCALIZED },
-                    { name: "value", type: "text", label: "Valeur", required: true, ...LOCALIZED },
+                    { name: "label", type: "text", label: "Libellé", ...LOCALIZED },
+                    { name: "value", type: "text", label: "Valeur", ...LOCALIZED },
                   ],
                 },
               ],
@@ -382,7 +441,7 @@ export const WhoWeAre: GlobalConfig = {
                   type: "array",
                   label: "Membres",
                   fields: [
-                    { name: "name", type: "text", label: "Nom", required: true, ...LOCALIZED },
+                    { name: "name", type: "text", label: "Nom", ...LOCALIZED },
                     { name: "role", type: "text", label: "Fonction", ...LOCALIZED },
                     {
                       name: "photo",

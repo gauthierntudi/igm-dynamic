@@ -7,6 +7,7 @@ import type { CmsWhoWeAre } from "@/lib/cms/who-we-are/types";
 import { resolveWhoWeArePage } from "@/lib/cms/who-we-are/resolveWhoWeArePage";
 
 import { AboutBreadcrumbHero } from "./AboutBreadcrumbHero";
+import { AboutHistoryTimeline } from "./AboutHistoryTimeline";
 import { WhoWeAreScrollOnMount } from "./WhoWeAreScrollOnMount";
 import { HeaderHeroDarkBody } from "@/components/cms/HeaderHeroDarkBody";
 
@@ -18,19 +19,10 @@ type Props = {
   content?: CmsWhoWeAre | null;
 };
 
-function stripMarkdown(text: string): string {
-  return text.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
-}
-
 export function WhoWeArePageView({ locale, activeSection = null, content = null }: Props) {
   const page = resolveWhoWeArePage(content, locale);
-  const historyHref = hrefForRoute("history", locale);
   const contactHref = page.contact.primaryHref;
   const isEn = locale === "en";
-
-  const historyTeaser =
-    page.history.paragraphs.slice(0, 2).map(stripMarkdown).join(" ") ||
-    page.history.lead;
 
   return (
     <main className="igm-about-page" data-igm-page="who-we-are">
@@ -122,43 +114,13 @@ export function WhoWeArePageView({ locale, activeSection = null, content = null 
         </div>
       </section>
 
-      {/* Historique — teaser vers page dédiée */}
-      <section className="about-history-teaser">
-        <div className="about-wrap about-history-teaser__grid">
-          <div className="about-history-teaser__aside">
-            <h2 className="about-history-teaser__title">{page.nav.history}</h2>
-            <span className="about-history-teaser__line" aria-hidden />
-          </div>
-
-          <div className="about-history-teaser__main">
-            <p className="about-history-teaser__lead">
-              {page.history.lead ||
-                (isEn
-                  ? "Created by Decree No. 23/19, the IGM ensures transparency and compliance in the mining sector."
-                  : "Créée par le Décret n°23/19, l'IGM garantit transparence et conformité dans le secteur minier.")}
-            </p>
-            <p className="about-history-teaser__excerpt">{historyTeaser}</p>
-
-            <div className="about-history-teaser__gallery">
-              {page.history.teaserImages.map((image) => (
-                <figure key={image.src}>
-                  <img
-                    src={image.src}
-                    alt={image.alt}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </figure>
-              ))}
-            </div>
-
-            <Link href={historyHref} className="about-link-btn">
-              {isEn ? "Read our full history" : "Lire l'historique complet"}
-              <ArrowRight size={16} aria-hidden />
-            </Link>
-          </div>
-        </div>
-      </section>
+      <AboutHistoryTimeline
+        locale={locale}
+        sectionTitle={page.history.title ?? page.nav.history}
+        introLead={page.history.introLead}
+        introParagraphs={page.history.introParagraphs ?? []}
+        events={page.history.milestones ?? []}
+      />
 
       {/* Bandeau charte + contact */}
       <section

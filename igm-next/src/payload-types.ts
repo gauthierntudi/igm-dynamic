@@ -1455,11 +1455,74 @@ export interface WhoWeAre {
      * Phrase courte affichée dans le bandeau (max. ~70 caractères).
      */
     headline?: string | null;
+    /**
+     * Optionnel. Court texte d'introduction affiché au-dessus de la frise chronologique sur /a-propos.
+     */
     lead?: string | null;
+    /**
+     * Optionnel. Un paragraphe par ligne. Lignes « • » pour les listes. Liens : [libellé](/chemin).
+     */
+    timelineIntro?: string | null;
     /**
      * Un paragraphe par ligne. Lignes commençant par « • » pour les listes. Liens : [libellé](/chemin).
      */
     body?: string | null;
+    /**
+     * Événements affichés dans la frise horizontale sur /a-propos. Cliquer sur l'année ou le titre ouvre la description.
+     */
+    milestones?:
+      | {
+          /**
+           * Date complète (ex. 2 juin 2003). L'année s'affiche sur la frise ; la date entière dans le modal.
+           */
+          year?: string | null;
+          title?: string | null;
+          /**
+           * Texte affiché dans la fenêtre au clic sur l'année ou le titre.
+           */
+          text?: string | null;
+          /**
+           * Bouton affiché sous la description si le libellé et la destination sont renseignés.
+           */
+          link?: {
+            label?: string | null;
+            /**
+             * Sélectionnez une page du menu du site.
+             */
+            navLink?:
+              | (
+                  | '/'
+                  | '/a-propos'
+                  | '/historique'
+                  | '/mission'
+                  | '/vision'
+                  | '/organigramme'
+                  | '/cartographie'
+                  | '/fraude-miniere'
+                  | '/contrebande-miniere'
+                  | '/denoncer'
+                  | '/sanctions'
+                  | '/actualites'
+                  | '/ordonnances'
+                  | '/lois'
+                  | '/decrets'
+                  | '/decisions'
+                  | '/photos'
+                  | '/videos'
+                  | '/dossier-de-presse'
+                  | '/revue-de-presse'
+                  | '/contact'
+                  | '__custom__'
+                )
+              | null;
+            /**
+             * Ex. https://…, mailto:…, ou un chemin non listé.
+             */
+            customHref?: string | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
     /**
      * Fond du bandeau en haut de /historique. Repli : bannière Introduction.
      */
@@ -1504,7 +1567,7 @@ export interface WhoWeAre {
     statutoryTitle?: string | null;
     statutoryItems?:
       | {
-          label: string;
+          label?: string | null;
           id?: string | null;
         }[]
       | null;
@@ -1514,7 +1577,7 @@ export interface WhoWeAre {
     prioritiesTitle?: string | null;
     priorities?:
       | {
-          label: string;
+          label?: string | null;
           id?: string | null;
         }[]
       | null;
@@ -1522,8 +1585,8 @@ export interface WhoWeAre {
   statsSection?: {
     items?:
       | {
-          label: string;
-          value: string;
+          label?: string | null;
+          value?: string | null;
           id?: string | null;
         }[]
       | null;
@@ -1536,7 +1599,7 @@ export interface WhoWeAre {
     lead?: string | null;
     members?:
       | {
-          name: string;
+          name?: string | null;
           role?: string | null;
           photo?: (number | null) | Media;
           id?: string | null;
@@ -2210,7 +2273,23 @@ export interface WhoWeAreSelect<T extends boolean = true> {
         title?: T;
         headline?: T;
         lead?: T;
+        timelineIntro?: T;
         body?: T;
+        milestones?:
+          | T
+          | {
+              year?: T;
+              title?: T;
+              text?: T;
+              link?:
+                | T
+                | {
+                    label?: T;
+                    navLink?: T;
+                    customHref?: T;
+                  };
+              id?: T;
+            };
         heroImage?: T;
         ctaImage?: T;
         teaserImage1?: T;
