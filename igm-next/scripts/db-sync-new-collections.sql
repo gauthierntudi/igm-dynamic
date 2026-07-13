@@ -11,7 +11,7 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
-  CREATE TYPE "enum_legislation_documents_category" AS ENUM ('ordinances', 'laws', 'decrees', 'decisions');
+  CREATE TYPE "enum_legislation_documents_category" AS ENUM ('ordinances', 'laws', 'decrees', 'arretes', 'decisions');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
@@ -19,7 +19,7 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
-  CREATE TYPE "enum__legislation_documents_v_version_category" AS ENUM ('ordinances', 'laws', 'decrees', 'decisions');
+  CREATE TYPE "enum__legislation_documents_v_version_category" AS ENUM ('ordinances', 'laws', 'decrees', 'arretes', 'decisions');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN

@@ -3,10 +3,7 @@ import type { LegislationCategory } from "@/lib/legislation/constants";
 import type { CmsMedia } from "../types";
 
 type LegislationHeroImageFields = {
-  ordinancesHeroImage?: CmsMedia | number | null;
-  lawsHeroImage?: CmsMedia | number | null;
-  decreesHeroImage?: CmsMedia | number | null;
-  decisionsHeroImage?: CmsMedia | number | null;
+  [K in LegislationCategory as `${K}HeroImage`]?: CmsMedia | number | null;
 };
 
 type LegislationHeroTextFields = {

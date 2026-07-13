@@ -173,3 +173,20 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN
   ALTER TYPE "enum_site_settings_footer_legal_links_nav_link" ADD VALUE '/strategie';
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+-- Lien menu Arrêtés
+DO $$ BEGIN
+  ALTER TYPE "enum_site_settings_header_nav_nav_link" ADD VALUE '/arretes';
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  ALTER TYPE "enum_site_settings_header_nav_children_nav_link" ADD VALUE '/arretes';
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  ALTER TYPE "enum_site_settings_header_nav_children_sub_items_nav_link" ADD VALUE '/arretes';
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  ALTER TYPE "enum_site_settings_footer_columns_links_nav_link" ADD VALUE '/arretes';
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  ALTER TYPE "enum_site_settings_footer_legal_links_nav_link" ADD VALUE '/arretes';
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;

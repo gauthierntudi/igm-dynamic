@@ -22,7 +22,7 @@ export const Legislation: GlobalConfig = {
   label: "Pages Législation",
   admin: {
     description:
-      "Bannières des pages Ordonnances, Lois, Décrets et Décisions : image, titre (H1) et sous-titre.",
+      "Bannières des pages Ordonnances, Lois, Décrets, Arrêtés et Décisions : image, titre (H1) et sous-titre.",
     group: "Contenu",
   },
   access: {

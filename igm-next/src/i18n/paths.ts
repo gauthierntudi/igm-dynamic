@@ -19,6 +19,7 @@ export const ROUTE_KEYS = {
   ordinances: { fr: "ordonnances", en: "ordinances" },
   laws: { fr: "lois", en: "laws" },
   decrees: { fr: "decrets", en: "decrees" },
+  arretes: { fr: "arretes", en: "orders" },
   decisions: { fr: "decisions", en: "decisions" },
   photos: { fr: "photos", en: "photos" },
   videos: { fr: "videos", en: "videos" },

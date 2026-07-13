@@ -9,6 +9,7 @@ const HERO_FIELD: Record<LegislationCategory, keyof CmsLegislationSettings> = {
   ordinances: "ordinancesHeroImage",
   laws: "lawsHeroImage",
   decrees: "decreesHeroImage",
+  arretes: "arretesHeroImage",
   decisions: "decisionsHeroImage",
 };
 

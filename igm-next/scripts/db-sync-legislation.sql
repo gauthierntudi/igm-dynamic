@@ -9,15 +9,21 @@ CREATE TABLE IF NOT EXISTS "legislation" (
   "created_at" timestamp(3) with time zone
 );
 
+-- Colonnes Arrêtés sur tables déjà existantes (avant FK / index)
+ALTER TABLE "legislation" ADD COLUMN IF NOT EXISTS "arretes_hero_image_id" integer;
+
 DO $$ BEGIN ALTER TABLE "legislation" ADD CONSTRAINT "legislation_ordinances_hero_image_id_media_id_fk" FOREIGN KEY ("ordinances_hero_image_id") REFERENCES "media"("id") ON DELETE SET NULL; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN ALTER TABLE "legislation" ADD CONSTRAINT "legislation_laws_hero_image_id_media_id_fk" FOREIGN KEY ("laws_hero_image_id") REFERENCES "media"("id") ON DELETE SET NULL; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN ALTER TABLE "legislation" ADD CONSTRAINT "legislation_decrees_hero_image_id_media_id_fk" FOREIGN KEY ("decrees_hero_image_id") REFERENCES "media"("id") ON DELETE SET NULL; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN ALTER TABLE "legislation" ADD CONSTRAINT "legislation_arretes_hero_image_id_media_id_fk" FOREIGN KEY ("arretes_hero_image_id") REFERENCES "media"("id") ON DELETE SET NULL; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN ALTER TABLE "legislation" ADD CONSTRAINT "legislation_decisions_hero_image_id_media_id_fk" FOREIGN KEY ("decisions_hero_image_id") REFERENCES "media"("id") ON DELETE SET NULL; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 CREATE INDEX IF NOT EXISTS "legislation_ordinances_hero_image_idx" ON "legislation" ("ordinances_hero_image_id");
 CREATE INDEX IF NOT EXISTS "legislation_laws_hero_image_idx" ON "legislation" ("laws_hero_image_id");
 CREATE INDEX IF NOT EXISTS "legislation_decrees_hero_image_idx" ON "legislation" ("decrees_hero_image_id");
+CREATE INDEX IF NOT EXISTS "legislation_arretes_hero_image_idx" ON "legislation" ("arretes_hero_image_id");
 CREATE INDEX IF NOT EXISTS "legislation_decisions_hero_image_idx" ON "legislation" ("decisions_hero_image_id");
+
 CREATE TABLE IF NOT EXISTS "legislation_locales" (
   "ordinances_hero_title" varchar,
   "ordinances_hero_subtitle" varchar,
@@ -47,5 +53,15 @@ ALTER TABLE "legislation_locales" ADD COLUMN IF NOT EXISTS "laws_hero_title" var
 ALTER TABLE "legislation_locales" ADD COLUMN IF NOT EXISTS "laws_hero_subtitle" varchar;
 ALTER TABLE "legislation_locales" ADD COLUMN IF NOT EXISTS "decrees_hero_title" varchar;
 ALTER TABLE "legislation_locales" ADD COLUMN IF NOT EXISTS "decrees_hero_subtitle" varchar;
+ALTER TABLE "legislation_locales" ADD COLUMN IF NOT EXISTS "arretes_hero_title" varchar;
+ALTER TABLE "legislation_locales" ADD COLUMN IF NOT EXISTS "arretes_hero_subtitle" varchar;
 ALTER TABLE "legislation_locales" ADD COLUMN IF NOT EXISTS "decisions_hero_title" varchar;
 ALTER TABLE "legislation_locales" ADD COLUMN IF NOT EXISTS "decisions_hero_subtitle" varchar;
+
+-- Enum catégorie documents : valeur arretes
+DO $$ BEGIN
+  ALTER TYPE "enum_legislation_documents_category" ADD VALUE 'arretes';
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  ALTER TYPE "enum__legislation_documents_v_version_category" ADD VALUE 'arretes';
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;

@@ -3,6 +3,7 @@ import type { CollectionAfterChangeHook, GlobalAfterChangeHook } from "payload";
 
 import { localePathPrefix, SUPPORTED_LOCALES } from "@/i18n/locales";
 import { hrefForRoute, hrefForNewsArticle, hrefForPhotoAlbum, hrefForPressReviewArticle } from "@/i18n/paths";
+import { LEGISLATION_CATEGORIES } from "@/lib/legislation/constants";
 import { pageHeroRouteKeysForRevalidation } from "@/lib/page-heroes/constants";
 
 function revalidateSite(tags: string[]) {
@@ -16,6 +17,13 @@ function revalidateSite(tags: string[]) {
     }
   } catch {
     // Hors contexte Next.js (scripts CLI, migrations).
+  }
+}
+
+function revalidateLegislationPages() {
+  for (const category of LEGISLATION_CATEGORIES) {
+    revalidatePath(hrefForRoute(category, "fr"));
+    revalidatePath(hrefForRoute(category, "en"));
   }
 }
 
@@ -56,13 +64,7 @@ export const revalidateFrontCollection: CollectionAfterChangeHook = ({ collectio
 
   if (collection.slug === "legislation-documents") {
     try {
-      for (const slug of ["ordonnances", "lois", "decrets", "decisions"]) {
-        revalidatePagePaths(slug);
-      }
-      revalidatePath("/en/ordinances");
-      revalidatePath("/en/laws");
-      revalidatePath("/en/decrees");
-      revalidatePath("/en/decisions");
+      revalidateLegislationPages();
     } catch {
       // Hors contexte Next.js.
     }
@@ -126,9 +128,7 @@ export const revalidateFrontCollection: CollectionAfterChangeHook = ({ collectio
       revalidatePath("/en/about");
       revalidatePath("/en/history");
       revalidatePath("/en/mission");
-      for (const slug of ["ordonnances", "lois", "decrets", "decisions"]) {
-        revalidatePagePaths(slug);
-      }
+      revalidateLegislationPages();
       revalidatePath(hrefForRoute("photos", "fr"));
       revalidatePath(hrefForRoute("photos", "en"));
       revalidatePath(hrefForRoute("videos", "fr"));
@@ -169,13 +169,7 @@ export const revalidateFrontGlobal: GlobalAfterChangeHook = ({ global, doc }) =>
 
   if (global.slug === "legislation") {
     try {
-      for (const slug of ["ordonnances", "lois", "decrets", "decisions"]) {
-        revalidatePagePaths(slug);
-      }
-      revalidatePath("/en/ordinances");
-      revalidatePath("/en/laws");
-      revalidatePath("/en/decrees");
-      revalidatePath("/en/decisions");
+      revalidateLegislationPages();
     } catch {
       // Hors contexte Next.js.
     }

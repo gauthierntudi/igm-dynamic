@@ -121,7 +121,7 @@ export const enum_contact_messages_status = pgEnum(
 );
 export const enum_legislation_documents_category = pgEnum(
   "enum_legislation_documents_category",
-  ["ordinances", "laws", "decrees", "decisions"],
+  ["ordinances", "laws", "decrees", "arretes", "decisions"],
 );
 export const enum_legislation_documents_status = pgEnum(
   "enum_legislation_documents_status",
@@ -129,7 +129,7 @@ export const enum_legislation_documents_status = pgEnum(
 );
 export const enum__legislation_documents_v_version_category = pgEnum(
   "enum__legislation_documents_v_version_category",
-  ["ordinances", "laws", "decrees", "decisions"],
+  ["ordinances", "laws", "decrees", "arretes", "decisions"],
 );
 export const enum__legislation_documents_v_version_status = pgEnum(
   "enum__legislation_documents_v_version_status",
@@ -2635,6 +2635,12 @@ export const legislation = pgTable(
         onDelete: "set null",
       },
     ),
+    arretesHeroImage: integer("arretes_hero_image_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
     decisionsHeroImage: integer("decisions_hero_image_id").references(
       () => media.id,
       {
@@ -2658,6 +2664,7 @@ export const legislation = pgTable(
     ),
     index("legislation_laws_hero_image_idx").on(columns.lawsHeroImage),
     index("legislation_decrees_hero_image_idx").on(columns.decreesHeroImage),
+    index("legislation_arretes_hero_image_idx").on(columns.arretesHeroImage),
     index("legislation_decisions_hero_image_idx").on(
       columns.decisionsHeroImage,
     ),
@@ -3720,6 +3727,11 @@ export const relations_legislation = relations(legislation, ({ one }) => ({
     fields: [legislation.decreesHeroImage],
     references: [media.id],
     relationName: "decreesHeroImage",
+  }),
+  arretesHeroImage: one(media, {
+    fields: [legislation.arretesHeroImage],
+    references: [media.id],
+    relationName: "arretesHeroImage",
   }),
   decisionsHeroImage: one(media, {
     fields: [legislation.decisionsHeroImage],

@@ -16,7 +16,7 @@ export const LegislationDocuments: CollectionConfig = {
     defaultColumns: ["title", "category", "reference", "publishedAt", "_status"],
     listSearchableFields: ["title", "reference", "summary"],
     description:
-      "Textes officiels (PDF) affichés sur les pages Ordonnances, Lois, Décrets et Décisions. Uploadez le PDF dans Médias publics puis liez-le ici.",
+      "Textes officiels (PDF) affichés sur les pages Ordonnances, Lois, Décrets, Arrêtés et Décisions. Uploadez le PDF dans Médias publics puis liez-le ici.",
     pagination: {
       defaultLimit: 25,
     },

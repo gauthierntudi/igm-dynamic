@@ -4,6 +4,7 @@ export const LEGISLATION_CATEGORIES = [
   "ordinances",
   "laws",
   "decrees",
+  "arretes",
   "decisions",
 ] as const;
 
@@ -25,5 +26,6 @@ export const LEGISLATION_CATEGORY_LABELS: Record<
   ordinances: { fr: "Ordonnances", en: "Ordinances" },
   laws: { fr: "Lois", en: "Laws" },
   decrees: { fr: "Décrets", en: "Decrees" },
+  arretes: { fr: "Arrêtés", en: "Orders" },
   decisions: { fr: "Décisions", en: "Decisions" },
 };

@@ -41,6 +41,7 @@ export async function buildLegislationMetadata(route: LegislationRoute): Promise
     ordinances: "ordinancesHeroImage",
     laws: "lawsHeroImage",
     decrees: "decreesHeroImage",
+    arretes: "arretesHeroImage",
     decisions: "decisionsHeroImage",
   } as const;
   const heroMedia = legislationSettings?.[heroField[category]];

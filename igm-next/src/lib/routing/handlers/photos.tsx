@@ -122,6 +122,7 @@ export async function buildMetadataAfterPhotoAlbum(ctx: RouteContext): Promise<M
       ordinances: "ordinancesHeroImage",
       laws: "lawsHeroImage",
       decrees: "decreesHeroImage",
+      arretes: "arretesHeroImage",
       decisions: "decisionsHeroImage",
     } as const;
     const heroMedia = legislationSettings?.[heroField[legislationCategory]];

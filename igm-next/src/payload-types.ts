@@ -445,7 +445,7 @@ export interface ContactMessage {
   createdAt: string;
 }
 /**
- * Textes officiels (PDF) affichés sur les pages Ordonnances, Lois, Décrets et Décisions. Uploadez le PDF dans Médias publics puis liez-le ici.
+ * Textes officiels (PDF) affichés sur les pages Ordonnances, Lois, Décrets, Arrêtés et Décisions. Uploadez le PDF dans Médias publics puis liez-le ici.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "legislation-documents".
@@ -456,7 +456,7 @@ export interface LegislationDocument {
   /**
    * Page sur laquelle le document sera listé.
    */
-  category: 'ordinances' | 'laws' | 'decrees' | 'decisions';
+  category: 'ordinances' | 'laws' | 'decrees' | 'arretes' | 'decisions';
   /**
    * Ex. Loi n°007/2002, Décret n°23/19…
    */
@@ -948,6 +948,7 @@ export interface SiteSetting {
               | '/ordonnances'
               | '/lois'
               | '/decrets'
+              | '/arretes'
               | '/decisions'
               | '/photos'
               | '/videos'
@@ -991,6 +992,7 @@ export interface SiteSetting {
                     | '/ordonnances'
                     | '/lois'
                     | '/decrets'
+                    | '/arretes'
                     | '/decisions'
                     | '/photos'
                     | '/videos'
@@ -1034,6 +1036,7 @@ export interface SiteSetting {
                           | '/ordonnances'
                           | '/lois'
                           | '/decrets'
+                          | '/arretes'
                           | '/decisions'
                           | '/photos'
                           | '/videos'
@@ -1090,6 +1093,7 @@ export interface SiteSetting {
                     | '/ordonnances'
                     | '/lois'
                     | '/decrets'
+                    | '/arretes'
                     | '/decisions'
                     | '/photos'
                     | '/videos'
@@ -1143,6 +1147,7 @@ export interface SiteSetting {
               | '/ordonnances'
               | '/lois'
               | '/decrets'
+              | '/arretes'
               | '/decisions'
               | '/photos'
               | '/videos'
@@ -1215,6 +1220,7 @@ export interface Home {
                 | '/ordonnances'
                 | '/lois'
                 | '/decrets'
+                | '/arretes'
                 | '/decisions'
                 | '/photos'
                 | '/videos'
@@ -1252,6 +1258,7 @@ export interface Home {
                 | '/ordonnances'
                 | '/lois'
                 | '/decrets'
+                | '/arretes'
                 | '/decisions'
                 | '/photos'
                 | '/videos'
@@ -1522,6 +1529,7 @@ export interface WhoWeAre {
                   | '/ordonnances'
                   | '/lois'
                   | '/decrets'
+                  | '/arretes'
                   | '/decisions'
                   | '/photos'
                   | '/videos'
@@ -1651,6 +1659,7 @@ export interface WhoWeAre {
             | '/ordonnances'
             | '/lois'
             | '/decrets'
+            | '/arretes'
             | '/decisions'
             | '/photos'
             | '/videos'
@@ -1695,6 +1704,7 @@ export interface WhoWeAre {
             | '/ordonnances'
             | '/lois'
             | '/decrets'
+            | '/arretes'
             | '/decisions'
             | '/photos'
             | '/videos'
@@ -1717,7 +1727,7 @@ export interface WhoWeAre {
   createdAt?: string | null;
 }
 /**
- * Bannières des pages Ordonnances, Lois, Décrets et Décisions : image, titre (H1) et sous-titre.
+ * Bannières des pages Ordonnances, Lois, Décrets, Arrêtés et Décisions : image, titre (H1) et sous-titre.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "legislation".
@@ -1760,6 +1770,18 @@ export interface Legislation {
    * Optionnel. Laisser vide pour n'afficher aucun sous-titre.
    */
   decreesHeroSubtitle?: string | null;
+  /**
+   * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
+   */
+  arretesHeroImage?: (number | null) | Media;
+  /**
+   * Titre principal et fil d'Ariane.
+   */
+  arretesHeroTitle?: string | null;
+  /**
+   * Optionnel. Laisser vide pour n'afficher aucun sous-titre.
+   */
+  arretesHeroSubtitle?: string | null;
   /**
    * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
    */
@@ -2430,6 +2452,9 @@ export interface LegislationSelect<T extends boolean = true> {
   decreesHeroImage?: T;
   decreesHeroTitle?: T;
   decreesHeroSubtitle?: T;
+  arretesHeroImage?: T;
+  arretesHeroTitle?: T;
+  arretesHeroSubtitle?: T;
   decisionsHeroImage?: T;
   decisionsHeroTitle?: T;
   decisionsHeroSubtitle?: T;

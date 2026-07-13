@@ -16,6 +16,7 @@ export const SITE_NAV_LINKS = [
   { label: "Législation — Ordonnances", value: "/ordonnances" },
   { label: "Législation — Lois", value: "/lois" },
   { label: "Législation — Décrets", value: "/decrets" },
+  { label: "Législation — Arrêtés", value: "/arretes" },
   { label: "Législation — Décisions", value: "/decisions" },
   { label: "Multimédia — Photos", value: "/photos" },
   { label: "Multimédia — Vidéos", value: "/videos" },

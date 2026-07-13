@@ -8,6 +8,7 @@ const HERO_TITLE_FIELD: Record<LegislationCategory, keyof CmsLegislationSettings
   ordinances: "ordinancesHeroTitle",
   laws: "lawsHeroTitle",
   decrees: "decreesHeroTitle",
+  arretes: "arretesHeroTitle",
   decisions: "decisionsHeroTitle",
 };
 
@@ -15,6 +16,7 @@ const HERO_SUBTITLE_FIELD: Record<LegislationCategory, keyof CmsLegislationSetti
   ordinances: "ordinancesHeroSubtitle",
   laws: "lawsHeroSubtitle",
   decrees: "decreesHeroSubtitle",
+  arretes: "arretesHeroSubtitle",
   decisions: "decisionsHeroSubtitle",
 };
 
