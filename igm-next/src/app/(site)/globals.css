@@ -278,6 +278,18 @@ header.style-4 .main-menu li.is-open > ul.sub-menu {
   display: block !important;
 }
 
+@media (min-width: 992px) {
+  header.style-4 .main-menu > ul > li:hover > ul.sub-menu {
+    display: none !important;
+  }
+
+  header.style-4 .main-menu li.menu-item-has-children.is-hover-open > ul.sub-menu,
+  header.style-4 .main-menu ul.sub-menu li.menu-item-has-children.is-hover-open > ul.sub-menu {
+    display: block !important;
+    animation: fade-downs 0.3s linear;
+  }
+}
+
 header.style-4 .main-menu > ul > li > a,
 header.style-4 .main-menu > ul > li > a.drop-down {
   letter-spacing: normal !important;

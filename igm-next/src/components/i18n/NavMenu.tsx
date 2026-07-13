@@ -1,8 +1,12 @@
 "use client";
 
+import { useRef } from "react";
+
 import { DenoncerOpenTrigger } from "@/components/signalement/DenoncerOpenTrigger";
 import { useSiteNavigation } from "@/components/providers/SiteSettingsProvider";
 import type { RuntimeNavItem } from "@/lib/cms/navigationTypes";
+
+import { useNavDropdownHoverDelay } from "./useNavDropdownHoverDelay";
 
 function NavMenuItem({ item, nested = false }: { item: RuntimeNavItem; nested?: boolean }) {
   if (item.kind === "link") {
@@ -51,9 +55,12 @@ function NavMenuItem({ item, nested = false }: { item: RuntimeNavItem; nested?: 
 
 export function NavMenu() {
   const { headerNav } = useSiteNavigation();
+  const menuRef = useRef<HTMLUListElement>(null);
+
+  useNavDropdownHoverDelay(menuRef, headerNav);
 
   return (
-    <ul className="menu-list">
+    <ul ref={menuRef} className="menu-list">
       {headerNav.map((item, index) => (
         <NavMenuItem key={index} item={item} />
       ))}
