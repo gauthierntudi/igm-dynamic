@@ -135,7 +135,7 @@ export function AboutHistoryTimeline({
             <svg className="about-history-timeline__clip-def" aria-hidden focusable="false">
               <defs>
                 <clipPath id={clipPathId} clipPathUnits="objectBoundingBox">
-                  <path d="M 0.86834 0.00562 H 0.00307 L 0.11586 0.47753 L 0.00307 0.99438 H 0.86834 L 0.99656 0.47753 Z" />
+                  <path d="M 0.869804 0 H 0 L 0.110803 0.471963 L 0 1 H 0.869804 L 1 0.471963 Z" />
                 </clipPath>
               </defs>
             </svg>
