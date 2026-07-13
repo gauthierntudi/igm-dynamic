@@ -1,0 +1,91 @@
+.hex-color-picker-field {
+  margin-bottom: 1rem;
+}
+
+.hex-color-picker-field__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.hex-color-picker-field__native {
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  padding: 0.15rem;
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: 6px;
+  background: var(--theme-elevation-0);
+  cursor: pointer;
+}
+
+.hex-color-picker-field__hex {
+  flex: 1;
+  min-width: 0;
+  height: 2.75rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: 6px;
+  background: var(--theme-elevation-0);
+  color: var(--theme-elevation-800);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.875rem;
+}
+
+.hex-color-picker-field__hex:focus {
+  outline: none;
+  border-color: var(--theme-elevation-400);
+}
+
+.hex-color-picker-field__clear {
+  flex-shrink: 0;
+  height: 2.75rem;
+  padding: 0 0.85rem;
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: 6px;
+  background: var(--theme-elevation-50);
+  color: var(--theme-elevation-800);
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.hex-color-picker-field__clear:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.hex-color-picker-field__clear:not(:disabled):hover {
+  border-color: var(--theme-elevation-400);
+}
+
+.hex-color-picker-field__presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.65rem;
+}
+
+.hex-color-picker-field__swatch {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(12, 31, 61, 0.12);
+}
+
+.hex-color-picker-field__swatch--active {
+  border-color: var(--theme-elevation-900);
+  box-shadow: 0 0 0 2px var(--theme-elevation-0);
+}
+
+.hex-color-picker-field__hint {
+  margin: 0.45rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--theme-elevation-500);
+}
+
+.hex-color-picker-field--error .hex-color-picker-field__native,
+.hex-color-picker-field--error .hex-color-picker-field__hex {
+  border-color: var(--theme-error-500);
+}

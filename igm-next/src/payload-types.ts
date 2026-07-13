@@ -1478,11 +1478,11 @@ export interface WhoWeAre {
           year?: string | null;
           title?: string | null;
           /**
-           * Fond du segment de la frise (hex, ex. #1b4491). Laisser vide pour le dégradé bleu automatique.
+           * Fond du segment de la frise. Laisser vide (bouton Auto) pour le dégradé bleu automatique.
            */
           segmentColor?: string | null;
           /**
-           * Bordure et fond au survol du cercle (hex). Laisser vide pour reprendre la couleur du segment.
+           * Fond du cercle titre. Laisser vide (bouton Auto) pour le style blanc par défaut.
            */
           bubbleColor?: string | null;
           /**

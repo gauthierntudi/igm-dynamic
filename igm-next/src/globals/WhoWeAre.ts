@@ -2,6 +2,7 @@ import type { GlobalConfig } from "payload";
 
 import { isAdmin } from "../access/isAdmin";
 import { bannerCtaFields } from "../fields/bannerCtaFields";
+import { hexColorField } from "../fields/hexColorField";
 import { LOCALIZED } from "../fields/localized";
 import { revalidateFrontGlobal } from "../hooks/revalidateFront";
 
@@ -244,23 +245,37 @@ export const WhoWeAre: GlobalConfig = {
                       ...LOCALIZED,
                     },
                     {
-                      name: "segmentColor",
-                      type: "text",
-                      label: "Couleur du segment",
+                      ...hexColorField({
+                        name: "segmentColor",
+                        label: "Couleur du segment",
+                        description:
+                          "Fond du segment de la frise. Laisser vide (bouton Auto) pour le dégradé bleu automatique.",
+                        width: "50%",
+                      }),
                       admin: {
                         description:
-                          "Fond du segment de la frise (hex, ex. #1b4491). Laisser vide pour le dégradé bleu automatique.",
+                          "Fond du segment de la frise. Laisser vide (bouton Auto) pour le dégradé bleu automatique.",
                         width: "50%",
+                        components: {
+                          Field: "@/components/admin/HexColorPickerField#HexColorPickerField",
+                        },
                       },
                     },
                     {
-                      name: "bubbleColor",
-                      type: "text",
-                      label: "Couleur du cercle",
+                      ...hexColorField({
+                        name: "bubbleColor",
+                        label: "Couleur du cercle",
+                        description:
+                          "Fond du cercle titre. Laisser vide (bouton Auto) pour le style blanc par défaut.",
+                        width: "50%",
+                      }),
                       admin: {
                         description:
-                          "Bordure et fond au survol du cercle (hex). Laisser vide pour reprendre la couleur du segment.",
+                          "Fond du cercle titre. Laisser vide (bouton Auto) pour le style blanc par défaut.",
                         width: "50%",
+                        components: {
+                          Field: "@/components/admin/HexColorPickerField#HexColorPickerField",
+                        },
                       },
                     },
                     {
