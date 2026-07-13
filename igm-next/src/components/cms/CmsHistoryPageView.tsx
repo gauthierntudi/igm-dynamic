@@ -4,7 +4,7 @@ import { HeaderHeroDarkBody } from "@/components/cms/HeaderHeroDarkBody";
 import { AboutBreadcrumbHero } from "@/components/cms/who-we-are/AboutBreadcrumbHero";
 import type { RouteKey } from "@/i18n/paths";
 import { hrefForRoute, localizeHref } from "@/i18n/paths";
-import type { SupportedLocale } from "@/i18n/types";
+import type { SupportedLocale } from "@/i18n/locales";
 import { isLcfcmCmsPageRoute } from "@/lib/page-heroes/constants";
 import { htmlToHistoryParagraphs } from "@/lib/cms/parsePageHtmlToHistory";
 import type { CmsPage } from "@/lib/cms/types";
