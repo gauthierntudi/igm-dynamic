@@ -3,9 +3,10 @@
  * Usage: npm run db:sync-press-kit-page
  */
 import pg from "pg";
-import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+
+import { ensureGlobalShellRow, runSqlFile } from "./lib/db-migration.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const sqlPath = join(__dirname, "db-sync-press-kit-page.sql");
@@ -19,9 +20,9 @@ if (!connectionString) {
 const pool = new pg.Pool({ connectionString });
 
 try {
-  console.log("→ Migration press-kit-page…");
-  const sql = readFileSync(sqlPath, "utf8");
-  await pool.query(sql);
+  console.log("→ Migration press-kit-page (schéma)…");
+  await runSqlFile(pool, sqlPath);
+  await ensureGlobalShellRow(pool, "press_kit_page");
   console.log("Migration press-kit-page terminée.");
 } catch (err) {
   console.error(err);

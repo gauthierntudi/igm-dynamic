@@ -1,11 +1,14 @@
 /**
  * Schéma global who-we-are (page À propos).
  * Usage: npm run db:sync-who-we-are
+ *
+ * Ne modifie pas le contenu éditorial. Pour initialiser : npm run seed:who-we-are
  */
 import pg from "pg";
-import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+
+import { ensureGlobalShellRow, runSqlFile } from "./lib/db-migration.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const sqlPath = join(__dirname, "db-sync-who-we-are.sql");
@@ -19,9 +22,9 @@ if (!connectionString) {
 const pool = new pg.Pool({ connectionString });
 
 try {
-  console.log("→ Migration who-we-are…");
-  const sql = readFileSync(sqlPath, "utf8");
-  await pool.query(sql);
+  console.log("→ Migration who-we-are (schéma)…");
+  await runSqlFile(pool, sqlPath);
+  await ensureGlobalShellRow(pool, "who_we_are");
   console.log("Migration who-we-are terminée.");
 } catch (err) {
   console.error(err);

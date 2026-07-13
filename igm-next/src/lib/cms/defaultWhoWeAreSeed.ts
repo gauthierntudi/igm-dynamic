@@ -54,16 +54,19 @@ export const DEFAULT_WHO_WE_ARE_FR: CmsWhoWeAre = {
       {
         year: "2002",
         title: "Code minier",
+        segmentColor: "#0c1f3d",
         text: "Adoption de la Loi n°007/2002 portant Code minier, fondement de la régulation du secteur minier en RDC.",
       },
       {
         year: "9 mars 2018",
         title: "Réformes minières",
+        segmentColor: "#1b4491",
         text: "La Loi n°18/001 du 09 mars 2018 modifie le Code minier et renforce les exigences de transparence et de conformité.",
       },
       {
         year: "9 juin 2023",
         title: "Création de l'IGM",
+        segmentColor: "#f6bf0d",
         text: "Le Décret n°23/19 du 09 juin 2023 crée l'Inspection Générale des Mines, service public autonome rattaché au Ministère des Mines.",
         link: { label: "Lire l'historique complet", navLink: "/historique" },
       },
@@ -183,16 +186,19 @@ export const DEFAULT_WHO_WE_ARE_EN: CmsWhoWeAre = {
       {
         year: "2002",
         title: "Mining Code",
+        segmentColor: "#0c1f3d",
         text: "Adoption of Law No. 007/2002 establishing the Mining Code, the foundation of mining sector regulation in the DRC.",
       },
       {
         year: "9 March 2018",
         title: "Mining reforms",
+        segmentColor: "#1b4491",
         text: "Law No. 18/001 of 9 March 2018 amends the Mining Code and strengthens transparency and compliance requirements.",
       },
       {
         year: "9 June 2023",
         title: "Creation of the IGM",
+        segmentColor: "#f6bf0d",
         text: "Decree No. 23/19 of 9 June 2023 establishes the General Inspectorate of Mines as an autonomous public service under the Ministry of Mines.",
         link: { label: "Read our full history", navLink: "/historique" },
       },

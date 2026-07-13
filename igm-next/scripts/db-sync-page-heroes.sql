@@ -36,11 +36,6 @@ CREATE INDEX IF NOT EXISTS "page_heroes_contact_hero_image_idx" ON "page_heroes"
 CREATE INDEX IF NOT EXISTS "page_heroes_photos_hero_image_idx" ON "page_heroes" ("photos_hero_image_id");
 CREATE INDEX IF NOT EXISTS "page_heroes_videos_hero_image_idx" ON "page_heroes" ("videos_hero_image_id");
 CREATE INDEX IF NOT EXISTS "page_heroes_audios_hero_image_idx" ON "page_heroes" ("audios_hero_image_id");
-
-INSERT INTO "page_heroes" ("id", "created_at", "updated_at")
-SELECT 1, NOW(), NOW()
-WHERE NOT EXISTS (SELECT 1 FROM "page_heroes" WHERE "id" = 1);
-
 CREATE TABLE IF NOT EXISTS "page_heroes_locales" (
   "org_chart_hero_title" varchar,
   "org_chart_hero_subtitle" varchar,

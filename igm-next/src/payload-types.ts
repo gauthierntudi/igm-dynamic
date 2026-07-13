@@ -1473,10 +1473,18 @@ export interface WhoWeAre {
     milestones?:
       | {
           /**
-           * Date complète (ex. 2 juin 2003). L'année s'affiche sur la frise ; la date entière dans le modal.
+           * Date complète localisée (ex. FR : 9 mars 2018 — EN : 9 March 2018). L'année s'affiche sur la frise ; la date entière dans le modal.
            */
           year?: string | null;
           title?: string | null;
+          /**
+           * Fond du segment de la frise (hex, ex. #1b4491). Laisser vide pour le dégradé bleu automatique.
+           */
+          segmentColor?: string | null;
+          /**
+           * Bordure et fond au survol du cercle (hex). Laisser vide pour reprendre la couleur du segment.
+           */
+          bubbleColor?: string | null;
           /**
            * Texte affiché dans la fenêtre au clic sur l'année ou le titre.
            */
@@ -2280,6 +2288,8 @@ export interface WhoWeAreSelect<T extends boolean = true> {
           | {
               year?: T;
               title?: T;
+              segmentColor?: T;
+              bubbleColor?: T;
               text?: T;
               link?:
                 | T

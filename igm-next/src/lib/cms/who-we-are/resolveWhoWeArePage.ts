@@ -16,6 +16,7 @@ import type {
   CmsWhoWeAreTeamMember,
 } from "./types";
 import type { CmsMedia } from "../types";
+import { resolveTimelineMilestoneColors } from "./timelineColors";
 
 export type ResolvedHistoryMilestone = {
   id: string;
@@ -25,6 +26,10 @@ export type ResolvedHistoryMilestone = {
   year: string;
   title: string;
   description?: string;
+  segmentColor: string;
+  segmentTextColor: string;
+  bubbleColor?: string;
+  bubbleTextColor?: string;
   link?: {
     label: string;
     href: string;
@@ -170,20 +175,36 @@ function resolveMilestones(
   fallbackItems: CmsWhoWeAreMilestone[] | null | undefined,
 ): ResolvedHistoryMilestone[] {
   const source = cms ? items : fallbackItems;
+  const fallbacks = fallbackItems ?? [];
+  const total = source?.length ?? 0;
+
   return (
     source
-      ?.filter((item) => item.year?.trim() && item.title?.trim())
-      .map((item, index) => {
-        const date = item.year!.trim();
+      ?.map((item, index) => {
+        const date = item.year?.trim() || fallbacks[index]?.year?.trim() || "";
+        const title = item.title?.trim() || fallbacks[index]?.title?.trim() || "";
+        if (!date || !title) return null;
+
+        const colors = resolveTimelineMilestoneColors(
+          index,
+          total,
+          item.segmentColor,
+          item.bubbleColor,
+          fallbacks[index]?.segmentColor,
+          fallbacks[index]?.bubbleColor,
+        );
+
         return {
           id: item.id ?? `milestone-${index}-${date}`,
           date,
           year: extractYearFromMilestoneDate(date),
-          title: item.title!.trim(),
-          description: item.text?.trim() || undefined,
-          link: resolveMilestoneLink(locale, item.link),
+          title,
+          description: item.text?.trim() || fallbacks[index]?.text?.trim() || undefined,
+          ...colors,
+          link: resolveMilestoneLink(locale, item.link ?? fallbacks[index]?.link),
         };
-      }) ?? []
+      })
+      .filter((item): item is ResolvedHistoryMilestone => item !== null) ?? []
   );
 }
 

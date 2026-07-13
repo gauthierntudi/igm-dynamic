@@ -22,7 +22,3 @@ CREATE TABLE IF NOT EXISTS "contact_page_locales" (
 DO $$ BEGIN ALTER TABLE "contact_page_locales" ADD CONSTRAINT "contact_page_locales_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "contact_page"("id") ON DELETE CASCADE; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 CREATE UNIQUE INDEX IF NOT EXISTS "contact_page_locales_locale_parent_id_unique" ON "contact_page_locales" ("_locale","_parent_id");
-
-INSERT INTO "contact_page" ("id", "created_at", "updated_at")
-SELECT 1, NOW(), NOW()
-WHERE NOT EXISTS (SELECT 1 FROM "contact_page" WHERE "id" = 1);

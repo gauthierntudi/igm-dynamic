@@ -1,11 +1,14 @@
 /**
  * Schéma Payload : globals legislation + page-heroes + contact-page + cartography-settings.
  * Usage: npm run db:sync-globals
+ *
+ * Schéma uniquement — pas de seed de contenu.
  */
 import pg from "pg";
-import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+
+import { ensureGlobalShellRow, runSqlFile } from "./lib/db-migration.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -18,19 +21,21 @@ if (!connectionString) {
 const pool = new pg.Pool({ connectionString });
 
 const migrations = [
-  "db-sync-legislation.sql",
-  "db-sync-page-heroes.sql",
-  "db-sync-page-images.sql",
-  "db-sync-contact-page.sql",
-  "db-sync-press-kit-page.sql",
-  "db-sync-cartography-settings.sql",
+  { file: "db-sync-legislation.sql", table: "legislation" },
+  { file: "db-sync-page-heroes.sql", table: "page_heroes" },
+  { file: "db-sync-page-images.sql", table: null },
+  { file: "db-sync-contact-page.sql", table: "contact_page" },
+  { file: "db-sync-press-kit-page.sql", table: "press_kit_page" },
+  { file: "db-sync-cartography-settings.sql", table: "cartography_settings" },
 ];
 
 try {
-  for (const file of migrations) {
+  for (const { file, table } of migrations) {
     console.log(`→ Migration ${file}…`);
-    const sql = readFileSync(join(__dirname, file), "utf8");
-    await pool.query(sql);
+    await runSqlFile(pool, join(__dirname, file));
+    if (table) {
+      await ensureGlobalShellRow(pool, table);
+    }
   }
   console.log("Migration globals terminée.");
 } catch (err) {

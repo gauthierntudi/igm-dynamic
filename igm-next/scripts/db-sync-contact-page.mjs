@@ -3,9 +3,10 @@
  * Usage: npm run db:sync-contact-page
  */
 import pg from "pg";
-import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+
+import { ensureGlobalShellRow, runSqlFile } from "./lib/db-migration.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const sqlPath = join(__dirname, "db-sync-contact-page.sql");
@@ -19,9 +20,9 @@ if (!connectionString) {
 const pool = new pg.Pool({ connectionString });
 
 try {
-  console.log("→ Migration contact-page…");
-  const sql = readFileSync(sqlPath, "utf8");
-  await pool.query(sql);
+  console.log("→ Migration contact-page (schéma)…");
+  await runSqlFile(pool, sqlPath);
+  await ensureGlobalShellRow(pool, "contact_page");
   console.log("Migration contact-page terminée.");
 } catch (err) {
   console.error(err);

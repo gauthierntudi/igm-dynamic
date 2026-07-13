@@ -17,35 +17,6 @@ type Props = {
   events: ResolvedHistoryMilestone[];
 };
 
-/** Bleus charte IGM du plus foncé au plus clair ; dernier segment = or. */
-const TIMELINE_BLUE_PALETTE = [
-  "#0c1f3d",
-  "#102a52",
-  "#153a7a",
-  "#1a4088",
-  "#1b4491",
-  "#2d5fae",
-  "#4a7cc4",
-] as const;
-
-const TIMELINE_GOLD = "#f6bf0d";
-
-function timelineSegmentColor(index: number, total: number): string {
-  if (total <= 0) return TIMELINE_BLUE_PALETTE[0];
-  if (index === total - 1) return TIMELINE_GOLD;
-
-  const blueSteps = total - 1;
-  if (blueSteps <= 1) return TIMELINE_BLUE_PALETTE[0];
-
-  const paletteMax = TIMELINE_BLUE_PALETTE.length - 1;
-  const paletteIndex = Math.round((index / (blueSteps - 1)) * paletteMax);
-  return TIMELINE_BLUE_PALETTE[paletteIndex];
-}
-
-function timelineSegmentTextColor(background: string): string {
-  return background === TIMELINE_GOLD ? "#0c1f3d" : "#ffffff";
-}
-
 export function AboutHistoryTimeline({
   locale,
   sectionTitle,
@@ -198,12 +169,15 @@ export function AboutHistoryTimeline({
               <div className="about-history-timeline__track">
                 {events.map((event, index) => {
                   const isTop = index % 2 === 0;
-                  const segmentBackground = timelineSegmentColor(index, events.length);
-                  const segmentTextColor = timelineSegmentTextColor(segmentBackground);
-                  const bubbleStyle = {
-                    ["--segment-color" as string]: segmentBackground,
-                    ["--segment-text" as string]: segmentTextColor,
-                  };
+                  const hasCustomBubbleColor = Boolean(event.bubbleColor);
+                  const bubbleStyle = hasCustomBubbleColor
+                    ? {
+                        ["--bubble-color" as string]: event.bubbleColor,
+                        ["--bubble-text" as string]: event.bubbleTextColor,
+                      }
+                    : {
+                        ["--segment-color" as string]: event.segmentColor,
+                      };
 
                   return (
                     <article
@@ -218,6 +192,7 @@ export function AboutHistoryTimeline({
                             type="button"
                             className="about-history-timeline__bubble"
                             style={bubbleStyle}
+                            data-custom-bubble-color={hasCustomBubbleColor ? "true" : undefined}
                             onClick={() => openEvent(event)}
                             aria-haspopup="dialog"
                             aria-label={`${event.date} — ${event.title}`}
@@ -233,8 +208,8 @@ export function AboutHistoryTimeline({
                         className="about-history-timeline__segment"
                         style={{
                           zIndex: index + 1,
-                          background: segmentBackground,
-                          ["--segment-text" as string]: segmentTextColor,
+                          background: event.segmentColor,
+                          ["--segment-text" as string]: event.segmentTextColor,
                         }}
                         onClick={() => openEvent(event)}
                         aria-haspopup="dialog"
@@ -249,6 +224,7 @@ export function AboutHistoryTimeline({
                             type="button"
                             className="about-history-timeline__bubble"
                             style={bubbleStyle}
+                            data-custom-bubble-color={hasCustomBubbleColor ? "true" : undefined}
                             onClick={() => openEvent(event)}
                             aria-haspopup="dialog"
                             aria-label={`${event.date} — ${event.title}`}

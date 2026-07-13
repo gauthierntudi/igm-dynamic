@@ -3,9 +3,10 @@
  * Usage: npm run db:sync-legislation
  */
 import pg from "pg";
-import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+
+import { ensureGlobalShellRow, runSqlFile } from "./lib/db-migration.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const sqlPath = join(__dirname, "db-sync-legislation.sql");
@@ -19,9 +20,9 @@ if (!connectionString) {
 const pool = new pg.Pool({ connectionString });
 
 try {
-  console.log("→ Migration legislation…");
-  const sql = readFileSync(sqlPath, "utf8");
-  await pool.query(sql);
+  console.log("→ Migration legislation (schéma)…");
+  await runSqlFile(pool, sqlPath);
+  await ensureGlobalShellRow(pool, "legislation");
   console.log("Migration legislation terminée.");
 } catch (err) {
   console.error(err);

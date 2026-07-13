@@ -18,11 +18,6 @@ CREATE INDEX IF NOT EXISTS "legislation_ordinances_hero_image_idx" ON "legislati
 CREATE INDEX IF NOT EXISTS "legislation_laws_hero_image_idx" ON "legislation" ("laws_hero_image_id");
 CREATE INDEX IF NOT EXISTS "legislation_decrees_hero_image_idx" ON "legislation" ("decrees_hero_image_id");
 CREATE INDEX IF NOT EXISTS "legislation_decisions_hero_image_idx" ON "legislation" ("decisions_hero_image_id");
-
-INSERT INTO "legislation" ("id", "created_at", "updated_at")
-SELECT 1, NOW(), NOW()
-WHERE NOT EXISTS (SELECT 1 FROM "legislation" WHERE "id" = 1);
-
 CREATE TABLE IF NOT EXISTS "legislation_locales" (
   "ordinances_hero_title" varchar,
   "ordinances_hero_subtitle" varchar,

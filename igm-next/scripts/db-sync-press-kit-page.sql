@@ -39,11 +39,6 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 CREATE UNIQUE INDEX IF NOT EXISTS "press_kit_page_locales_locale_parent_id_unique"
   ON "press_kit_page_locales" ("_locale", "_parent_id");
-
-INSERT INTO "press_kit_page" ("id", "created_at", "updated_at")
-SELECT 1, NOW(), NOW()
-WHERE NOT EXISTS (SELECT 1 FROM "press_kit_page" WHERE "id" = 1);
-
 -- Bannière page Dossier de presse
 ALTER TABLE "page_heroes" ADD COLUMN IF NOT EXISTS "press_kit_hero_image_id" integer;
 

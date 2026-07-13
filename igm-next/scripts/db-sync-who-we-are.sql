@@ -1,4 +1,5 @@
 -- Global Payload « who-we-are » (page À propos)
+-- Schéma uniquement : pas d'INSERT/UPDATE de contenu. Les seeds passent par npm run seed:who-we-are.
 DO $$ BEGIN CREATE TYPE "enum_who_we_are_cta_section_link_nav_link" AS ENUM ('/','/a-propos','/historique','/mission','/vision','/organigramme','/cartographie','/fraude-miniere','/contrebande-miniere','/denoncer','/sanctions','/actualites','/ordonnances','/lois','/decrets','/decisions','/photos','/videos','/audios','/contact','__custom__'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN CREATE TYPE "enum_who_we_are_history_section_milestones_link_nav_link" AS ENUM ('/','/a-propos','/historique','/mission','/vision','/organigramme','/cartographie','/fraude-miniere','/contrebande-miniere','/denoncer','/sanctions','/actualites','/ordonnances','/lois','/decrets','/decisions','/photos','/videos','/dossier-de-presse','/revue-de-presse','/contact','__custom__'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN CREATE TYPE "enum_who_we_are_contact_section_primary_cta_nav_link" AS ENUM ('/','/a-propos','/historique','/mission','/vision','/organigramme','/cartographie','/fraude-miniere','/contrebande-miniere','/denoncer','/sanctions','/actualites','/ordonnances','/lois','/decrets','/decisions','/photos','/videos','/audios','/contact','__custom__'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
@@ -58,12 +59,17 @@ CREATE TABLE IF NOT EXISTS "who_we_are_history_section_milestones" (
   "_order" integer NOT NULL,
   "_parent_id" integer NOT NULL,
   "id" varchar PRIMARY KEY NOT NULL,
-  "year" varchar NOT NULL
+  "segment_color" varchar,
+  "bubble_color" varchar,
+  "link_nav_link" "enum_who_we_are_history_section_milestones_link_nav_link",
+  "link_custom_href" varchar
 );
 
 CREATE TABLE IF NOT EXISTS "who_we_are_history_section_milestones_locales" (
+  "year" varchar NOT NULL,
   "title" varchar NOT NULL,
   "text" varchar,
+  "link_label" varchar,
   "id" serial PRIMARY KEY NOT NULL,
   "_locale" "_locales" NOT NULL,
   "_parent_id" varchar NOT NULL
@@ -167,21 +173,96 @@ ALTER TABLE "who_we_are_locales" ADD COLUMN IF NOT EXISTS "history_section_body"
 ALTER TABLE "who_we_are_locales" ADD COLUMN IF NOT EXISTS "history_section_headline" varchar;
 ALTER TABLE "who_we_are_locales" ADD COLUMN IF NOT EXISTS "hero_title" varchar;
 
--- Titres de section optionnels : pas de valeur par défaut en base
-ALTER TABLE "who_we_are_locales" ALTER COLUMN "about_section_title" DROP DEFAULT;
-ALTER TABLE "who_we_are_locales" ALTER COLUMN "history_section_title" DROP DEFAULT;
-ALTER TABLE "who_we_are_locales" ALTER COLUMN "mission_section_title" DROP DEFAULT;
-ALTER TABLE "who_we_are_locales" ALTER COLUMN "mission_section_statutory_title" DROP DEFAULT;
-ALTER TABLE "who_we_are_locales" ALTER COLUMN "mission_section_priorities_title" DROP DEFAULT;
-ALTER TABLE "who_we_are_locales" ALTER COLUMN "team_section_title" DROP DEFAULT;
-ALTER TABLE "who_we_are_locales" ALTER COLUMN "mission_section_headline" DROP DEFAULT;
+-- Titres de section optionnels : retirer les DEFAULT éditoriaux (une seule fois)
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'who_we_are_locales'
+      AND column_name = 'about_section_title' AND column_default IS NOT NULL
+  ) THEN
+    ALTER TABLE "who_we_are_locales" ALTER COLUMN "about_section_title" DROP DEFAULT;
+    ALTER TABLE "who_we_are_locales" ALTER COLUMN "history_section_title" DROP DEFAULT;
+    ALTER TABLE "who_we_are_locales" ALTER COLUMN "mission_section_title" DROP DEFAULT;
+    ALTER TABLE "who_we_are_locales" ALTER COLUMN "mission_section_statutory_title" DROP DEFAULT;
+    ALTER TABLE "who_we_are_locales" ALTER COLUMN "mission_section_priorities_title" DROP DEFAULT;
+    ALTER TABLE "who_we_are_locales" ALTER COLUMN "team_section_title" DROP DEFAULT;
+    ALTER TABLE "who_we_are_locales" ALTER COLUMN "mission_section_headline" DROP DEFAULT;
+  END IF;
+END $$;
+
+ALTER TABLE "who_we_are" ADD COLUMN IF NOT EXISTS "history_section_hero_image_id" integer;
+ALTER TABLE "who_we_are" ADD COLUMN IF NOT EXISTS "history_section_cta_image_id" integer;
+ALTER TABLE "who_we_are" ADD COLUMN IF NOT EXISTS "history_section_teaser_image1_id" integer;
+ALTER TABLE "who_we_are" ADD COLUMN IF NOT EXISTS "history_section_teaser_image2_id" integer;
+ALTER TABLE "who_we_are" ADD COLUMN IF NOT EXISTS "mission_section_image_id" integer;
+
+DO $$ BEGIN ALTER TABLE "who_we_are" ADD CONSTRAINT "who_we_are_history_section_hero_image_id_media_id_fk" FOREIGN KEY ("history_section_hero_image_id") REFERENCES "media"("id") ON DELETE SET NULL; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN ALTER TABLE "who_we_are" ADD CONSTRAINT "who_we_are_history_section_cta_image_id_media_id_fk" FOREIGN KEY ("history_section_cta_image_id") REFERENCES "media"("id") ON DELETE SET NULL; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN ALTER TABLE "who_we_are" ADD CONSTRAINT "who_we_are_history_section_teaser_image1_id_media_id_fk" FOREIGN KEY ("history_section_teaser_image1_id") REFERENCES "media"("id") ON DELETE SET NULL; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN ALTER TABLE "who_we_are" ADD CONSTRAINT "who_we_are_history_section_teaser_image2_id_media_id_fk" FOREIGN KEY ("history_section_teaser_image2_id") REFERENCES "media"("id") ON DELETE SET NULL; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN ALTER TABLE "who_we_are" ADD CONSTRAINT "who_we_are_mission_section_image_id_media_id_fk" FOREIGN KEY ("mission_section_image_id") REFERENCES "media"("id") ON DELETE SET NULL; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+CREATE INDEX IF NOT EXISTS "who_we_are_history_section_history_section_hero_image_idx" ON "who_we_are" ("history_section_hero_image_id");
+CREATE INDEX IF NOT EXISTS "who_we_are_history_section_history_section_cta_image_idx" ON "who_we_are" ("history_section_cta_image_id");
+CREATE INDEX IF NOT EXISTS "who_we_are_history_section_history_section_teaser_image1_idx" ON "who_we_are" ("history_section_teaser_image1_id");
+CREATE INDEX IF NOT EXISTS "who_we_are_history_section_history_section_teaser_image2_idx" ON "who_we_are" ("history_section_teaser_image2_id");
+CREATE INDEX IF NOT EXISTS "who_we_are_mission_section_mission_section_image_idx" ON "who_we_are" ("mission_section_image_id");
+
+ALTER TABLE "who_we_are_history_section_milestones_locales" ADD COLUMN IF NOT EXISTS "link_label" varchar;
 
 ALTER TABLE "who_we_are_history_section_milestones" ADD COLUMN IF NOT EXISTS "link_nav_link" "enum_who_we_are_history_section_milestones_link_nav_link";
 ALTER TABLE "who_we_are_history_section_milestones" ADD COLUMN IF NOT EXISTS "link_custom_href" varchar;
-ALTER TABLE "who_we_are_history_section_milestones_locales" ADD COLUMN IF NOT EXISTS "link_label" varchar;
+ALTER TABLE "who_we_are_history_section_milestones" ADD COLUMN IF NOT EXISTS "segment_color" varchar;
+ALTER TABLE "who_we_are_history_section_milestones" ADD COLUMN IF NOT EXISTS "bubble_color" varchar;
+
+ALTER TABLE "who_we_are_history_section_milestones_locales" ADD COLUMN IF NOT EXISTS "year" varchar;
+
+-- Migration ponctuelle : dates localisées (year parent → locales). Ne s'exécute qu'une fois.
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'who_we_are_history_section_milestones'
+      AND column_name = 'year'
+  ) THEN
+    UPDATE "who_we_are_history_section_milestones_locales" loc
+    SET "year" = m."year"
+    FROM "who_we_are_history_section_milestones" m
+    WHERE loc."_parent_id" = m."id"
+      AND loc."_locale" = 'fr'
+      AND loc."year" IS NULL
+      AND m."year" IS NOT NULL;
+
+    UPDATE "who_we_are_history_section_milestones_locales" en
+    SET "year" = CASE
+      WHEN fr."year" = '2002' THEN '2002'
+      WHEN fr."year" ILIKE '%mars 2018%' THEN '9 March 2018'
+      WHEN fr."year" ILIKE '%juin 2023%' THEN '9 June 2023'
+      WHEN fr."year" ~* 'janvier' THEN regexp_replace(fr."year", 'janvier', 'January', 'i')
+      WHEN fr."year" ~* 'février' OR fr."year" ~* 'fevrier' THEN regexp_replace(fr."year", 'février|fevrier', 'February', 'i')
+      WHEN fr."year" ~* 'mars' THEN regexp_replace(fr."year", 'mars', 'March', 'i')
+      WHEN fr."year" ~* 'avril' THEN regexp_replace(fr."year", 'avril', 'April', 'i')
+      WHEN fr."year" ~* 'mai' THEN regexp_replace(fr."year", 'mai', 'May', 'i')
+      WHEN fr."year" ~* 'juin' THEN regexp_replace(fr."year", 'juin', 'June', 'i')
+      WHEN fr."year" ~* 'juillet' THEN regexp_replace(fr."year", 'juillet', 'July', 'i')
+      WHEN fr."year" ~* 'août' OR fr."year" ~* 'aout' THEN regexp_replace(fr."year", 'août|aout', 'August', 'i')
+      WHEN fr."year" ~* 'septembre' THEN regexp_replace(fr."year", 'septembre', 'September', 'i')
+      WHEN fr."year" ~* 'octobre' THEN regexp_replace(fr."year", 'octobre', 'October', 'i')
+      WHEN fr."year" ~* 'novembre' THEN regexp_replace(fr."year", 'novembre', 'November', 'i')
+      WHEN fr."year" ~* 'décembre' OR fr."year" ~* 'decembre' THEN regexp_replace(fr."year", 'décembre|decembre', 'December', 'i')
+      ELSE fr."year"
+    END
+    FROM "who_we_are_history_section_milestones_locales" fr
+    WHERE en."_parent_id" = fr."_parent_id"
+      AND fr."_locale" = 'fr'
+      AND en."_locale" = 'en'
+      AND en."year" IS NULL
+      AND fr."year" IS NOT NULL;
+
+    ALTER TABLE "who_we_are_history_section_milestones" DROP COLUMN "year";
+  END IF;
+END $$;
 
 ALTER TABLE "who_we_are_locales" ADD COLUMN IF NOT EXISTS "history_section_timeline_intro" varchar;
-
-INSERT INTO "who_we_are" ("id", "created_at", "updated_at")
-SELECT 1, NOW(), NOW()
-WHERE NOT EXISTS (SELECT 1 FROM "who_we_are" WHERE "id" = 1);

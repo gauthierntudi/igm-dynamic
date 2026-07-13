@@ -16,6 +16,8 @@ export type CmsWhoWeAreMilestone = {
   year?: string | null;
   title?: string | null;
   text?: string | null;
+  segmentColor?: string | null;
+  bubbleColor?: string | null;
   link?: CmsWhoWeAreCta | null;
   id?: string | null;
 };

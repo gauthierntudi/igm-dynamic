@@ -233,14 +233,35 @@ export const WhoWeAre: GlobalConfig = {
                       label: "Date de l'événement",
                       admin: {
                         description:
-                          "Date complète (ex. 2 juin 2003). L'année s'affiche sur la frise ; la date entière dans le modal.",
+                          "Date complète localisée (ex. FR : 9 mars 2018 — EN : 9 March 2018). L'année s'affiche sur la frise ; la date entière dans le modal.",
                       },
+                      ...LOCALIZED,
                     },
                     {
                       name: "title",
                       type: "text",
                       label: "Titre de l'événement",
                       ...LOCALIZED,
+                    },
+                    {
+                      name: "segmentColor",
+                      type: "text",
+                      label: "Couleur du segment",
+                      admin: {
+                        description:
+                          "Fond du segment de la frise (hex, ex. #1b4491). Laisser vide pour le dégradé bleu automatique.",
+                        width: "50%",
+                      },
+                    },
+                    {
+                      name: "bubbleColor",
+                      type: "text",
+                      label: "Couleur du cercle",
+                      admin: {
+                        description:
+                          "Bordure et fond au survol du cercle (hex). Laisser vide pour reprendre la couleur du segment.",
+                        width: "50%",
+                      },
                     },
                     {
                       name: "text",

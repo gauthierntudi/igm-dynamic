@@ -79,7 +79,3 @@ DO $$ BEGIN
     ADD CONSTRAINT "cartography_settings_province_assignments_inspectors_minerals_parent_id_fk"
     FOREIGN KEY ("_parent_id") REFERENCES "cartography_settings_province_assignments_inspectors"("id") ON DELETE CASCADE;
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
-
-INSERT INTO "cartography_settings" ("id", "created_at", "updated_at")
-SELECT 1, NOW(), NOW()
-WHERE NOT EXISTS (SELECT 1 FROM "cartography_settings" WHERE "id" = 1);
