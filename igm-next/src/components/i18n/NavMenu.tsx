@@ -37,13 +37,16 @@ function NavMenuItem({ item, nested = false }: { item: RuntimeNavItem; nested?: 
       <a className="drop-down" href="#">
         {item.label}
       </a>
-      <i
-        className={
-          useCaretIcon
-            ? "d-lg-flex d-none bi-caret-right-fill dropdown-icon"
-            : "bi bi-plus dropdown-icon"
-        }
-      />
+      {useCaretIcon ? (
+        <>
+          {/* Desktop : caret pour le sous-menu latéral */}
+          <i className="d-none d-lg-flex bi-caret-right-fill dropdown-icon" aria-hidden />
+          {/* Mobile : plus/minus pour ouvrir le sous-onglet */}
+          <i className="d-lg-none bi bi-plus dropdown-icon" aria-hidden />
+        </>
+      ) : (
+        <i className="bi bi-plus dropdown-icon" aria-hidden />
+      )}
       <ul className="sub-menu none">
         {item.children.map((child, index) => (
           <NavMenuItem key={`${item.label}-${index}`} item={child} nested />

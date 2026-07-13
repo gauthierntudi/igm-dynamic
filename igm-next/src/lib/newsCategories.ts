@@ -4,12 +4,14 @@ export const CUSTOM_NEWS_CATEGORY = "custom" as const;
 
 export const PRESS_REVIEW_CATEGORY = "revue-de-presse" as const;
 
+export const PRESS_RELEASE_CATEGORY = "communique-presse" as const;
+
 export const NEWS_CATEGORY_VALUES = [
   "inspection",
   "cadastre",
   "digitalisation",
   "conformite",
-  "communique-presse",
+  PRESS_RELEASE_CATEGORY,
   PRESS_REVIEW_CATEGORY,
   CUSTOM_NEWS_CATEGORY,
 ] as const;
@@ -21,7 +23,7 @@ export const NEWS_CATEGORY_OPTIONS: { label: string; value: NewsCategoryValue }[
   { label: "Cadastre", value: "cadastre" },
   { label: "Digitalisation", value: "digitalisation" },
   { label: "Conformité", value: "conformite" },
-  { label: "Communiqué de presse", value: "communique-presse" },
+  { label: "Communiqué de presse", value: PRESS_RELEASE_CATEGORY },
   { label: "Revue de presse", value: PRESS_REVIEW_CATEGORY },
   { label: "Personnaliser", value: CUSTOM_NEWS_CATEGORY },
 ];
@@ -31,8 +33,8 @@ const LABELS_FR: Record<Exclude<NewsCategoryValue, typeof CUSTOM_NEWS_CATEGORY>,
   cadastre: "Cadastre",
   digitalisation: "Digitalisation",
   conformite: "Conformité",
-  "communique-presse": "Communiqué de presse",
-  "revue-de-presse": "Revue de presse",
+  [PRESS_RELEASE_CATEGORY]: "Communiqué de presse",
+  [PRESS_REVIEW_CATEGORY]: "Revue de presse",
 };
 
 const LABELS_EN: Record<Exclude<NewsCategoryValue, typeof CUSTOM_NEWS_CATEGORY>, string> = {
@@ -40,8 +42,8 @@ const LABELS_EN: Record<Exclude<NewsCategoryValue, typeof CUSTOM_NEWS_CATEGORY>,
   cadastre: "Cadastre",
   digitalisation: "Digitalisation",
   conformite: "Compliance",
-  "communique-presse": "Press release",
-  "revue-de-presse": "Press review",
+  [PRESS_RELEASE_CATEGORY]: "Press release",
+  [PRESS_REVIEW_CATEGORY]: "Press review",
 };
 
 export function resolveNewsCategoryLabel(

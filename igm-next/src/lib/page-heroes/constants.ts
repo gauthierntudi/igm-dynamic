@@ -13,6 +13,7 @@ export const PAGE_HERO_ROUTE_KEYS = [
   "contact",
   "photos",
   "videos",
+  "pressReview",
 ] as const;
 
 export type PageHeroRouteKey = (typeof PAGE_HERO_ROUTE_KEYS)[number];
@@ -33,6 +34,7 @@ export const PAGE_HERO_FIELD: Record<PageHeroRouteKey, `${PageHeroRouteKey}HeroI
   contact: "contactHeroImage",
   photos: "photosHeroImage",
   videos: "videosHeroImage",
+  pressReview: "pressReviewHeroImage",
 };
 
 export const PAGE_HERO_CTA_ROUTE_KEYS = ["fraud", "smuggling", "sanctions", "strategy"] as const;
@@ -88,6 +90,7 @@ export const PAGE_HERO_GROUPS: Record<
   media: [
     { routeKey: "photos", label: "Photos" },
     { routeKey: "videos", label: "Vidéos" },
+    { routeKey: "pressReview", label: "Revue de presse" },
   ],
 };
 

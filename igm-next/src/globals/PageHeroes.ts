@@ -76,7 +76,7 @@ export const PageHeroes: GlobalConfig = {
   label: "Bannières de pages",
   admin: {
     description:
-      "Bannières des pages Présentation, LCFCM et Multimédia : image, titre (H1) et sous-titre. Contact et Dossier de presse : textes dans leurs globals dédiés. Pages À propos : global « Page À propos ».",
+      "Bannières des pages Présentation, LCFCM, Multimédia (Photos, Vidéos, Revue de presse) : image, titre (H1) et sous-titre si applicable. Contact et Dossier de presse : textes dans leurs globals dédiés. Pages À propos : global « Page À propos ».",
     group: "Contenu",
   },
   access: {

@@ -2734,6 +2734,12 @@ export const page_heroes = pgTable(
         onDelete: "set null",
       },
     ),
+    pressReviewHeroImage: integer("press_review_hero_image_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
     audiosHeroImage: integer("audios_hero_image_id").references(
       () => media.id,
       {
@@ -2772,6 +2778,9 @@ export const page_heroes = pgTable(
     index("page_heroes_contact_hero_image_idx").on(columns.contactHeroImage),
     index("page_heroes_photos_hero_image_idx").on(columns.photosHeroImage),
     index("page_heroes_videos_hero_image_idx").on(columns.videosHeroImage),
+    index("page_heroes_press_review_hero_image_idx").on(
+      columns.pressReviewHeroImage,
+    ),
     index("page_heroes_audios_hero_image_idx").on(columns.audiosHeroImage),
   ],
 );

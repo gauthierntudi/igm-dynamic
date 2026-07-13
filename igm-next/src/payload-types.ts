@@ -1776,7 +1776,7 @@ export interface Legislation {
   createdAt?: string | null;
 }
 /**
- * Bannières des pages Présentation, LCFCM et Multimédia : image, titre (H1) et sous-titre. Contact et Dossier de presse : textes dans leurs globals dédiés. Pages À propos : global « Page À propos ».
+ * Bannières des pages Présentation, LCFCM, Multimédia (Photos, Vidéos, Revue de presse) : image, titre (H1) et sous-titre si applicable. Contact et Dossier de presse : textes dans leurs globals dédiés. Pages À propos : global « Page À propos ».
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "page-heroes".
@@ -1915,6 +1915,10 @@ export interface PageHero {
    * Optionnel. Laisser vide pour n'afficher aucun sous-titre.
    */
   videosHeroSubtitle?: string | null;
+  /**
+   * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
+   */
+  pressReviewHeroImage?: (number | null) | Media;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2471,6 +2475,7 @@ export interface PageHeroesSelect<T extends boolean = true> {
   videosHeroImage?: T;
   videosHeroTitle?: T;
   videosHeroSubtitle?: T;
+  pressReviewHeroImage?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

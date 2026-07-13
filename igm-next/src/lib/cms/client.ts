@@ -63,6 +63,7 @@ async function fetchPublishedNewsPage(
     q?: string;
     category?: string;
     excludeCategory?: string;
+    excludeCategories?: string[];
   } = {},
 ): Promise<{ docs: CmsNews[]; totalDocs: number; totalPages: number; page: number }> {
   if (!hasDatabase()) {
@@ -72,6 +73,13 @@ async function fetchPublishedNewsPage(
   const limit = Math.max(1, options.limit ?? 12);
   const page = Math.max(1, options.page ?? 1);
   const q = options.q?.trim();
+  const excludeCategories = [
+    ...new Set(
+      [...(options.excludeCategories ?? []), options.excludeCategory]
+        .map((value) => value?.trim())
+        .filter((value): value is string => Boolean(value)),
+    ),
+  ];
 
   try {
     const payload = await getPayloadClient();
@@ -80,8 +88,8 @@ async function fetchPublishedNewsPage(
     if (options.category) {
       baseConditions.push({ category: { equals: options.category } });
     }
-    if (options.excludeCategory) {
-      baseConditions.push({ category: { not_equals: options.excludeCategory } });
+    for (const category of excludeCategories) {
+      baseConditions.push({ category: { not_equals: category } });
     }
 
     const where: Where = q
@@ -357,13 +365,21 @@ export async function getNewsListing(
     q?: string;
     category?: string;
     excludeCategory?: string;
+    excludeCategories?: string[];
   } = {},
 ) {
   const page = Math.max(1, options.page ?? 1);
   const limit = options.limit ?? 12;
   const q = options.q?.trim() ?? "";
   const category = options.category ?? "";
-  const excludeCategory = options.excludeCategory ?? "";
+  const excludeCategories = [
+    ...new Set(
+      [...(options.excludeCategories ?? []), options.excludeCategory]
+        .map((value) => value?.trim())
+        .filter((value): value is string => Boolean(value)),
+    ),
+  ].sort();
+  const excludeCategoryKey = excludeCategories.join("|");
 
   const cached = unstable_cache(
     () =>
@@ -372,9 +388,9 @@ export async function getNewsListing(
         limit,
         q: q || undefined,
         category: category || undefined,
-        excludeCategory: excludeCategory || undefined,
+        excludeCategories,
       }),
-    ["cms-news-listing", locale, String(page), String(limit), q, category, excludeCategory],
+    ["cms-news-listing", locale, String(page), String(limit), q, category, excludeCategoryKey],
     {
       tags: ["collection:news", `collection:news:${locale}`, "collection:news:listing"],
     },

@@ -93,3 +93,8 @@ ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "photos_hero_title" v
 ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "photos_hero_subtitle" varchar;
 ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "videos_hero_title" varchar;
 ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "videos_hero_subtitle" varchar;
+
+-- Bannière liste Revue de presse
+ALTER TABLE "page_heroes" ADD COLUMN IF NOT EXISTS "press_review_hero_image_id" integer;
+DO $$ BEGIN ALTER TABLE "page_heroes" ADD CONSTRAINT "page_heroes_press_review_hero_image_id_media_id_fk" FOREIGN KEY ("press_review_hero_image_id") REFERENCES "media"("id") ON DELETE SET NULL; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+CREATE INDEX IF NOT EXISTS "page_heroes_press_review_hero_image_idx" ON "page_heroes" ("press_review_hero_image_id");

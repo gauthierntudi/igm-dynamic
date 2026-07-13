@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { CmsNewsArticleView } from "@/components/cms/CmsNewsArticleView";
 import { NewsListingView } from "@/components/cms/news-listing/NewsListingView";
 import { getNewsListing } from "@/lib/cms/client";
+import { getPageHeroesSettings } from "@/lib/cms/page-heroes/getPageHeroesSettings";
+import { resolvePageHeroImage } from "@/lib/cms/page-heroes/resolvePageHero";
 import { tryResolveHeroMediaSrc } from "@/lib/cms/resolveHeroMediaSrc";
 import { getMessages } from "@/i18n/messages";
 import { ARTICLE_RELATED_NEWS_MAX_ITEMS } from "@/lib/newsDisplay";
@@ -35,17 +37,21 @@ export async function renderPressReviewArticleRoute(route: PressReviewArticleRou
 
 export async function renderPressReviewListingRoute(route: PressReviewListingRoute) {
   const { locale, page, q } = route;
-  const listing = await getNewsListing(locale, {
-    page,
-    limit: NEWS_LISTING_PAGE_SIZE,
-    q: q || undefined,
-    category: PRESS_REVIEW_CATEGORY,
-  });
+  const [listing, pageHeroes] = await Promise.all([
+    getNewsListing(locale, {
+      page,
+      limit: NEWS_LISTING_PAGE_SIZE,
+      q: q || undefined,
+      category: PRESS_REVIEW_CATEGORY,
+    }),
+    getPageHeroesSettings(locale),
+  ]);
 
   return (
     <NewsListingView
       locale={locale}
       variant="pressReview"
+      heroImageSrc={resolvePageHeroImage(pageHeroes, "pressReview")}
       articles={listing.docs}
       page={listing.page}
       totalPages={listing.totalPages}
@@ -74,8 +80,11 @@ export async function buildPressReviewListingMetadata(
 ): Promise<Metadata> {
   const { locale, pathSegments } = route;
   const m = getMessages(locale).pressReviewListing;
+  const pageHeroes = await getPageHeroesSettings(locale);
   return siteMeta(locale, pathSegments, {
     title: m.metaTitle,
     description: m.metaDescription,
+    image: resolvePageHeroImage(pageHeroes, "pressReview"),
+    imageAlt: m.exploreTitle,
   });
 }

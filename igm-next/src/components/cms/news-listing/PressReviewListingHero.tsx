@@ -1,13 +1,13 @@
 import { HeaderHeroDarkBody } from "@/components/cms/HeaderHeroDarkBody";
-import { resolveNewsCoverSrc } from "@/components/home/news/resolveNewsMedia";
-import type { CmsNews } from "@/lib/cms/types";
+import { withDeployedBase } from "@/lib/deployBasePath";
+import { PAGE_HERO_DEFAULT_FALLBACK } from "@/lib/page-heroes/constants";
 
 type Props = {
   title: string;
   lead: string;
   sectionLabel: string;
   eyebrow: string;
-  featuredArticle?: CmsNews | null;
+  heroImageSrc?: string | null;
 };
 
 export function PressReviewListingHero({
@@ -15,9 +15,9 @@ export function PressReviewListingHero({
   lead,
   sectionLabel,
   eyebrow,
-  featuredArticle,
+  heroImageSrc,
 }: Props) {
-  const coverSrc = resolveNewsCoverSrc(featuredArticle?.cover, 0);
+  const coverSrc = heroImageSrc?.trim() || withDeployedBase(PAGE_HERO_DEFAULT_FALLBACK);
 
   return (
     <section className="igm-press-review-listing-hero" aria-label={sectionLabel}>

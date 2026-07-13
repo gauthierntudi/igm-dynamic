@@ -22,12 +22,12 @@
 
     li.classList.toggle("is-open", open);
 
-    var icon = li.querySelector(":scope > .dropdown-icon");
+    var icon = li.querySelector(
+      ":scope > .dropdown-icon.bi-plus, :scope > .dropdown-icon.bi-dash",
+    );
     if (icon && icon.classList) {
-      if (icon.classList.contains("bi-plus") || icon.classList.contains("bi-dash")) {
-        icon.classList.toggle("bi-plus", !open);
-        icon.classList.toggle("bi-dash", open);
-      }
+      icon.classList.toggle("bi-plus", !open);
+      icon.classList.toggle("bi-dash", open);
     }
   }
 

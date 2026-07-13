@@ -17,6 +17,7 @@ type Props = {
   locale: SupportedLocale;
   variant?: NewsListingVariant;
   heroArticles?: CmsNews[];
+  heroImageSrc?: string | null;
   articles: CmsNews[];
   page: number;
   totalPages: number;
@@ -28,6 +29,7 @@ export function NewsListingView({
   locale,
   variant = "news",
   heroArticles = [],
+  heroImageSrc,
   articles,
   page,
   totalPages,
@@ -62,7 +64,7 @@ export function NewsListingView({
           lead={pressReviewM.heroLead}
           sectionLabel={pressReviewM.sectionLabel}
           eyebrow={pressReviewM.heroEyebrow}
-          featuredArticle={articles[0]}
+          heroImageSrc={heroImageSrc}
         />
       ) : null}
 

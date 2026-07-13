@@ -6,7 +6,7 @@ import { getNewsListing } from "@/lib/cms/client";
 import { tryResolveHeroMediaSrc } from "@/lib/cms/resolveHeroMediaSrc";
 import { getMessages } from "@/i18n/messages";
 import { ARTICLE_RELATED_NEWS_MAX_ITEMS } from "@/lib/newsDisplay";
-import { PRESS_REVIEW_CATEGORY } from "@/lib/newsCategories";
+import { PRESS_RELEASE_CATEGORY, PRESS_REVIEW_CATEGORY } from "@/lib/newsCategories";
 import {
   NEWS_LISTING_HERO_COUNT,
   NEWS_LISTING_PAGE_SIZE,
@@ -17,6 +17,9 @@ import type { SiteRoute } from "../types";
 
 type NewsArticleRoute = Extract<SiteRoute, { kind: "news-article" }>;
 type NewsListingRoute = Extract<SiteRoute, { kind: "news-listing" }>;
+
+/** Catégories exclues du carrousel hero Actualités. */
+const NEWS_HERO_EXCLUDE_CATEGORIES = [PRESS_REVIEW_CATEGORY, PRESS_RELEASE_CATEGORY];
 
 export async function renderNewsArticleRoute(route: NewsArticleRoute) {
   const { locale, article } = route;
@@ -43,7 +46,7 @@ export async function renderNewsListingRoute(route: NewsListingRoute) {
       : getNewsListing(locale, {
           page: 1,
           limit: NEWS_LISTING_HERO_COUNT,
-          excludeCategory: PRESS_REVIEW_CATEGORY,
+          excludeCategories: NEWS_HERO_EXCLUDE_CATEGORIES,
         }),
   ]);
 
