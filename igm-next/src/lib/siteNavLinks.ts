@@ -6,6 +6,7 @@ export const SITE_NAV_LINKS = [
   { label: "Présentation — Mission", value: "/mission" },
   { label: "Présentation — Vision", value: "/vision" },
   { label: "Présentation — Organigramme", value: "/organigramme" },
+  { label: "Présentation — Stratégie", value: "/strategie" },
   { label: "Présentation — Cartographie", value: "/cartographie" },
   { label: "LCFCM — Fraude minière", value: "/fraude-miniere" },
   { label: "LCFCM — Contrebande minière", value: "/contrebande-miniere" },

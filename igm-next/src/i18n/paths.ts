@@ -14,6 +14,7 @@ export const ROUTE_KEYS = {
   smuggling: { fr: "contrebande-miniere", en: "mining-smuggling" },
   report: { fr: "denoncer", en: "report" },
   sanctions: { fr: "sanctions", en: "sanctions" },
+  strategy: { fr: "strategie", en: "strategy" },
   news: { fr: "actualites", en: "news" },
   ordinances: { fr: "ordonnances", en: "ordinances" },
   laws: { fr: "lois", en: "laws" },

@@ -5,6 +5,7 @@ export const PAGE_HERO_ROUTE_KEYS = [
   "orgChart",
   "pressKit",
   "map",
+  "strategy",
   "fraud",
   "smuggling",
   "sanctions",
@@ -24,6 +25,7 @@ export const PAGE_HERO_FIELD: Record<PageHeroRouteKey, `${PageHeroRouteKey}HeroI
   orgChart: "orgChartHeroImage",
   pressKit: "pressKitHeroImage",
   map: "mapHeroImage",
+  strategy: "strategyHeroImage",
   fraud: "fraudHeroImage",
   smuggling: "smugglingHeroImage",
   sanctions: "sanctionsHeroImage",
@@ -33,7 +35,7 @@ export const PAGE_HERO_FIELD: Record<PageHeroRouteKey, `${PageHeroRouteKey}HeroI
   videos: "videosHeroImage",
 };
 
-export const PAGE_HERO_CTA_ROUTE_KEYS = ["fraud", "smuggling", "sanctions"] as const;
+export const PAGE_HERO_CTA_ROUTE_KEYS = ["fraud", "smuggling", "sanctions", "strategy"] as const;
 
 export type PageHeroCtaRouteKey = (typeof PAGE_HERO_CTA_ROUTE_KEYS)[number];
 
@@ -50,6 +52,7 @@ export const PAGE_HERO_CTA_FIELD: Record<
   fraud: "fraudCtaHeroImage",
   smuggling: "smugglingCtaHeroImage",
   sanctions: "sanctionsCtaHeroImage",
+  strategy: "strategyCtaHeroImage",
 };
 
 export const PAGE_HERO_DEFAULT: Partial<Record<PageHeroRouteKey, string>> = {
@@ -73,6 +76,7 @@ export const PAGE_HERO_GROUPS: Record<
     { routeKey: "orgChart", label: "Organigramme" },
     { routeKey: "pressKit", label: "Dossier de presse" },
     { routeKey: "map", label: "Cartographie" },
+    { routeKey: "strategy", label: "Stratégie" },
   ],
   lcfcm: [
     { routeKey: "fraud", label: "Fraude minière" },

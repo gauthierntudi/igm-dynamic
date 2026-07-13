@@ -18,7 +18,7 @@ export const DEFAULT_HOME_STRATEGY_FR: CmsHomeStrategy = {
     { label: "Audits de conformité sociale & environnementale" },
   ],
   ctaLabel: "Consulter notre stratégie",
-  ctaHref: "/contact",
+  ctaHref: "/strategie",
 };
 
 export const DEFAULT_HOME_STRATEGY_EN: CmsHomeStrategy = {
@@ -39,5 +39,5 @@ export const DEFAULT_HOME_STRATEGY_EN: CmsHomeStrategy = {
     { label: "Social & environmental compliance audits" },
   ],
   ctaLabel: "View our strategy",
-  ctaHref: "/contact",
+  ctaHref: "/strategie",
 };

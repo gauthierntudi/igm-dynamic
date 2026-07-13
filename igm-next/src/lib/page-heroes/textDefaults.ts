@@ -7,6 +7,7 @@ import type { PageHeroRouteKey } from "./constants";
 export const PAGE_HERO_TEXT_ROUTE_KEYS = [
   "orgChart",
   "map",
+  "strategy",
   "fraud",
   "smuggling",
   "sanctions",
@@ -29,6 +30,7 @@ export const PAGE_HERO_TITLE_FIELD: Record<
 > = {
   orgChart: "orgChartHeroTitle",
   map: "mapHeroTitle",
+  strategy: "strategyHeroTitle",
   fraud: "fraudHeroTitle",
   smuggling: "smugglingHeroTitle",
   sanctions: "sanctionsHeroTitle",
@@ -43,6 +45,7 @@ export const PAGE_HERO_SUBTITLE_FIELD: Record<
 > = {
   orgChart: "orgChartHeroSubtitle",
   map: "mapHeroSubtitle",
+  strategy: "strategyHeroSubtitle",
   fraud: "fraudHeroSubtitle",
   smuggling: "smugglingHeroSubtitle",
   sanctions: "sanctionsHeroSubtitle",
@@ -62,6 +65,8 @@ export function getDefaultPageHeroTitle(
       return messages.nav.orgChart;
     case "map":
       return messages.cartography.title;
+    case "strategy":
+      return messages.nav.strategy;
     case "fraud":
       return messages.nav.miningFraud;
     case "smuggling":
@@ -90,6 +95,10 @@ export function getDefaultPageHeroSubtitle(
         : "Structure de l'Inspection Générale des Mines conformément au Décret n°23/19.";
     case "map":
       return messages.cartography.subtitle;
+    case "strategy":
+      return locale === "en"
+        ? "National roadmap for strengthening mining governance and sector transparency."
+        : "Feuille de route nationale pour renforcer la gouvernance minière et la transparence du secteur.";
     case "fraud":
     case "smuggling":
     case "sanctions":

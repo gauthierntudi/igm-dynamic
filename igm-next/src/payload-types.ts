@@ -938,6 +938,7 @@ export interface SiteSetting {
               | '/mission'
               | '/vision'
               | '/organigramme'
+              | '/strategie'
               | '/cartographie'
               | '/fraude-miniere'
               | '/contrebande-miniere'
@@ -980,6 +981,7 @@ export interface SiteSetting {
                     | '/mission'
                     | '/vision'
                     | '/organigramme'
+                    | '/strategie'
                     | '/cartographie'
                     | '/fraude-miniere'
                     | '/contrebande-miniere'
@@ -1022,6 +1024,7 @@ export interface SiteSetting {
                           | '/mission'
                           | '/vision'
                           | '/organigramme'
+                          | '/strategie'
                           | '/cartographie'
                           | '/fraude-miniere'
                           | '/contrebande-miniere'
@@ -1077,6 +1080,7 @@ export interface SiteSetting {
                     | '/mission'
                     | '/vision'
                     | '/organigramme'
+                    | '/strategie'
                     | '/cartographie'
                     | '/fraude-miniere'
                     | '/contrebande-miniere'
@@ -1129,6 +1133,7 @@ export interface SiteSetting {
               | '/mission'
               | '/vision'
               | '/organigramme'
+              | '/strategie'
               | '/cartographie'
               | '/fraude-miniere'
               | '/contrebande-miniere'
@@ -1200,6 +1205,7 @@ export interface Home {
                 | '/mission'
                 | '/vision'
                 | '/organigramme'
+                | '/strategie'
                 | '/cartographie'
                 | '/fraude-miniere'
                 | '/contrebande-miniere'
@@ -1236,6 +1242,7 @@ export interface Home {
                 | '/mission'
                 | '/vision'
                 | '/organigramme'
+                | '/strategie'
                 | '/cartographie'
                 | '/fraude-miniere'
                 | '/contrebande-miniere'
@@ -1505,6 +1512,7 @@ export interface WhoWeAre {
                   | '/mission'
                   | '/vision'
                   | '/organigramme'
+                  | '/strategie'
                   | '/cartographie'
                   | '/fraude-miniere'
                   | '/contrebande-miniere'
@@ -1633,6 +1641,7 @@ export interface WhoWeAre {
             | '/mission'
             | '/vision'
             | '/organigramme'
+            | '/strategie'
             | '/cartographie'
             | '/fraude-miniere'
             | '/contrebande-miniere'
@@ -1676,6 +1685,7 @@ export interface WhoWeAre {
             | '/mission'
             | '/vision'
             | '/organigramme'
+            | '/strategie'
             | '/cartographie'
             | '/fraude-miniere'
             | '/contrebande-miniere'
@@ -1801,6 +1811,22 @@ export interface PageHero {
    * Optionnel. Laisser vide pour n'afficher aucun sous-titre.
    */
   mapHeroSubtitle?: string | null;
+  /**
+   * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
+   */
+  strategyHeroImage?: (number | null) | Media;
+  /**
+   * Titre principal et fil d'Ariane.
+   */
+  strategyHeroTitle?: string | null;
+  /**
+   * Optionnel. Laisser vide pour n'afficher aucun sous-titre.
+   */
+  strategyHeroSubtitle?: string | null;
+  /**
+   * Image de fond du bandeau « acteur central » en bas de page. Repli : bannière du haut.
+   */
+  strategyCtaHeroImage?: (number | null) | Media;
   /**
    * Image de fond de la bannière en haut de page (recommandé : paysage, ≥ 1920×600 px).
    */
@@ -2419,6 +2445,10 @@ export interface PageHeroesSelect<T extends boolean = true> {
   mapHeroImage?: T;
   mapHeroTitle?: T;
   mapHeroSubtitle?: T;
+  strategyHeroImage?: T;
+  strategyHeroTitle?: T;
+  strategyHeroSubtitle?: T;
+  strategyCtaHeroImage?: T;
   fraudHeroImage?: T;
   fraudHeroTitle?: T;
   fraudHeroSubtitle?: T;

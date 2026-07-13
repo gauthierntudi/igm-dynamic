@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS "page_heroes" (
   "fraud_hero_image_id" integer,
   "smuggling_hero_image_id" integer,
   "sanctions_hero_image_id" integer,
+  "strategy_hero_image_id" integer,
   "report_hero_image_id" integer,
   "contact_hero_image_id" integer,
   "photos_hero_image_id" integer,
@@ -15,11 +16,15 @@ CREATE TABLE IF NOT EXISTS "page_heroes" (
   "created_at" timestamp(3) with time zone
 );
 
+-- Colonnes ajoutées sur tables déjà existantes (prod) — avant FK / index
+ALTER TABLE "page_heroes" ADD COLUMN IF NOT EXISTS "strategy_hero_image_id" integer;
+
 DO $$ BEGIN ALTER TABLE "page_heroes" ADD CONSTRAINT "page_heroes_org_chart_hero_image_id_media_id_fk" FOREIGN KEY ("org_chart_hero_image_id") REFERENCES "media"("id") ON DELETE SET NULL; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN ALTER TABLE "page_heroes" ADD CONSTRAINT "page_heroes_map_hero_image_id_media_id_fk" FOREIGN KEY ("map_hero_image_id") REFERENCES "media"("id") ON DELETE SET NULL; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN ALTER TABLE "page_heroes" ADD CONSTRAINT "page_heroes_fraud_hero_image_id_media_id_fk" FOREIGN KEY ("fraud_hero_image_id") REFERENCES "media"("id") ON DELETE SET NULL; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN ALTER TABLE "page_heroes" ADD CONSTRAINT "page_heroes_smuggling_hero_image_id_media_id_fk" FOREIGN KEY ("smuggling_hero_image_id") REFERENCES "media"("id") ON DELETE SET NULL; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN ALTER TABLE "page_heroes" ADD CONSTRAINT "page_heroes_sanctions_hero_image_id_media_id_fk" FOREIGN KEY ("sanctions_hero_image_id") REFERENCES "media"("id") ON DELETE SET NULL; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN ALTER TABLE "page_heroes" ADD CONSTRAINT "page_heroes_strategy_hero_image_id_media_id_fk" FOREIGN KEY ("strategy_hero_image_id") REFERENCES "media"("id") ON DELETE SET NULL; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN ALTER TABLE "page_heroes" ADD CONSTRAINT "page_heroes_report_hero_image_id_media_id_fk" FOREIGN KEY ("report_hero_image_id") REFERENCES "media"("id") ON DELETE SET NULL; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN ALTER TABLE "page_heroes" ADD CONSTRAINT "page_heroes_contact_hero_image_id_media_id_fk" FOREIGN KEY ("contact_hero_image_id") REFERENCES "media"("id") ON DELETE SET NULL; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN ALTER TABLE "page_heroes" ADD CONSTRAINT "page_heroes_photos_hero_image_id_media_id_fk" FOREIGN KEY ("photos_hero_image_id") REFERENCES "media"("id") ON DELETE SET NULL; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
@@ -31,6 +36,7 @@ CREATE INDEX IF NOT EXISTS "page_heroes_map_hero_image_idx" ON "page_heroes" ("m
 CREATE INDEX IF NOT EXISTS "page_heroes_fraud_hero_image_idx" ON "page_heroes" ("fraud_hero_image_id");
 CREATE INDEX IF NOT EXISTS "page_heroes_smuggling_hero_image_idx" ON "page_heroes" ("smuggling_hero_image_id");
 CREATE INDEX IF NOT EXISTS "page_heroes_sanctions_hero_image_idx" ON "page_heroes" ("sanctions_hero_image_id");
+CREATE INDEX IF NOT EXISTS "page_heroes_strategy_hero_image_idx" ON "page_heroes" ("strategy_hero_image_id");
 CREATE INDEX IF NOT EXISTS "page_heroes_report_hero_image_idx" ON "page_heroes" ("report_hero_image_id");
 CREATE INDEX IF NOT EXISTS "page_heroes_contact_hero_image_idx" ON "page_heroes" ("contact_hero_image_id");
 CREATE INDEX IF NOT EXISTS "page_heroes_photos_hero_image_idx" ON "page_heroes" ("photos_hero_image_id");
@@ -47,6 +53,8 @@ CREATE TABLE IF NOT EXISTS "page_heroes_locales" (
   "smuggling_hero_subtitle" varchar,
   "sanctions_hero_title" varchar,
   "sanctions_hero_subtitle" varchar,
+  "strategy_hero_title" varchar,
+  "strategy_hero_subtitle" varchar,
   "report_hero_title" varchar,
   "report_hero_subtitle" varchar,
   "photos_hero_title" varchar,
@@ -77,6 +85,8 @@ ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "smuggling_hero_title
 ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "smuggling_hero_subtitle" varchar;
 ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "sanctions_hero_title" varchar;
 ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "sanctions_hero_subtitle" varchar;
+ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "strategy_hero_title" varchar;
+ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "strategy_hero_subtitle" varchar;
 ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "report_hero_title" varchar;
 ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "report_hero_subtitle" varchar;
 ALTER TABLE "page_heroes_locales" ADD COLUMN IF NOT EXISTS "photos_hero_title" varchar;

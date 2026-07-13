@@ -18,4 +18,5 @@ export type CmsPageHeroesSettings = PageHeroImageFields &
     fraudCtaHeroImage?: CmsMedia | number | null;
     smugglingCtaHeroImage?: CmsMedia | number | null;
     sanctionsCtaHeroImage?: CmsMedia | number | null;
+    strategyCtaHeroImage?: CmsMedia | number | null;
   };

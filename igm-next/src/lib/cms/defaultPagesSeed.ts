@@ -282,6 +282,82 @@ const SANCTIONS_CONTENT_EN = `
 <p>Through its legal mandate, IGM ensures that mining operators comply with national standards, international standards and good governance principles, thereby helping to protect natural resources and strengthen the rule of law in the mining sector.</p>
 `.trim();
 
+const STRATEGY_CONTENT_FR = `
+<p>Conformément au Décret n°23/19 du 09 juin 2023 portant organisation et fonctionnement de l'Inspection Générale des Mines, l'IGM déploie une stratégie nationale visant à renforcer la gouvernance du secteur minier, à protéger les ressources naturelles et à garantir la transparence des opérations sur l'ensemble du territoire.</p>
+<p>À travers cette stratégie, l'IGM ambitionne de :</p>
+<ul>
+  <li>Renforcer la souveraineté minière de l'État ;</li>
+  <li>Garantir une exploitation responsable et durable ;</li>
+  <li>Protéger les ressources naturelles ;</li>
+  <li>Accroître les recettes publiques ;</li>
+  <li>Assurer la transparence et la traçabilité du secteur.</li>
+</ul>
+<p>Axes stratégiques :</p>
+<ul>
+  <li>Opérationnalisation nationale ;</li>
+  <li>Digitalisation &amp; traçabilité ;</li>
+  <li>Lutte contre la fraude et la contrebande ;</li>
+  <li>Audits de conformité sociale &amp; environnementale.</li>
+</ul>
+<p>Cette stratégie s'appuie sur une présence territoriale renforcée, des outils de digitalisation et de traçabilité, ainsi qu'une coordination interinstitutionnelle avec les services de l'État et les partenaires techniques. Pour en savoir plus ou échanger avec nos équipes, contactez l'Inspection Générale des Mines.</p>
+`.trim();
+
+const STRATEGY_CONTENT_EN = `
+<p>In accordance with Decree No. 23/19 of 9 June 2023 on the organisation and operation of the General Mine Inspection, IGM is rolling out a national strategy to strengthen mining sector governance, protect natural resources and ensure transparency of operations across the country.</p>
+<p>Through this strategy, the IGM aims to:</p>
+<ul>
+  <li>Strengthen the State's mining sovereignty;</li>
+  <li>Ensure responsible and sustainable exploitation;</li>
+  <li>Protect natural resources;</li>
+  <li>Increase public revenue;</li>
+  <li>Ensure transparency and traceability in the sector.</li>
+</ul>
+<p>Strategic pillars:</p>
+<ul>
+  <li>Nationwide operational rollout;</li>
+  <li>Digitalisation &amp; traceability;</li>
+  <li>Fight against fraud and smuggling;</li>
+  <li>Social &amp; environmental compliance audits.</li>
+</ul>
+<p>This strategy relies on strengthened territorial presence, digitalisation and traceability tools, and inter-institutional coordination with State services and technical partners. To find out more or speak with our teams, contact the General Mine Inspection.</p>
+`.trim();
+
+export const DEFAULT_STRATEGY_PAGE_FR: DefaultPageSeed = {
+  routeKey: "strategy",
+  slug: "strategie",
+  title: "Stratégie de déploiement",
+  hero: {
+    eyebrow: "Présentation",
+    title: "Stratégie de déploiement",
+    lead:
+      "Feuille de route nationale pour renforcer la gouvernance minière, la transparence et la protection des ressources naturelles.",
+    ctaLabel: "Nous contacter",
+    ctaHref: "/contact",
+  },
+  contentHtml: STRATEGY_CONTENT_FR,
+  seoTitle: "Stratégie de déploiement — IGM",
+  seoDescription:
+    "Stratégie nationale de l'IGM : ambitions, axes stratégiques et déploiement territorial pour la gouvernance minière en RDC.",
+};
+
+export const DEFAULT_STRATEGY_PAGE_EN: DefaultPageSeed = {
+  routeKey: "strategy",
+  slug: "strategy",
+  title: "Deployment strategy",
+  hero: {
+    eyebrow: "About us",
+    title: "Deployment strategy",
+    lead:
+      "National roadmap for strengthening mining governance, transparency and protection of natural resources.",
+    ctaLabel: "Contact us",
+    ctaHref: "/contact",
+  },
+  contentHtml: STRATEGY_CONTENT_EN,
+  seoTitle: "Deployment strategy — IGM",
+  seoDescription:
+    "IGM's national strategy: ambitions, strategic pillars and territorial rollout for mining governance in the DRC.",
+};
+
 export const DEFAULT_SANCTIONS_PAGE_FR: DefaultPageSeed = {
   routeKey: "sanctions",
   slug: "sanctions",
@@ -491,6 +567,7 @@ const DEFAULT_PAGES_BY_LOCALE = {
     DEFAULT_MINING_FRAUD_PAGE_FR,
     DEFAULT_MINING_SMUGGLING_PAGE_FR,
     DEFAULT_SANCTIONS_PAGE_FR,
+    DEFAULT_STRATEGY_PAGE_FR,
     DEFAULT_TERMS_PAGE_FR,
     DEFAULT_COOKIES_PAGE_FR,
   ],
@@ -498,6 +575,7 @@ const DEFAULT_PAGES_BY_LOCALE = {
     DEFAULT_MINING_FRAUD_PAGE_EN,
     DEFAULT_MINING_SMUGGLING_PAGE_EN,
     DEFAULT_SANCTIONS_PAGE_EN,
+    DEFAULT_STRATEGY_PAGE_EN,
     DEFAULT_TERMS_PAGE_EN,
     DEFAULT_COOKIES_PAGE_EN,
   ],
@@ -551,6 +629,7 @@ export const DEFAULT_PAGE_SEED_PAIRS = [
   { fr: DEFAULT_MINING_FRAUD_PAGE_FR, en: DEFAULT_MINING_FRAUD_PAGE_EN },
   { fr: DEFAULT_MINING_SMUGGLING_PAGE_FR, en: DEFAULT_MINING_SMUGGLING_PAGE_EN },
   { fr: DEFAULT_SANCTIONS_PAGE_FR, en: DEFAULT_SANCTIONS_PAGE_EN },
+  { fr: DEFAULT_STRATEGY_PAGE_FR, en: DEFAULT_STRATEGY_PAGE_EN },
   { fr: DEFAULT_TERMS_PAGE_FR, en: DEFAULT_TERMS_PAGE_EN },
   { fr: DEFAULT_COOKIES_PAGE_FR, en: DEFAULT_COOKIES_PAGE_EN },
 ] as const;

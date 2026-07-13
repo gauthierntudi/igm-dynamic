@@ -156,3 +156,20 @@ CREATE TABLE IF NOT EXISTS "site_settings_footer_legal_links_locales" (
 );
 CREATE UNIQUE INDEX IF NOT EXISTS "site_settings_footer_legal_links_locales_locale_parent_id_un" ON "site_settings_footer_legal_links_locales" ("_locale","_parent_id");
 DO $$ BEGIN ALTER TABLE "site_settings_footer_legal_links_locales" ADD CONSTRAINT "site_settings_footer_legal_links_locales_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "site_settings_footer_legal_links"("id") ON DELETE CASCADE; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+-- Lien menu Stratégie
+DO $$ BEGIN
+  ALTER TYPE "enum_site_settings_header_nav_nav_link" ADD VALUE '/strategie';
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  ALTER TYPE "enum_site_settings_header_nav_children_nav_link" ADD VALUE '/strategie';
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  ALTER TYPE "enum_site_settings_header_nav_children_sub_items_nav_link" ADD VALUE '/strategie';
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  ALTER TYPE "enum_site_settings_footer_columns_links_nav_link" ADD VALUE '/strategie';
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  ALTER TYPE "enum_site_settings_footer_legal_links_nav_link" ADD VALUE '/strategie';
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;

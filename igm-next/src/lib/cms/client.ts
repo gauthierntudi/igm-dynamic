@@ -221,35 +221,47 @@ async function fetchHomePageBundleUncached(maxNews: number, locale: SupportedLoc
     return { stats: [] as CmsStat[], home: null as CmsHome | null, news: [] as CmsNews[] };
   }
 
-  try {
-    const payload = await getPayloadClient();
-    const [statsResult, home, newsResult] = await Promise.all([
-      payload.find({ collection: "stats", limit: 100, sort: "order", locale }),
-      payload.findGlobal({ slug: "home", depth: 2, locale }),
-      payload.find({
-        collection: "news",
-        limit: maxNews,
-        sort: "-publishedAt",
-        depth: 1,
-        locale,
-        where: {
-          and: [
-            { _status: { equals: "published" } },
-            { category: { not_equals: PRESS_REVIEW_CATEGORY } },
-          ],
-        },
-      }),
-    ]);
+  const payload = await getPayloadClient();
+  const [statsSettled, homeSettled, newsSettled] = await Promise.allSettled([
+    payload.find({ collection: "stats", limit: 100, sort: "order", locale }),
+    payload.findGlobal({ slug: "home", depth: 2, locale }),
+    payload.find({
+      collection: "news",
+      limit: maxNews,
+      sort: "-publishedAt",
+      depth: 1,
+      locale,
+      where: {
+        and: [
+          { _status: { equals: "published" } },
+          { category: { not_equals: PRESS_REVIEW_CATEGORY } },
+        ],
+      },
+    }),
+  ]);
 
-    return {
-      stats: statsResult.docs as CmsStat[],
-      home: home as CmsHome,
-      news: newsResult.docs as CmsNews[],
-    };
-  } catch (err) {
-    console.error("[cms] getHomePageBundle:", err);
-    return { stats: [] as CmsStat[], home: null as CmsHome | null, news: [] as CmsNews[] };
+  if (statsSettled.status === "rejected") {
+    console.error("[cms] getHomePageBundle stats:", statsSettled.reason);
   }
+  if (newsSettled.status === "rejected") {
+    console.error("[cms] getHomePageBundle news:", newsSettled.reason);
+  }
+  if (homeSettled.status === "rejected") {
+    console.error("[cms] getHomePageBundle home:", homeSettled.reason);
+    throw homeSettled.reason;
+  }
+
+  return {
+    stats:
+      statsSettled.status === "fulfilled"
+        ? (statsSettled.value.docs as CmsStat[])
+        : [],
+    home: homeSettled.value as CmsHome,
+    news:
+      newsSettled.status === "fulfilled"
+        ? (newsSettled.value.docs as CmsNews[])
+        : [],
+  };
 }
 
 const whoWeAreCacheByLocale = {
@@ -371,6 +383,9 @@ export async function getNewsListing(
 }
 
 export async function getHomePageBundle(locale: SupportedLocale = DEFAULT_LOCALE) {
+  if (process.env.NODE_ENV === "development") {
+    return fetchHomePageBundleUncached(12, locale);
+  }
   return homePageBundleCacheByLocale[locale]();
 }
 
