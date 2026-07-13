@@ -32,6 +32,7 @@ export async function renderCmsPageRoute(route: CmsPageRoute) {
     <CmsHistoryPageView
       page={page}
       locale={locale}
+      routeKey={routeKey}
       heroImageSrc={heroImageSrc}
       ctaHeroImageSrc={ctaHeroImageSrc}
     />

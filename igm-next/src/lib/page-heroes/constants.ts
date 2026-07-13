@@ -91,6 +91,15 @@ export const PAGE_HERO_GROUPS: Record<
   ],
 };
 
+/** Pages LCFCM au layout « historique » (CmsHistoryPageView), hors formulaire Dénoncer. */
+export const LCFCM_CMS_PAGE_ROUTE_KEYS = ["fraud", "smuggling", "sanctions"] as const;
+
+export type LcfcmCmsPageRouteKey = (typeof LCFCM_CMS_PAGE_ROUTE_KEYS)[number];
+
+export function isLcfcmCmsPageRoute(routeKey: string | null | undefined): routeKey is LcfcmCmsPageRouteKey {
+  return routeKey != null && (LCFCM_CMS_PAGE_ROUTE_KEYS as readonly string[]).includes(routeKey);
+}
+
 /** Routes du menu concernées (pour revalidation). */
 export function pageHeroRouteKeysForRevalidation(): RouteKey[] {
   return [...PAGE_HERO_ROUTE_KEYS];

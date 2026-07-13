@@ -2,8 +2,10 @@ import Link from "next/link";
 
 import { HeaderHeroDarkBody } from "@/components/cms/HeaderHeroDarkBody";
 import { AboutBreadcrumbHero } from "@/components/cms/who-we-are/AboutBreadcrumbHero";
-import type { SupportedLocale } from "@/i18n/locales";
+import type { RouteKey } from "@/i18n/paths";
 import { hrefForRoute, localizeHref } from "@/i18n/paths";
+import type { SupportedLocale } from "@/i18n/types";
+import { isLcfcmCmsPageRoute } from "@/lib/page-heroes/constants";
 import { htmlToHistoryParagraphs } from "@/lib/cms/parsePageHtmlToHistory";
 import type { CmsPage } from "@/lib/cms/types";
 import { resolveHeroMediaSrc, tryResolveHeroMediaSrc } from "@/lib/cms/resolveHeroMediaSrc";
@@ -14,12 +16,14 @@ import "@/components/cms/who-we-are/about-page.css";
 type Props = {
   page: CmsPage;
   locale: SupportedLocale;
+  routeKey?: RouteKey | null;
   heroImageSrc?: string;
   ctaHeroImageSrc?: string;
 };
 
-export function CmsHistoryPageView({ page, locale, heroImageSrc, ctaHeroImageSrc }: Props) {
+export function CmsHistoryPageView({ page, locale, routeKey, heroImageSrc, ctaHeroImageSrc }: Props) {
   const isEn = locale === "en";
+  const isLcfcmPage = isLcfcmCmsPageRoute(routeKey);
   const resolvedHeroImageSrc =
     heroImageSrc ??
     resolveHeroMediaSrc(
@@ -35,7 +39,6 @@ export function CmsHistoryPageView({ page, locale, heroImageSrc, ctaHeroImageSrc
   const heroTitle = page.hero?.title?.trim() || page.title;
   const asideLabel = page.hero?.eyebrow?.trim() || page.title;
   const breadcrumbTitle = page.title;
-  const docTitle = page.title;
   const heroLead = page.hero?.lead?.trim();
 
   const paragraphs = page.contentHtml?.trim()
@@ -60,7 +63,7 @@ export function CmsHistoryPageView({ page, locale, heroImageSrc, ctaHeroImageSrc
     : "Un acteur central de la gouvernance minière";
 
   return (
-    <main className="igm-about-page" data-igm-page="cms-history">
+    <main className="igm-about-page" data-igm-page="cms-history" data-lcfcm-page={isLcfcmPage ? "true" : undefined}>
       <HeaderHeroDarkBody />
 
       <AboutBreadcrumbHero
@@ -74,14 +77,24 @@ export function CmsHistoryPageView({ page, locale, heroImageSrc, ctaHeroImageSrc
       <section className="about-history-full">
         <div className="about-wrap about-history-layout">
           <aside className="about-history-layout__aside" aria-label={asideLabel}>
-            <h2 className="about-history-teaser__title">{asideLabel}</h2>
+            <h2
+              className={
+                isLcfcmPage
+                  ? "about-history-teaser__title about-history-teaser__title--lcfcm"
+                  : "about-history-teaser__title"
+              }
+            >
+              {asideLabel}
+            </h2>
             <span className="about-history-teaser__line" aria-hidden />
           </aside>
 
           <article className="about-history-layout__main">
-            <header className="about-history-doc-head">
-              <h1 className="about-history-doc-title">{docTitle}</h1>
-            </header>
+            {!isLcfcmPage ? (
+              <header className="about-history-doc-head">
+                <h1 className="about-history-doc-title">{page.title}</h1>
+              </header>
+            ) : null}
 
             {bodyParagraphs.length > 0 ? (
               <HistoryContent paragraphs={bodyParagraphs} />

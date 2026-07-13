@@ -465,6 +465,11 @@
   color: var(--about-ink);
 }
 
+.about-history-teaser__title--lcfcm {
+  font-size: clamp(1.35rem, 2.5vw, 1.65rem);
+  line-height: 1.2;
+}
+
 .about-history-teaser__line {
   display: block;
   width: clamp(2.5rem, 6vw, 3.5rem);
