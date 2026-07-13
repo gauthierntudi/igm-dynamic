@@ -6,7 +6,8 @@ import type { RouteKey } from "@/i18n/paths";
 import { hrefForRoute, localizeHref } from "@/i18n/paths";
 import type { SupportedLocale } from "@/i18n/locales";
 import { isLcfcmCmsPageRoute } from "@/lib/page-heroes/constants";
-import { htmlToHistoryParagraphs } from "@/lib/cms/parsePageHtmlToHistory";
+import { htmlToHistoryBlocks, splitHistoryContentFromHtml } from "@/lib/cms/parsePageHtmlToHistory";
+import type { HistoryBlock } from "@/lib/cms/who-we-are/parseHistoryContent";
 import type { CmsPage } from "@/lib/cms/types";
 import { resolveHeroMediaSrc, tryResolveHeroMediaSrc } from "@/lib/cms/resolveHeroMediaSrc";
 import { HistoryContent } from "@/lib/cms/who-we-are/parseHistoryContent";
@@ -41,15 +42,18 @@ export function CmsHistoryPageView({ page, locale, routeKey, heroImageSrc, ctaHe
   const breadcrumbTitle = page.title;
   const heroLead = page.hero?.lead?.trim();
 
-  const paragraphs = page.contentHtml?.trim()
-    ? htmlToHistoryParagraphs(page.contentHtml)
+  const { bodyBlocks, closingText } = page.contentHtml?.trim()
+    ? splitHistoryContentFromHtml(page.contentHtml)
     : page.summary?.trim()
-      ? [page.summary.trim()]
-      : [];
+      ? { bodyBlocks: [{ type: "paragraph", text: page.summary.trim() } satisfies HistoryBlock], closingText: "" }
+      : { bodyBlocks: [], closingText: "" };
 
-  const closingText = paragraphs.length > 1 ? (paragraphs.at(-1) ?? "") : "";
-  const bodyParagraphs =
-    closingText && paragraphs.length > 1 ? paragraphs.slice(0, -1) : paragraphs;
+  const contentBlocks =
+    isLcfcmPage && closingText
+      ? [...bodyBlocks, { type: "paragraph", text: closingText } satisfies HistoryBlock]
+      : bodyBlocks;
+
+  const showClosingCta = !isLcfcmPage && Boolean(closingText);
 
   const ctaHref = page.hero?.ctaHref?.trim()
     ? localizeHref(page.hero.ctaHref, locale)
@@ -96,14 +100,12 @@ export function CmsHistoryPageView({ page, locale, routeKey, heroImageSrc, ctaHe
               </header>
             ) : null}
 
-            {bodyParagraphs.length > 0 ? (
-              <HistoryContent paragraphs={bodyParagraphs} />
-            ) : null}
+            {contentBlocks.length > 0 ? <HistoryContent blocks={contentBlocks} /> : null}
           </article>
         </div>
       </section>
 
-      {closingText ? (
+      {showClosingCta ? (
         <section
           className="about-history-cta"
           style={{ backgroundImage: `url(${resolvedCtaHeroImageSrc})` }}
