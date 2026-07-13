@@ -28,8 +28,8 @@ import { SignalementLanceurCell as SignalementLanceurCell_b21945ae0e77e59b522919
 import { ContactMessageDetailPanel as ContactMessageDetailPanel_e253186454a51d44fe66c9fe0886c186 } from '@/components/admin/ContactMessageDetailPanel'
 import { NavMenuRowLabel as NavMenuRowLabel_ecdf19676b4c67fda96896c939ca488b } from '@/components/admin/NavMenuRowLabel'
 import { BannerSlideRowLabel as BannerSlideRowLabel_f7963e0c18066251d378bf55b98f97cd } from '@/components/admin/BannerSlideRowLabel'
-import { CartographyProvinceRowLabel as CartographyProvinceRowLabel_a1b2c3d4e5f6789012345678abcdef01 } from '@/components/admin/CartographyProvinceRowLabel'
-import { HexColorPickerField as HexColorPickerField_b8c7d6e5f4a39281706f5e4d3c2b1a09 } from '@/components/admin/HexColorPickerField'
+import { HexColorPickerField as HexColorPickerField_36a2bc70a639a4fb4c550d634453ba7f } from '@/components/admin/HexColorPickerField'
+import { CartographyProvinceRowLabel as CartographyProvinceRowLabel_9447a2dfc7062217ec1394b1a00ef0af } from '@/components/admin/CartographyProvinceRowLabel'
 import { IgmAdminIcon as IgmAdminIcon_54a79d99513d6643891406af19968126 } from '@/components/admin/IgmAdminIcon'
 import { IgmAdminLogo as IgmAdminLogo_12c29ee0cc729abab4b586e51fa1356c } from '@/components/admin/IgmAdminLogo'
 import { IgmLoginIntro as IgmLoginIntro_79d73b313b3c057e06777beb654da469 } from '@/components/admin/IgmLoginIntro'
@@ -68,8 +68,8 @@ export const importMap = {
   "@/components/admin/ContactMessageDetailPanel#ContactMessageDetailPanel": ContactMessageDetailPanel_e253186454a51d44fe66c9fe0886c186,
   "@/components/admin/NavMenuRowLabel#NavMenuRowLabel": NavMenuRowLabel_ecdf19676b4c67fda96896c939ca488b,
   "@/components/admin/BannerSlideRowLabel#BannerSlideRowLabel": BannerSlideRowLabel_f7963e0c18066251d378bf55b98f97cd,
-  "@/components/admin/CartographyProvinceRowLabel#CartographyProvinceRowLabel": CartographyProvinceRowLabel_a1b2c3d4e5f6789012345678abcdef01,
-  "@/components/admin/HexColorPickerField#HexColorPickerField": HexColorPickerField_b8c7d6e5f4a39281706f5e4d3c2b1a09,
+  "@/components/admin/HexColorPickerField#HexColorPickerField": HexColorPickerField_36a2bc70a639a4fb4c550d634453ba7f,
+  "@/components/admin/CartographyProvinceRowLabel#CartographyProvinceRowLabel": CartographyProvinceRowLabel_9447a2dfc7062217ec1394b1a00ef0af,
   "@/components/admin/IgmAdminIcon#IgmAdminIcon": IgmAdminIcon_54a79d99513d6643891406af19968126,
   "@/components/admin/IgmAdminLogo#IgmAdminLogo": IgmAdminLogo_12c29ee0cc729abab4b586e51fa1356c,
   "@/components/admin/IgmLoginIntro#IgmLoginIntro": IgmLoginIntro_79d73b313b3c057e06777beb654da469,
