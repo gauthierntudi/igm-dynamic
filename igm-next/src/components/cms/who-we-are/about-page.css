@@ -1410,12 +1410,11 @@
 }
 
 .about-history-list-marker--sub {
-  width: 0.42rem;
-  height: 0.42rem;
-  margin-top: 0.58em;
-  background: linear-gradient(135deg, var(--about-blue) 0%, var(--about-blue-deep) 100%);
-  border-radius: 1px;
-  transform: rotate(45deg);
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-top: 0.55em;
+  background: var(--about-blue);
+  border-radius: 50%;
   box-shadow: 0 0 0 1px rgba(27, 68, 145, 0.12);
 }
 
@@ -1436,8 +1435,7 @@
 
 .about-history-list--nested {
   margin: 0.35rem 0 0 0.2rem;
-  padding: 0.3rem 0 0.1rem 0.9rem;
-  border-left: 2px solid rgba(27, 68, 145, 0.16);
+  padding: 0.3rem 0 0.1rem 0.5rem;
 }
 
 .about-history-list--nested li {
