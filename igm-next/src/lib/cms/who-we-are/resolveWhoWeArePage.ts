@@ -178,34 +178,34 @@ function resolveMilestones(
   const fallbacks = fallbackItems ?? [];
   const total = source?.length ?? 0;
 
-  return (
-    source
-      ?.map((item, index) => {
-        const date = item.year?.trim() || fallbacks[index]?.year?.trim() || "";
-        const title = item.title?.trim() || fallbacks[index]?.title?.trim() || "";
-        if (!date || !title) return null;
+  const milestones: ResolvedHistoryMilestone[] = [];
 
-        const colors = resolveTimelineMilestoneColors(
-          index,
-          total,
-          item.segmentColor,
-          item.bubbleColor,
-          fallbacks[index]?.segmentColor,
-          fallbacks[index]?.bubbleColor,
-        );
+  for (const [index, item] of (source ?? []).entries()) {
+    const date = item.year?.trim() || fallbacks[index]?.year?.trim() || "";
+    const title = item.title?.trim() || fallbacks[index]?.title?.trim() || "";
+    if (!date || !title) continue;
 
-        return {
-          id: item.id ?? `milestone-${index}-${date}`,
-          date,
-          year: extractYearFromMilestoneDate(date),
-          title,
-          description: item.text?.trim() || fallbacks[index]?.text?.trim() || undefined,
-          ...colors,
-          link: resolveMilestoneLink(locale, item.link ?? fallbacks[index]?.link),
-        };
-      })
-      .filter((item): item is ResolvedHistoryMilestone => item !== null) ?? []
-  );
+    const colors = resolveTimelineMilestoneColors(
+      index,
+      total,
+      item.segmentColor,
+      item.bubbleColor,
+      fallbacks[index]?.segmentColor,
+      fallbacks[index]?.bubbleColor,
+    );
+
+    milestones.push({
+      id: item.id ?? `milestone-${index}-${date}`,
+      date,
+      year: extractYearFromMilestoneDate(date),
+      title,
+      description: item.text?.trim() || fallbacks[index]?.text?.trim() || undefined,
+      ...colors,
+      link: resolveMilestoneLink(locale, item.link ?? fallbacks[index]?.link),
+    });
+  }
+
+  return milestones;
 }
 
 function pickText(value: string | null | undefined, fallback: string): string {

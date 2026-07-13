@@ -3,6 +3,77 @@
  * Schéma uniquement — le contenu éditorial passe par les scripts seed:* (manuel).
  */
 import { readFileSync } from "node:fs";
+import pg from "pg";
+
+const LEGACY_SSL_MODES = new Set(["prefer", "require", "verify-ca"]);
+
+function normalizePostgresConnectionString(uri) {
+  const trimmed = uri.trim();
+  if (!trimmed) return trimmed;
+
+  try {
+    const url = new URL(trimmed);
+    const sslmode = url.searchParams.get("sslmode")?.toLowerCase();
+    if (sslmode && LEGACY_SSL_MODES.has(sslmode)) {
+      url.searchParams.set("sslmode", "verify-full");
+    }
+    return url.toString();
+  } catch {
+    return trimmed.replace(
+      /([?&])sslmode=(prefer|require|verify-ca)(?=&|$)/gi,
+      "$1sslmode=verify-full",
+    );
+  }
+}
+
+/** Neon : préfère l'hôte pooler (meilleure reachabilité depuis un poste dev). */
+function preferNeonPoolerConnectionString(uri) {
+  try {
+    const url = new URL(uri);
+    const host = url.hostname;
+    if (host.includes(".neon.tech") && !host.includes("-pooler")) {
+      url.hostname = host.replace(/^(ep-[^.]+)\./, "$1-pooler.");
+    }
+    return url.toString();
+  } catch {
+    return uri;
+  }
+}
+
+export function resolveMigrationDatabaseUri() {
+  const raw = process.env.DATABASE_URI || process.env.DATABASE_URL || "";
+  if (!raw.trim()) return "";
+
+  const normalized = normalizePostgresConnectionString(raw);
+  return preferNeonPoolerConnectionString(normalized);
+}
+
+export function createMigrationPool() {
+  const connectionString = resolveMigrationDatabaseUri();
+  if (!connectionString) {
+    throw new Error("DATABASE_URI ou DATABASE_URL manquant dans l'environnement.");
+  }
+
+  let host = "";
+  try {
+    host = new URL(connectionString).hostname;
+  } catch {
+    // ignore
+  }
+
+  if (host && !host.includes("-pooler") && host.includes(".neon.tech")) {
+    console.warn(
+      "⚠ Connexion Neon sans pooler détectée — bascule automatique vers l'hôte -pooler pour la migration.",
+    );
+  }
+
+  return new pg.Pool({
+    connectionString,
+    connectionTimeoutMillis: 20_000,
+    // Évite les échecs EHOSTUNREACH IPv6 sur certains réseaux locaux.
+    family: 4,
+  });
+}
 
 export async function columnExists(pool, table, column) {
   const { rows } = await pool.query(
