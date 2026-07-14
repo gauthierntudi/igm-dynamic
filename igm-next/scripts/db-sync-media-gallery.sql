@@ -135,3 +135,7 @@ DO $$ BEGIN
     ADD CONSTRAINT "payload_locked_documents_rels_media_gallery_items_fk"
     FOREIGN KEY ("media_gallery_items_id") REFERENCES "media_gallery_items"("id") ON DELETE CASCADE;
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+-- Lien YouTube (remplace l’upload fichier vidéo)
+ALTER TABLE "media_gallery_items" ADD COLUMN IF NOT EXISTS "youtube_url" varchar;
+ALTER TABLE "_media_gallery_items_v" ADD COLUMN IF NOT EXISTS "version_youtube_url" varchar;

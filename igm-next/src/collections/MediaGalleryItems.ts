@@ -3,8 +3,9 @@ import type { CollectionConfig } from "payload";
 import { isAdmin, publishedRead } from "../access/isAdmin";
 import { LOCALIZED } from "../fields/localized";
 import { revalidateFrontCollection } from "../hooks/revalidateFront";
+import { parseYoutubeVideoId } from "../lib/cms/media-gallery/parseYoutubeUrl";
 
-/** Vidéos publiées une par une sur /videos. */
+/** Vidéos YouTube publiées une par une sur /videos. */
 export const MediaGalleryItems: CollectionConfig = {
   slug: "media-gallery-items",
   labels: {
@@ -14,9 +15,9 @@ export const MediaGalleryItems: CollectionConfig = {
   admin: {
     useAsTitle: "title",
     defaultColumns: ["title", "publishedAt", "_status"],
-    listSearchableFields: ["title", "summary", "caption"],
+    listSearchableFields: ["title", "summary", "caption", "youtubeUrl"],
     description:
-      "Vidéos affichées sur /videos. Uploadez le fichier dans Médias publics puis liez-le ici. Les photos se gèrent dans « Albums photos ».",
+      "Vidéos affichées sur /videos. Collez l’URL YouTube (watch, shorts ou youtu.be). Les photos se gèrent dans « Albums photos ».",
     group: "Contenu",
     pagination: {
       defaultLimit: 25,
@@ -59,7 +60,7 @@ export const MediaGalleryItems: CollectionConfig = {
               type: "textarea",
               label: "Légende",
               admin: {
-                description: "Texte affiché sous la vidéo dans la galerie.",
+                description: "Texte affiché sous la vidéo dans le lecteur.",
               },
               ...LOCALIZED,
             },
@@ -84,13 +85,23 @@ export const MediaGalleryItems: CollectionConfig = {
               },
             },
             {
-              name: "media",
-              type: "upload",
-              relationTo: "media",
-              label: "Fichier vidéo",
+              name: "youtubeUrl",
+              type: "text",
+              label: "Lien YouTube",
               required: true,
               admin: {
-                description: "Vidéo MP4 (collection Médias publics).",
+                description:
+                  "Exemple : https://www.youtube.com/watch?v=… ou https://youtu.be/…",
+                placeholder: "https://www.youtube.com/watch?v=",
+              },
+              validate: (value: unknown) => {
+                if (typeof value !== "string" || !value.trim()) {
+                  return "Le lien YouTube est requis.";
+                }
+                if (!parseYoutubeVideoId(value)) {
+                  return "URL YouTube invalide. Utilisez un lien watch, youtu.be, embed ou shorts.";
+                }
+                return true;
               },
             },
           ],

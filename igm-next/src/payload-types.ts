@@ -476,7 +476,7 @@ export interface LegislationDocument {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Vidéos affichées sur /videos. Uploadez le fichier dans Médias publics puis liez-le ici. Les photos se gèrent dans « Albums photos ».
+ * Vidéos affichées sur /videos. Collez l’URL YouTube (watch, shorts ou youtu.be). Les photos se gèrent dans « Albums photos ».
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media-gallery-items".
@@ -486,7 +486,7 @@ export interface MediaGalleryItem {
   title: string;
   summary?: string | null;
   /**
-   * Texte affiché sous la vidéo dans la galerie.
+   * Texte affiché sous la vidéo dans le lecteur.
    */
   caption?: string | null;
   publishedAt?: string | null;
@@ -495,9 +495,9 @@ export interface MediaGalleryItem {
    */
   order?: number | null;
   /**
-   * Vidéo MP4 (collection Médias publics).
+   * Exemple : https://www.youtube.com/watch?v=… ou https://youtu.be/…
    */
-  media: number | Media;
+  youtubeUrl: string;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -855,7 +855,7 @@ export interface MediaGalleryItemsSelect<T extends boolean = true> {
   caption?: T;
   publishedAt?: T;
   order?: T;
-  media?: T;
+  youtubeUrl?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;

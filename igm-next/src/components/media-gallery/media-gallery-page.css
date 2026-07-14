@@ -361,7 +361,10 @@
   inset: 0;
   z-index: 1200;
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: 100vw;
+  height: 100dvh;
   color: #fff;
   background: rgba(8, 18, 40, 0.96);
   backdrop-filter: blur(10px);
@@ -445,8 +448,42 @@
   z-index: 1;
   display: grid;
   place-items: center;
+  justify-items: center;
+  align-content: center;
+  width: 100%;
+  min-width: 0;
   min-height: 0;
-  padding: clamp(0.75rem, 2vw, 1.5rem) clamp(3.25rem, 8vw, 5rem);
+  padding: clamp(0.75rem, 2vw, 1.25rem) clamp(1rem, 4vw, 3.5rem);
+  box-sizing: border-box;
+}
+
+.igm-video-lightbox__stage > .igm-plyr-wrap,
+.igm-video-lightbox__stage > .igm-youtube-wrap {
+  box-sizing: border-box;
+  width: min(1080px, 92vw) !important;
+  height: min(607px, calc(92vw * 9 / 16), calc(100dvh - 11.5rem)) !important;
+  max-width: min(1080px, 92vw) !important;
+  max-height: calc(100dvh - 11.5rem) !important;
+  margin: 0 auto;
+  aspect-ratio: auto !important;
+}
+
+/* Lecteur YouTube — styles aussi ici pour rester actifs hors import player */
+.igm-youtube-wrap {
+  position: relative;
+  overflow: hidden;
+  background: #000;
+}
+
+.igm-youtube-embed {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  border: 0;
 }
 
 .igm-video-lightbox__nav {

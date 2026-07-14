@@ -3,16 +3,20 @@
 import dynamic from "next/dynamic";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 
 import type { SupportedLocale } from "@/i18n/locales";
 import { getMessages } from "@/i18n/messages";
 import type { ResolvedMediaGalleryItem } from "@/lib/cms/media-gallery/types";
 
+import "./media-gallery-page.css";
+import "./plyr-igm-theme.css";
+
 const GalleryVideoPlayer = dynamic(
   () => import("./GalleryVideoPlayer").then((mod) => ({ default: mod.GalleryVideoPlayer })),
   {
     ssr: false,
-    loading: () => <div className="igm-plyr-wrap igm-plyr-wrap--loading" aria-hidden />,
+    loading: () => <div className="igm-plyr-wrap igm-plyr-wrap--loading igm-youtube-wrap" aria-hidden />,
   },
 );
 
@@ -77,7 +81,9 @@ export function VideoLightbox({ locale, items, activeIndex, onClose, onIndexChan
     else showNext();
   };
 
-  return (
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <div className="igm-video-lightbox" role="dialog" aria-modal="true" aria-label={activeItem.title}>
       <button
         type="button"
@@ -130,8 +136,7 @@ export function VideoLightbox({ locale, items, activeIndex, onClose, onIndexChan
 
         <GalleryVideoPlayer
           key={activeItem.id}
-          src={activeItem.mediaSrc}
-          posterSrc={activeItem.posterSrc}
+          embedSrc={activeItem.embedSrc}
           title={activeItem.title}
         />
       </div>
@@ -141,6 +146,7 @@ export function VideoLightbox({ locale, items, activeIndex, onClose, onIndexChan
           <p>{description}</p>
         </footer>
       ) : null}
-    </div>
+    </div>,
+    document.body,
   );
 }

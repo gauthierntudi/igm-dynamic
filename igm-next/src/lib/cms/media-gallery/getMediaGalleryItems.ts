@@ -2,7 +2,6 @@ import { unstable_cache } from "next/cache";
 
 import type { SupportedLocale } from "@/i18n/locales";
 
-import { hydrateMediaFields } from "../hydrateMediaRefs";
 import { getPayloadClient } from "../payload";
 import type { CmsMediaGalleryItem } from "./types";
 
@@ -18,7 +17,7 @@ async function fetchMediaGalleryVideos(locale: SupportedLocale): Promise<CmsMedi
     const result = await payload.find({
       collection: "media-gallery-items",
       locale,
-      depth: 2,
+      depth: 0,
       limit: 200,
       sort: "-publishedAt,order",
       where: {
@@ -26,12 +25,7 @@ async function fetchMediaGalleryVideos(locale: SupportedLocale): Promise<CmsMedi
       },
     });
 
-    const docs = result.docs as CmsMediaGalleryItem[];
-    const hydrated = await Promise.all(
-      docs.map((doc) => hydrateMediaFields(doc, ["media"] as (keyof CmsMediaGalleryItem)[])),
-    );
-
-    return hydrated.filter((doc): doc is CmsMediaGalleryItem => doc != null);
+    return result.docs as CmsMediaGalleryItem[];
   } catch (error) {
     console.error("[cms] getMediaGalleryVideos:", error);
     return [];

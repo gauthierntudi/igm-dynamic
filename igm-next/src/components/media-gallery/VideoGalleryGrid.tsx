@@ -54,7 +54,7 @@ export function VideoGalleryGrid({ locale, items }: Props) {
                 aria-label={`${t.openItem}: ${item.title}`}
               >
                 <span className="igm-media-gallery-card__media">
-                  <VideoThumbnail src={item.mediaSrc} posterSrc={item.posterSrc} alt={item.alt} />
+                  <VideoThumbnail posterSrc={item.posterSrc} alt={item.alt} />
                   <span className="igm-media-gallery-card__play" aria-hidden>
                     <span className="igm-media-gallery-card__play-badge">
                       <Play className="igm-media-gallery-card__play-icon" size={44} strokeWidth={0} fill="#ffffff" />

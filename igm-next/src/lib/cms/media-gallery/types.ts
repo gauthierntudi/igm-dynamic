@@ -1,6 +1,4 @@
-import type { CmsMedia } from "../types";
-
-/** Vidéo médiathèque (une entrée = une vidéo). */
+/** Vidéo médiathèque (une entrée = une vidéo YouTube). */
 export type CmsMediaGalleryItem = {
   id: number;
   title: string;
@@ -8,7 +6,7 @@ export type CmsMediaGalleryItem = {
   caption?: string | null;
   publishedAt?: string | null;
   order?: number | null;
-  media?: CmsMedia | number | null;
+  youtubeUrl?: string | null;
 };
 
 export type ResolvedMediaGalleryItem = {
@@ -17,8 +15,9 @@ export type ResolvedMediaGalleryItem = {
   summary?: string | null;
   caption?: string | null;
   publishedAt?: string | null;
-  mediaSrc: string;
-  posterSrc: string | null;
+  youtubeId: string;
+  embedSrc: string;
+  posterSrc: string;
   alt: string;
-  isVideo: boolean;
+  isVideo: true;
 };
