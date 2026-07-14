@@ -2,19 +2,55 @@ import { tryResolveHeroMediaSrc } from "../resolveHeroMediaSrc";
 import type { CmsMedia } from "../types";
 import type {
   CmsPhotoAlbum,
+  CmsPhotoAlbumPhoto,
   ResolvedAlbumPhoto,
   ResolvedPhotoAlbumDetail,
   ResolvedPhotoAlbumSummary,
 } from "./types";
 
-function resolveAlbumPhoto(media: CmsMedia, index: number): ResolvedAlbumPhoto | null {
+function isPhotoRow(value: unknown): value is CmsPhotoAlbumPhoto {
+  return Boolean(value && typeof value === "object" && "image" in value);
+}
+
+function resolveAlbumPhoto(
+  media: CmsMedia,
+  index: number,
+  caption?: string | null,
+  rowId?: string | null,
+): ResolvedAlbumPhoto | null {
   const mediaSrc = tryResolveHeroMediaSrc(media);
   if (!mediaSrc) return null;
   return {
-    id: media.id ?? index,
+    id: rowId?.trim() || media.id || index,
     mediaSrc,
     alt: media.alt?.trim() || "Photo IGM",
+    caption: caption?.trim() || null,
   };
+}
+
+function resolveAlbumPhotos(album: CmsPhotoAlbum): ResolvedAlbumPhoto[] {
+  const photos: ResolvedAlbumPhoto[] = [];
+
+  for (const [index, entry] of (album.photos ?? []).entries()) {
+    if (entry == null) continue;
+
+    if (typeof entry === "number") continue;
+
+    if (isPhotoRow(entry)) {
+      const media = entry.image;
+      if (!media || typeof media !== "object") continue;
+      const resolved = resolveAlbumPhoto(media, index, entry.caption, entry.id);
+      if (resolved) photos.push(resolved);
+      continue;
+    }
+
+    if (typeof entry === "object") {
+      const resolved = resolveAlbumPhoto(entry as CmsMedia, index);
+      if (resolved) photos.push(resolved);
+    }
+  }
+
+  return photos;
 }
 
 function resolveCoverSrc(
@@ -30,11 +66,7 @@ function resolveCoverSrc(
 }
 
 export function resolvePhotoAlbumSummary(album: CmsPhotoAlbum): ResolvedPhotoAlbumSummary | null {
-  const photos = (album.photos ?? [])
-    .filter((item): item is CmsMedia => item != null && typeof item === "object")
-    .map((media, index) => resolveAlbumPhoto(media, index))
-    .filter((item): item is ResolvedAlbumPhoto => item != null);
-
+  const photos = resolveAlbumPhotos(album);
   if (photos.length === 0) return null;
 
   return {
@@ -52,14 +84,9 @@ export function resolvePhotoAlbumDetail(album: CmsPhotoAlbum): ResolvedPhotoAlbu
   const summary = resolvePhotoAlbumSummary(album);
   if (!summary) return null;
 
-  const photos = (album.photos ?? [])
-    .filter((item): item is CmsMedia => item != null && typeof item === "object")
-    .map((media, index) => resolveAlbumPhoto(media, index))
-    .filter((item): item is ResolvedAlbumPhoto => item != null);
-
   return {
     ...summary,
-    photos,
+    photos: resolveAlbumPhotos(album),
   };
 }
 

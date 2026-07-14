@@ -167,11 +167,17 @@ export function PhotoLightbox({
             key={activePhoto.id}
             className={`igm-photo-lightbox__image${isLoading ? "" : " is-visible"}`}
             src={activePhoto.mediaSrc}
-            alt=""
+            alt={activePhoto.caption?.trim() || activePhoto.alt || ""}
             onLoad={() => setIsLoading(false)}
           />
         </figure>
       </div>
+
+      {activePhoto.caption?.trim() ? (
+        <footer className="igm-photo-lightbox__footer">
+          <p>{activePhoto.caption.trim()}</p>
+        </footer>
+      ) : null}
 
       {hasMultiple ? (
         <div

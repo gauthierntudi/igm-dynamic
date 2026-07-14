@@ -521,13 +521,22 @@ export interface PhotoAlbum {
   slug: string;
   summary?: string | null;
   /**
-   * Optionnel. Repli : première photo de l’album.
+   * Optionnel. Repli : première photo de l’album. Utilisée aussi dans le carrousel de la page /photos.
    */
   coverImage?: (number | null) | Media;
   /**
-   * Sélectionnez une ou plusieurs images (JPEG, PNG, WebP…).
+   * Ajoutez les images de l’album. La légende est optionnelle et s’affiche sous la photo dans le visualiseur.
    */
-  photos: (number | Media)[];
+  photos?:
+    | {
+        image: number | Media;
+        /**
+         * Optionnel. Affichée en bas de la photo lors de la visualisation.
+         */
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   publishedAt?: string | null;
   /**
    * Plus la valeur est basse, plus l’album apparaît en haut.

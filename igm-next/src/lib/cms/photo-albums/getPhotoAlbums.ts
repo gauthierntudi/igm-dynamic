@@ -2,21 +2,49 @@ import { unstable_cache } from "next/cache";
 
 import type { SupportedLocale } from "@/i18n/locales";
 
-import { hydrateMediaFields, hydrateMediaList } from "../hydrateMediaRefs";
+import { hydrateMediaFields, hydrateMediaList, hydrateMediaRef } from "../hydrateMediaRefs";
 import { getPayloadClient } from "../payload";
-import type { CmsPhotoAlbum } from "./types";
+import type { CmsMedia } from "../types";
+import type { CmsPhotoAlbum, CmsPhotoAlbumPhoto } from "./types";
 
 function hasDatabase(): boolean {
   return Boolean(process.env.DATABASE_URI?.trim() || process.env.DATABASE_URL?.trim());
+}
+
+function isPhotoRow(value: unknown): value is CmsPhotoAlbumPhoto {
+  return Boolean(value && typeof value === "object" && "image" in value);
 }
 
 async function hydratePhotoAlbum(doc: CmsPhotoAlbum): Promise<CmsPhotoAlbum> {
   const withRelations = await hydrateMediaFields(doc, ["coverImage"] as (keyof CmsPhotoAlbum)[]);
   if (!withRelations) return doc;
 
+  const rawPhotos = withRelations.photos ?? [];
+  if (!rawPhotos.length) {
+    return { ...withRelations, photos: [] };
+  }
+
+  // Ancien format hasMany : liste de media / ids.
+  if (!isPhotoRow(rawPhotos[0])) {
+    return {
+      ...withRelations,
+      photos: await hydrateMediaList(rawPhotos as (CmsMedia | number)[]),
+    };
+  }
+
+  const hydratedRows = await Promise.all(
+    (rawPhotos as CmsPhotoAlbumPhoto[]).map(async (row) => {
+      const image = await hydrateMediaRef(row.image);
+      return {
+        ...row,
+        image: image && typeof image === "object" ? image : row.image,
+      };
+    }),
+  );
+
   return {
     ...withRelations,
-    photos: await hydrateMediaList(withRelations.photos),
+    photos: hydratedRows,
   };
 }
 

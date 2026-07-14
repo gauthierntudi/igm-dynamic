@@ -45,17 +45,43 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+.about-hero__slideshow {
+  position: absolute;
+  inset: 0;
+}
+
+.about-hero__slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 1.1s ease;
+  transform: scale(1.04);
+}
+
+.about-hero__slide.is-active {
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity 1.1s ease,
+    transform 6.5s ease-out;
 }
 
 .about-hero__overlay {
   position: absolute;
   inset: 0;
+  z-index: 1;
   background: rgba(8, 18, 40, 0.62);
 }
 
 .about-hero__inner {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   padding-block: clamp(6rem, 14vw, 8rem) clamp(2.5rem, 5vw, 3.5rem);
 }
 

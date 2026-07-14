@@ -174,5 +174,116 @@ DO $$ BEGIN
     FOREIGN KEY ("photo_albums_id") REFERENCES "photo_albums"("id") ON DELETE CASCADE;
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
+-- Photos en lignes array (image + légende) — migration depuis hasMany (photo_albums_rels)
+CREATE TABLE IF NOT EXISTS "photo_albums_photos" (
+  "_order" integer NOT NULL,
+  "_parent_id" integer NOT NULL,
+  "id" varchar PRIMARY KEY NOT NULL,
+  "image_id" integer
+);
+
+CREATE TABLE IF NOT EXISTS "photo_albums_photos_locales" (
+  "caption" varchar,
+  "id" serial PRIMARY KEY NOT NULL,
+  "_locale" "_locales" NOT NULL,
+  "_parent_id" varchar NOT NULL
+);
+
+DO $$ BEGIN
+  ALTER TABLE "photo_albums_photos"
+    ADD CONSTRAINT "photo_albums_photos_parent_id_fk"
+    FOREIGN KEY ("_parent_id") REFERENCES "photo_albums"("id") ON DELETE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+DO $$ BEGIN
+  ALTER TABLE "photo_albums_photos"
+    ADD CONSTRAINT "photo_albums_photos_image_id_media_id_fk"
+    FOREIGN KEY ("image_id") REFERENCES "media"("id") ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+DO $$ BEGIN
+  ALTER TABLE "photo_albums_photos_locales"
+    ADD CONSTRAINT "photo_albums_photos_locales_parent_id_fk"
+    FOREIGN KEY ("_parent_id") REFERENCES "photo_albums_photos"("id") ON DELETE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+CREATE INDEX IF NOT EXISTS "photo_albums_photos_order_idx" ON "photo_albums_photos" ("_order");
+CREATE INDEX IF NOT EXISTS "photo_albums_photos_parent_id_idx" ON "photo_albums_photos" ("_parent_id");
+CREATE INDEX IF NOT EXISTS "photo_albums_photos_image_idx" ON "photo_albums_photos" ("image_id");
+CREATE UNIQUE INDEX IF NOT EXISTS "photo_albums_photos_locales_locale_parent_id_unique"
+  ON "photo_albums_photos_locales" ("_locale", "_parent_id");
+
+-- Versions drafts
+CREATE TABLE IF NOT EXISTS "_photo_albums_v_version_photos" (
+  "_order" integer NOT NULL,
+  "_parent_id" integer NOT NULL,
+  "id" varchar PRIMARY KEY NOT NULL,
+  "image_id" integer,
+  "_uuid" varchar
+);
+
+CREATE TABLE IF NOT EXISTS "_photo_albums_v_version_photos_locales" (
+  "caption" varchar,
+  "id" serial PRIMARY KEY NOT NULL,
+  "_locale" "_locales" NOT NULL,
+  "_parent_id" varchar NOT NULL
+);
+
+DO $$ BEGIN
+  ALTER TABLE "_photo_albums_v_version_photos"
+    ADD CONSTRAINT "_photo_albums_v_version_photos_parent_id_fk"
+    FOREIGN KEY ("_parent_id") REFERENCES "_photo_albums_v"("id") ON DELETE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+DO $$ BEGIN
+  ALTER TABLE "_photo_albums_v_version_photos"
+    ADD CONSTRAINT "_photo_albums_v_version_photos_image_id_media_id_fk"
+    FOREIGN KEY ("image_id") REFERENCES "media"("id") ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+DO $$ BEGIN
+  ALTER TABLE "_photo_albums_v_version_photos_locales"
+    ADD CONSTRAINT "_photo_albums_v_version_photos_locales_parent_id_fk"
+    FOREIGN KEY ("_parent_id") REFERENCES "_photo_albums_v_version_photos"("id") ON DELETE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+CREATE INDEX IF NOT EXISTS "_photo_albums_v_version_photos_order_idx" ON "_photo_albums_v_version_photos" ("_order");
+CREATE INDEX IF NOT EXISTS "_photo_albums_v_version_photos_parent_id_idx" ON "_photo_albums_v_version_photos" ("_parent_id");
+CREATE INDEX IF NOT EXISTS "_photo_albums_v_version_photos_image_idx" ON "_photo_albums_v_version_photos" ("image_id");
+CREATE UNIQUE INDEX IF NOT EXISTS "_photo_albums_v_version_photos_locales_locale_parent_id_un"
+  ON "_photo_albums_v_version_photos_locales" ("_locale", "_parent_id");
+
+-- Migrer les photos existantes (hasMany → array) une seule fois
+INSERT INTO "photo_albums_photos" ("_order", "_parent_id", "id", "image_id")
+SELECT
+  COALESCE(r."order", 0),
+  r."parent_id",
+  'migrated-' || r."id"::text,
+  r."media_id"
+FROM "photo_albums_rels" r
+WHERE r."path" = 'photos'
+  AND r."media_id" IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM "photo_albums_photos" p
+    WHERE p."_parent_id" = r."parent_id"
+      AND p."image_id" = r."media_id"
+  );
+
+INSERT INTO "_photo_albums_v_version_photos" ("_order", "_parent_id", "id", "image_id", "_uuid")
+SELECT
+  COALESCE(r."order", 0),
+  r."parent_id",
+  'migrated-v-' || r."id"::text,
+  r."media_id",
+  'migrated-v-' || r."id"::text
+FROM "_photo_albums_v_rels" r
+WHERE r."path" = 'photos'
+  AND r."media_id" IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM "_photo_albums_v_version_photos" p
+    WHERE p."_parent_id" = r."parent_id"
+      AND p."image_id" = r."media_id"
+  );
+
 -- media-gallery-items : retrait du champ category côté Payload (colonne conservée en base)
 ALTER TABLE "media_gallery_items" ALTER COLUMN "category" DROP NOT NULL;

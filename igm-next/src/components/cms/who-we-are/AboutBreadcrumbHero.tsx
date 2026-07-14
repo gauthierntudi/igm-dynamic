@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { AboutHeroBackgroundSlideshow } from "@/components/cms/who-we-are/AboutHeroBackgroundSlideshow";
 import type { SupportedLocale } from "@/i18n/locales";
 import { getMessages } from "@/i18n/messages";
 import { hrefForRoute } from "@/i18n/paths";
@@ -8,6 +9,8 @@ type Props = {
   locale: SupportedLocale;
   title: string;
   heroImageSrc: string;
+  /** Si fourni (≥ 2 images), le fond alterne en fondu entre ces images. */
+  heroImageSrcs?: string[];
   tagline?: string;
   breadcrumbTitle?: string;
   subtitle?: string;
@@ -18,6 +21,7 @@ export function AboutBreadcrumbHero({
   locale,
   title,
   heroImageSrc,
+  heroImageSrcs,
   tagline,
   breadcrumbTitle,
   subtitle,
@@ -29,16 +33,24 @@ export function AboutBreadcrumbHero({
     locale === "en"
       ? "General Inspectorate of Mines — DRC"
       : "Inspection Générale des Mines — RDC";
-  const heroBackground = heroImageSrc
-    ? { backgroundImage: `url(${JSON.stringify(heroImageSrc)})` }
-    : undefined;
+
+  const slideshowImages = [
+    ...new Set(
+      [...(heroImageSrcs ?? []), heroImageSrc]
+        .map((src) => src.trim())
+        .filter(Boolean),
+    ),
+  ];
+  const useSlideshow = slideshowImages.length > 1;
+  const heroBackground =
+    !useSlideshow && heroImageSrc
+      ? { backgroundImage: `url(${JSON.stringify(heroImageSrc)})` }
+      : undefined;
 
   return (
     <>
-      <section
-        className="about-hero"
-        style={heroBackground}
-      >
+      <section className="about-hero" style={heroBackground}>
+        {useSlideshow ? <AboutHeroBackgroundSlideshow images={slideshowImages} /> : null}
         <div className="about-hero__overlay" aria-hidden />
         <div className="about-wrap about-hero__inner">
           <h1 className="about-hero__title">{title}</h1>

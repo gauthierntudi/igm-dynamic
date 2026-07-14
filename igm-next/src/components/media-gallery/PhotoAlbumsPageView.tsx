@@ -11,6 +11,7 @@ type Props = {
   locale: SupportedLocale;
   albums: ResolvedPhotoAlbumSummary[];
   heroImageSrc: string;
+  heroImageSrcs?: string[];
   heroTitle: string;
   heroSubtitle?: string;
 };
@@ -19,6 +20,7 @@ export function PhotoAlbumsPageView({
   locale,
   albums,
   heroImageSrc,
+  heroImageSrcs,
   heroTitle,
   heroSubtitle,
 }: Props) {
@@ -31,6 +33,7 @@ export function PhotoAlbumsPageView({
         title={heroTitle}
         breadcrumbTitle={heroTitle}
         heroImageSrc={heroImageSrc}
+        heroImageSrcs={heroImageSrcs}
         subtitle={heroSubtitle}
       />
 

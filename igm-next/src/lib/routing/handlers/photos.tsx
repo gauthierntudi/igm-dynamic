@@ -54,13 +54,19 @@ export async function renderPhotosListingRoute(route: PhotosListingRoute) {
     getPhotoAlbums(locale),
     getPageHeroesSettings(locale),
   ]);
+  const resolvedAlbums = resolvePhotoAlbumSummaries(albums);
   const heroImageSrc = resolvePageHeroImage(pageHeroes, "photos");
   const heroBanner = resolvePageHeroBanner(pageHeroes, "photos", locale);
+  const albumCoverSrcs = resolvedAlbums
+    .map((album) => album.coverSrc)
+    .filter((src): src is string => Boolean(src?.trim()));
+
   return (
     <PhotoAlbumsPageView
       locale={locale}
-      albums={resolvePhotoAlbumSummaries(albums)}
+      albums={resolvedAlbums}
       heroImageSrc={heroImageSrc}
+      heroImageSrcs={albumCoverSrcs.length > 0 ? albumCoverSrcs : undefined}
       heroTitle={heroBanner.title}
       heroSubtitle={heroBanner.subtitle}
     />

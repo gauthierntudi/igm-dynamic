@@ -80,20 +80,42 @@ export const PhotoAlbums: CollectionConfig = {
               label: "Image de couverture",
               admin: {
                 description:
-                  "Optionnel. Repli : première photo de l’album.",
+                  "Optionnel. Repli : première photo de l’album. Utilisée aussi dans le carrousel de la page /photos.",
               },
             },
             {
               name: "photos",
-              type: "upload",
-              relationTo: "media",
-              hasMany: true,
+              type: "array",
               label: "Photos",
               required: true,
+              minRows: 1,
+              labels: {
+                singular: "Photo",
+                plural: "Photos",
+              },
               admin: {
                 description:
-                  "Sélectionnez une ou plusieurs images (JPEG, PNG, WebP…).",
+                  "Ajoutez les images de l’album. La légende est optionnelle et s’affiche sous la photo dans le visualiseur.",
               },
+              fields: [
+                {
+                  name: "image",
+                  type: "upload",
+                  relationTo: "media",
+                  label: "Image",
+                  required: true,
+                },
+                {
+                  name: "caption",
+                  type: "textarea",
+                  label: "Légende",
+                  ...LOCALIZED,
+                  admin: {
+                    description:
+                      "Optionnel. Affichée en bas de la photo lors de la visualisation.",
+                  },
+                },
+              ],
             },
             {
               name: "publishedAt",
