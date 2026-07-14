@@ -213,11 +213,26 @@ CREATE INDEX IF NOT EXISTS "photo_albums_photos_image_idx" ON "photo_albums_phot
 CREATE UNIQUE INDEX IF NOT EXISTS "photo_albums_photos_locales_locale_parent_id_unique"
   ON "photo_albums_photos_locales" ("_locale", "_parent_id");
 
--- Versions drafts
+-- Versions drafts : Payload (idToUUID) attend id SERIAL + _uuid (pas id varchar)
+-- Si une ancienne version varchar existe, on la recrée proprement.
+DO $$ BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = '_photo_albums_v_version_photos'
+      AND column_name = 'id'
+      AND data_type = 'character varying'
+  ) THEN
+    DROP TABLE IF EXISTS "_photo_albums_v_version_photos_locales" CASCADE;
+    DROP TABLE IF EXISTS "_photo_albums_v_version_photos" CASCADE;
+  END IF;
+END $$;
+
 CREATE TABLE IF NOT EXISTS "_photo_albums_v_version_photos" (
   "_order" integer NOT NULL,
   "_parent_id" integer NOT NULL,
-  "id" varchar PRIMARY KEY NOT NULL,
+  "id" serial PRIMARY KEY NOT NULL,
   "image_id" integer,
   "_uuid" varchar
 );
@@ -226,7 +241,7 @@ CREATE TABLE IF NOT EXISTS "_photo_albums_v_version_photos_locales" (
   "caption" varchar,
   "id" serial PRIMARY KEY NOT NULL,
   "_locale" "_locales" NOT NULL,
-  "_parent_id" varchar NOT NULL
+  "_parent_id" integer NOT NULL
 );
 
 DO $$ BEGIN
@@ -269,15 +284,15 @@ WHERE r."path" = 'photos'
       AND p."image_id" = r."media_id"
   );
 
-INSERT INTO "_photo_albums_v_version_photos" ("_order", "_parent_id", "id", "image_id", "_uuid")
+-- Versions : le path Payload est « version.photos » (pas « photos »)
+INSERT INTO "_photo_albums_v_version_photos" ("_order", "_parent_id", "image_id", "_uuid")
 SELECT
   COALESCE(r."order", 0),
   r."parent_id",
-  'migrated-v-' || r."id"::text,
   r."media_id",
   'migrated-v-' || r."id"::text
 FROM "_photo_albums_v_rels" r
-WHERE r."path" = 'photos'
+WHERE r."path" IN ('version.photos', 'photos')
   AND r."media_id" IS NOT NULL
   AND NOT EXISTS (
     SELECT 1 FROM "_photo_albums_v_version_photos" p

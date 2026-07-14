@@ -9,7 +9,7 @@ type Props = {
   locale: SupportedLocale;
   title: string;
   heroImageSrc: string;
-  /** Si fourni (≥ 2 images), le fond alterne en fondu entre ces images. */
+  /** Si fourni, le fond alterne uniquement entre ces images (ex. covers d’albums). La bannière CMS (`heroImageSrc`) sert de repli si la liste est vide. */
   heroImageSrcs?: string[];
   tagline?: string;
   breadcrumbTitle?: string;
@@ -34,17 +34,22 @@ export function AboutBreadcrumbHero({
       ? "General Inspectorate of Mines — DRC"
       : "Inspection Générale des Mines — RDC";
 
-  const slideshowImages = [
-    ...new Set(
-      [...(heroImageSrcs ?? []), heroImageSrc]
-        .map((src) => src.trim())
-        .filter(Boolean),
-    ),
+  // Si des images de carrousel sont fournies (ex. covers d’albums), on n’y ajoute pas
+  // la bannière CMS — elle sert uniquement de repli quand il n’y a pas assez de slides.
+  const coverSlideshow = [
+    ...new Set((heroImageSrcs ?? []).map((src) => src.trim()).filter(Boolean)),
   ];
+  const slideshowImages =
+    coverSlideshow.length > 0
+      ? coverSlideshow
+      : heroImageSrc.trim()
+        ? [heroImageSrc.trim()]
+        : [];
   const useSlideshow = slideshowImages.length > 1;
+  const singleHeroSrc = slideshowImages[0] ?? heroImageSrc.trim();
   const heroBackground =
-    !useSlideshow && heroImageSrc
-      ? { backgroundImage: `url(${JSON.stringify(heroImageSrc)})` }
+    !useSlideshow && singleHeroSrc
+      ? { backgroundImage: `url(${JSON.stringify(singleHeroSrc)})` }
       : undefined;
 
   return (
