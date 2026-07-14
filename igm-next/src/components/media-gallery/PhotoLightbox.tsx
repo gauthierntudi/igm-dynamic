@@ -162,22 +162,31 @@ export function PhotoLightbox({
               {t.photoViewerLoading}
             </span>
           ) : null}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            key={activePhoto.id}
-            className={`igm-photo-lightbox__image${isLoading ? "" : " is-visible"}`}
-            src={activePhoto.mediaSrc}
-            alt={activePhoto.caption?.trim() || activePhoto.alt || ""}
-            onLoad={() => setIsLoading(false)}
-          />
+          <div className="igm-photo-lightbox__media">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              key={activePhoto.id}
+              className={`igm-photo-lightbox__image${isLoading ? "" : " is-visible"}`}
+              src={activePhoto.mediaSrc}
+              alt={activePhoto.caption?.trim() || activePhoto.alt || ""}
+              onLoad={() => setIsLoading(false)}
+            />
+            {activePhoto.caption?.trim() ? (
+              <figcaption
+                key={`caption-${activePhoto.id}`}
+                className="igm-photo-lightbox__caption"
+              >
+                <span className="igm-photo-lightbox__caption-label">
+                  {t.photoViewerCaptionLabel}
+                </span>
+                <p className="igm-photo-lightbox__caption-text">
+                  {activePhoto.caption.trim()}
+                </p>
+              </figcaption>
+            ) : null}
+          </div>
         </figure>
       </div>
-
-      {activePhoto.caption?.trim() ? (
-        <footer className="igm-photo-lightbox__footer">
-          <p>{activePhoto.caption.trim()}</p>
-        </footer>
-      ) : null}
 
       {hasMultiple ? (
         <div

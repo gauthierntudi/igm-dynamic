@@ -527,16 +527,14 @@ export interface PhotoAlbum {
   /**
    * Ajoutez les images de l’album. La légende est optionnelle et s’affiche sous la photo dans le visualiseur.
    */
-  photos?:
-    | {
-        image: number | Media;
-        /**
-         * Optionnel. Affichée en bas de la photo lors de la visualisation.
-         */
-        caption?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  photos: {
+    image: number | Media;
+    /**
+     * Optionnel. Affichée en bas de la photo lors de la visualisation.
+     */
+    caption?: string | null;
+    id?: string | null;
+  }[];
   publishedAt?: string | null;
   /**
    * Plus la valeur est basse, plus l’album apparaît en haut.
@@ -872,7 +870,13 @@ export interface PhotoAlbumsSelect<T extends boolean = true> {
   slug?: T;
   summary?: T;
   coverImage?: T;
-  photos?: T;
+  photos?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
   publishedAt?: T;
   order?: T;
   updatedAt?: T;
