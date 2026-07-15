@@ -1587,7 +1587,11 @@ header.style-4 .main-menu a.primary-btn4:focus-visible {
   color: rgba(255, 255, 255, 0.88);
 }
 
-.igm-orgchart-box--support,
+.igm-orgchart-box--support {
+  background: #d7eef6;
+  border-color: rgba(15, 110, 140, 0.55);
+}
+
 .igm-orgchart-box--service {
   background: #fff;
   border-color: rgba(12, 31, 61, 0.85);
@@ -1657,8 +1661,8 @@ header.style-4 .main-menu a.primary-btn4:focus-visible {
 }
 
 .igm-orgchart-legend-swatch--support {
-  background: #fff;
-  border: 1px solid rgba(12, 31, 61, 0.85);
+  background: #d7eef6;
+  border: 1px solid rgba(15, 110, 140, 0.55);
 }
 
 .igm-orgchart-legend-swatch--department {
