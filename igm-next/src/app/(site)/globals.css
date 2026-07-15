@@ -144,7 +144,6 @@ body {
   width: 84px;
   height: 84px;
   object-fit: contain;
-  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.16));
   animation: igm-float 1400ms ease-in-out infinite;
 }
 
@@ -1091,29 +1090,16 @@ header.style-4 .main-menu a.primary-btn4:focus-visible {
 
 .home4-about-section .about-image-block {
   position: relative;
-  padding-bottom: 60px;
 }
 
 .home4-about-section .image-wrapper {
   position: relative;
   z-index: 2;
-  margin-right: 40px;
 }
 
 .home4-about-section .image-wrapper img {
   width: 100%;
   display: block;
-  border-radius: 2px;
-}
-
-.home4-about-section .decor-box {
-  position: absolute;
-  bottom: -30px;
-  right: -30px;
-  width: 180px;
-  height: 220px;
-  background: var(--brand-red);
-  z-index: -1;
   border-radius: 2px;
 }
 
@@ -1142,6 +1128,14 @@ header.style-4 .main-menu a.primary-btn4:focus-visible {
 
 .home4-services-section .about-wrapper-bg{
   background: #1b4491!important;
+}
+
+/* Masquer les SVG décoratifs du thème (vector1 img + vector2 :after) */
+.home5-about-section .about-wrapper .vector1,
+.home5-about-section .about-wrapper::before,
+.home5-about-section .about-wrapper::after {
+  content: none !important;
+  display: none !important;
 }
 
 .home4-services-section .section-title.four.white h2,
@@ -1331,13 +1325,10 @@ header.style-4 .main-menu a.primary-btn4:focus-visible {
   line-height: 1.4;
 }
 
-/* Même principe que le thème : image de texture + couleur de base (cf. f171f2c129af25c2.css) */
+/* Section organigramme — fond uni (sans texture décorative) */
 .home4-team-section {
   background-color: #d7e3fb;
-  background-image: url("/template_next/static/media/home4-team-bg.a11222fd.png"),
-    linear-gradient(180deg, #d7e3fb, #c9daf8) !important;
-  background-size: cover !important;
-  background-repeat: no-repeat !important;
+  background-image: none !important;
 }
 
 /* Team slider (home4) : hauteur d’image uniforme — complète le thème (.team-card .team-img dans f171f2c129af25c2.css) */
@@ -3108,5 +3099,144 @@ header.header-area.style-4.sticky .igm-lang-switch-link.is-active {
 .igm-news-listing-pagination-next {
   font-size: 22px;
   line-height: 1;
+}
+
+/* Accueil — CTA signalement (sans galerie média) */
+.igm-home-contact .igm-home-contact__panel {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem 3rem;
+  max-width: none;
+  margin: 0;
+  padding: 2.25rem 2.5rem;
+  border: none;
+  border-radius: 16px;
+  background: #1b4491;
+  color: #fff;
+  box-shadow: none;
+}
+
+.igm-home-contact .igm-home-contact__copy,
+.igm-home-contact .igm-home-contact__action {
+  position: relative;
+  z-index: 1;
+}
+
+.igm-home-contact .igm-home-contact__copy {
+  flex: 1 1 20rem;
+  max-width: 36rem;
+  text-align: left;
+}
+
+.igm-home-contact .igm-home-contact__eyebrow {
+  margin: 0 0 0.65rem;
+  font-family: "Google Sans", Inter, system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.igm-home-contact .contact-content,
+.igm-home-contact .section-title2 {
+  max-width: none;
+  margin: 0;
+  text-align: left;
+}
+
+.igm-home-contact .section-title2 h2 {
+  margin: 0;
+  color: #fff;
+  font-family: "Google Sans", Inter, system-ui, sans-serif !important;
+  font-size: clamp(1.55rem, 2.4vw, 2.15rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.igm-home-contact .section-title2 p {
+  margin: 0.75rem 0 0;
+  max-width: 34ch;
+  color: rgba(255, 255, 255, 0.88);
+  font-family: "Google Sans", Inter, system-ui, sans-serif !important;
+  font-size: 1.05rem;
+  line-height: 1.55;
+}
+
+.igm-home-contact .igm-home-contact__action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.85rem;
+  flex: 0 0 auto;
+  padding-top: 0 !important;
+  text-align: left;
+}
+
+.igm-home-contact .igm-home-contact__btn .content {
+  background-color: #fff !important;
+  color: #1b4491 !important;
+}
+
+.igm-home-contact .igm-home-contact__btn .icon {
+  background-color: #05cffa !important;
+  color: #ffffff !important;
+}
+
+.igm-home-contact .igm-home-contact__btn .icon svg {
+  stroke: #ffffff !important;
+}
+
+.igm-home-contact .igm-home-contact__btn:hover .content,
+.igm-home-contact .igm-home-contact__btn:focus-visible .content {
+  background-color: #f2f6fe !important;
+}
+
+.igm-home-contact .igm-home-contact__btn:hover .icon,
+.igm-home-contact .igm-home-contact__btn:focus-visible .icon {
+  background-color: #05cffa !important;
+}
+
+.igm-home-contact .igm-home-contact__btn .content {
+  padding: 1rem 1.6rem !important;
+  border-radius: 100px !important;
+  font-weight: 700;
+}
+
+.igm-home-contact .igm-home-contact__note {
+  margin: 0;
+  max-width: 22rem;
+  font-family: "Google Sans", Inter, system-ui, sans-serif;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+@media (max-width: 767px) {
+  .igm-home-contact .igm-home-contact__panel {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.5rem;
+    padding: 1.75rem 1.35rem 1.75rem 1.55rem;
+    border-radius: 14px;
+  }
+
+  .igm-home-contact .igm-home-contact__copy,
+  .igm-home-contact .section-title2,
+  .igm-home-contact .section-title2 p {
+    max-width: none;
+  }
+
+  .igm-home-contact .igm-home-contact__action {
+    align-items: stretch;
+  }
+
+  .igm-home-contact .igm-home-contact__btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 

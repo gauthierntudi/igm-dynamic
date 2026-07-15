@@ -1,6 +1,5 @@
 import type { SupportedLocale } from "@/i18n/locales";
 import { localizeHref } from "@/i18n/paths";
-import { withDeployedBase } from "@/lib/deployBasePath";
 import type { CmsHomeStrategy } from "@/lib/cms/home/types";
 
 import { StrategyCheckIcon, StrategyCta } from "./StrategyParts";
@@ -52,7 +51,6 @@ export function HomeStrategySection({ strategy, locale }: Props) {
     ? localizeHref(strategy.ctaHref?.trim() || "/contact", locale)
     : null;
   const videoSrc = resolveStrategyVideoSrc(strategy.video);
-  const vectorSrc = withDeployedBase("/assets/img/home5/home5-about-section-vector1.svg");
 
   return (
     <div className="home5-about-section home4-services-section mb-0">
@@ -60,7 +58,6 @@ export function HomeStrategySection({ strategy, locale }: Props) {
         <video autoPlay loop muted playsInline src={videoSrc} />
       </div>
       <div className="about-wrapper about-wrapper-bg">
-        <img src={vectorSrc} alt="" className="vector1" />
         <div className="container">
           <div className="row gy-md-4 gy-5">
             <div

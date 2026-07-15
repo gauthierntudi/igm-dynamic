@@ -544,7 +544,7 @@ export const Home: GlobalConfig = {
                   name: "lead",
                   type: "textarea",
                   label: "Texte",
-                  defaultValue: "Irrégularité constatée ? Contactez l'IGM.",
+                  defaultValue: "Irrégularité constatée ? Signalez-la en toute confidentialité.",
                   ...LOCALIZED,
                 },
                 {

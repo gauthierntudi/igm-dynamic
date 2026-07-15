@@ -34,9 +34,6 @@ function DetailText({ text }: { text: string }) {
 export function HomeAboutSection({ about }: Props) {
   if (!hasAboutContent(about)) return null;
 
-  const signatureName = about.signatureName?.trim();
-  const signatureRole = about.signatureRole?.trim();
-  const hasSignature = Boolean(signatureName && signatureRole);
   const imageSrc = resolveAboutImageSrc(about.image);
   const imageAlt = resolveAboutImageAlt(about.image);
 
@@ -45,8 +42,19 @@ export function HomeAboutSection({ about }: Props) {
       <div className="container">
         <div className="row align-items-center">
           <div
-            className="col-lg-7 wow animate fadeInLeft"
+            className="col-lg-5 wow animate fadeInLeft"
             data-wow-delay="200ms"
+            data-wow-duration="1500ms"
+          >
+            <div className="about-image-block">
+              <div className="image-wrapper" style={{ position: "relative" }}>
+                <img src={imageSrc} alt={imageAlt} />
+              </div>
+            </div>
+          </div>
+          <div
+            className="col-lg-7 wow animate fadeInRight"
+            data-wow-delay="400ms"
             data-wow-duration="1500ms"
           >
             <div className="about-content">
@@ -57,30 +65,6 @@ export function HomeAboutSection({ about }: Props) {
                 ) : null}
                 {about.detailText?.trim() ? (
                   <DetailText text={about.detailText.trim()} />
-                ) : null}
-                {hasSignature ? (
-                  <div className="signature d-lg-block d-none">
-                    <h3>{signatureName}</h3>
-                    <span>{signatureRole}</span>
-                  </div>
-                ) : null}
-              </div>
-            </div>
-          </div>
-          <div
-            className="col-lg-5 wow animate fadeInRight"
-            data-wow-delay="400ms"
-            data-wow-duration="1500ms"
-          >
-            <div className="about-image-block">
-              <div className="image-wrapper" style={{ position: "relative" }}>
-                <img src={imageSrc} alt={imageAlt} />
-                <div className="decor-box" />
-                {hasSignature ? (
-                  <div className="signature signature-mobile-overlay d-lg-none d-block">
-                    <h3>{signatureName}</h3>
-                    <span>{signatureRole}</span>
-                  </div>
                 ) : null}
               </div>
             </div>
