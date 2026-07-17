@@ -1,8 +1,5 @@
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-
 import type { SupportedLocale } from "@/i18n/locales";
-import { hrefForRoute, type WhoWeAreSectionId } from "@/i18n/paths";
+import type { WhoWeAreSectionId } from "@/i18n/paths";
 import type { CmsWhoWeAre } from "@/lib/cms/who-we-are/types";
 import { resolveWhoWeArePage } from "@/lib/cms/who-we-are/resolveWhoWeArePage";
 
@@ -21,8 +18,6 @@ type Props = {
 
 export function WhoWeArePageView({ locale, activeSection = null, content = null }: Props) {
   const page = resolveWhoWeArePage(content, locale);
-  const contactHref = page.contact.primaryHref;
-  const isEn = locale === "en";
 
   return (
     <main className="igm-about-page" data-igm-page="who-we-are">
@@ -121,20 +116,6 @@ export function WhoWeArePageView({ locale, activeSection = null, content = null 
         introParagraphs={page.history.introParagraphs ?? []}
         events={page.history.milestones ?? []}
       />
-
-      {/* Bandeau charte + contact */}
-      <section
-        className="about-accent-bar"
-        aria-label={page.contact.title ?? (isEn ? "Contact" : "Contact")}
-      >
-        <div className="about-wrap about-accent-bar__inner">
-          <p>{page.cta.text}</p>
-          <Link href={contactHref} className="about-accent-bar__link">
-            {page.contact.primaryLabel}
-            <ArrowRight size={18} aria-hidden />
-          </Link>
-        </div>
-      </section>
     </main>
   );
 }
