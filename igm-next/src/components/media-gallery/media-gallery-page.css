@@ -14,7 +14,9 @@
 }
 
 .igm-media-gallery-page .about-hero__title {
-  max-width: min(22rem, 95%);
+  max-width: min(42rem, 92%);
+  font-size: clamp(1.85rem, 4vw, 2.75rem);
+  line-height: 1.15;
 }
 
 .igm-media-gallery-section {
