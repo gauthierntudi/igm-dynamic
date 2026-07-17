@@ -19,7 +19,7 @@ async function fetchMediaGalleryVideos(locale: SupportedLocale): Promise<CmsMedi
       locale,
       depth: 0,
       limit: 200,
-      sort: "-publishedAt,order",
+      sort: "order,-publishedAt",
       where: {
         _status: { equals: "published" },
       },
@@ -41,7 +41,7 @@ function getCachedFetcher(locale: SupportedLocale) {
       key,
       unstable_cache(
         () => fetchMediaGalleryVideos(locale),
-        ["cms-media-gallery-videos", locale],
+        ["cms-media-gallery-videos-v2", locale],
         {
           tags: [
             "collection:media-gallery-items",
