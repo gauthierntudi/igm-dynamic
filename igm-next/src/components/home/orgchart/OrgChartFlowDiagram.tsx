@@ -83,8 +83,6 @@ function OrgChartFlowCanvas({ locale }: Props) {
 
   return (
     <figure className="igm-orgchart-decree">
-      <figcaption>{content.caption}</figcaption>
-
       <div className="igm-orgchart-flow" ref={flowContainerRef}>
         <ReactFlow
           nodes={nodes as Node<OrgChartNodeData>[]}
