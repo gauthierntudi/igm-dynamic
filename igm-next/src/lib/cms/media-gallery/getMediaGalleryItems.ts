@@ -10,7 +10,7 @@ function hasDatabase(): boolean {
 }
 
 function orderValue(item: CmsMediaGalleryItem): number {
-  const raw = item.order;
+  const raw: unknown = item.order;
   if (typeof raw === "number" && Number.isFinite(raw)) return raw;
   if (typeof raw === "string" && raw.trim() !== "") {
     const parsed = Number(raw);

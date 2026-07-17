@@ -28,8 +28,8 @@ describe("sortMediaGalleryVideosByDisplayOrder", () => {
 
   it("accepte order en string (numeric Postgres)", () => {
     const sorted = sortMediaGalleryVideosByDisplayOrder([
-      item({ id: 1, order: "2" as unknown as number, publishedAt: null }),
-      item({ id: 2, order: "1" as unknown as number, publishedAt: null }),
+      { ...item({ id: 1, order: 0, publishedAt: null }), order: "2" as unknown as number },
+      { ...item({ id: 2, order: 0, publishedAt: null }), order: "1" as unknown as number },
     ]);
 
     expect(sorted.map((v) => v.id)).toEqual([2, 1]);
