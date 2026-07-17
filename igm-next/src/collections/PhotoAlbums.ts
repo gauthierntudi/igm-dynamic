@@ -84,6 +84,21 @@ export const PhotoAlbums: CollectionConfig = {
               },
             },
             {
+              name: "bulkAddPhotos",
+              type: "upload",
+              relationTo: "media",
+              hasMany: true,
+              virtual: true,
+              label: "Ajouter plusieurs photos",
+              admin: {
+                description:
+                  "Sélectionnez ou uploadez plusieurs images d’un coup. Elles seront ajoutées à la liste ci-dessous (vous pourrez ensuite renseigner les légendes).",
+                components: {
+                  Field: "@/components/admin/BulkAddAlbumPhotosField#BulkAddAlbumPhotosField",
+                },
+              },
+            },
+            {
               name: "photos",
               type: "array",
               label: "Photos",
@@ -95,7 +110,7 @@ export const PhotoAlbums: CollectionConfig = {
               },
               admin: {
                 description:
-                  "Ajoutez les images de l’album. La légende est optionnelle et s’affiche sous la photo dans le visualiseur.",
+                  "Liste des photos de l’album (ordre, légendes). Pour ajouter plusieurs images rapidement, utilisez le champ ci-dessus.",
               },
               fields: [
                 {

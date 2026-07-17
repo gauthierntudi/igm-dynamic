@@ -525,7 +525,11 @@ export interface PhotoAlbum {
    */
   coverImage?: (number | null) | Media;
   /**
-   * Ajoutez les images de l’album. La légende est optionnelle et s’affiche sous la photo dans le visualiseur.
+   * Sélectionnez ou uploadez plusieurs images d’un coup. Elles seront ajoutées à la liste ci-dessous (vous pourrez ensuite renseigner les légendes).
+   */
+  bulkAddPhotos?: (number | Media)[] | null;
+  /**
+   * Liste des photos de l’album (ordre, légendes). Pour ajouter plusieurs images rapidement, utilisez le champ ci-dessus.
    */
   photos: {
     image: number | Media;
@@ -870,6 +874,7 @@ export interface PhotoAlbumsSelect<T extends boolean = true> {
   slug?: T;
   summary?: T;
   coverImage?: T;
+  bulkAddPhotos?: T;
   photos?:
     | T
     | {
