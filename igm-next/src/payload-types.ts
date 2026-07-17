@@ -491,7 +491,7 @@ export interface MediaGalleryItem {
   caption?: string | null;
   publishedAt?: string | null;
   /**
-   * Plus la valeur est basse, plus la vidéo apparaît en haut.
+   * Position sur /videos : 1 = première, 2 = deuxième, 3 = troisième, etc. Publiez après modification.
    */
   order?: number | null;
   /**

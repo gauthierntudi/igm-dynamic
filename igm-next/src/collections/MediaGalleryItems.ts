@@ -14,7 +14,7 @@ export const MediaGalleryItems: CollectionConfig = {
   },
   admin: {
     useAsTitle: "title",
-    defaultColumns: ["title", "publishedAt", "_status"],
+    defaultColumns: ["title", "order", "publishedAt", "_status"],
     listSearchableFields: ["title", "summary", "caption", "youtubeUrl"],
     description:
       "Vidéos affichées sur /videos. Collez l’URL YouTube (watch, shorts ou youtu.be). Les photos se gèrent dans « Albums photos ».",
@@ -23,6 +23,7 @@ export const MediaGalleryItems: CollectionConfig = {
       defaultLimit: 25,
     },
   },
+  defaultSort: "order",
   versions: {
     drafts: true,
   },
@@ -79,9 +80,10 @@ export const MediaGalleryItems: CollectionConfig = {
               name: "order",
               type: "number",
               label: "Ordre d’affichage",
-              defaultValue: 0,
+              defaultValue: 1,
               admin: {
-                description: "Plus la valeur est basse, plus la vidéo apparaît en haut.",
+                description:
+                  "Position sur /videos : 1 = première, 2 = deuxième, 3 = troisième, etc. Publiez après modification.",
               },
             },
             {
