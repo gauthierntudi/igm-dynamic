@@ -682,6 +682,20 @@ header.style-4 .main-menu a.primary-btn4:focus-visible {
 .home4-banner-slider a.primary-btn4.black-bg .content,
 .home4-banner-slider a.primary-btn4.black-bg .icon {
   border: 1px solid transparent;
+  background-color: #1b4491 !important;
+  color: #ffffff !important;
+}
+
+.home4-banner-slider a.primary-btn4.black-bg .icon svg,
+.home4-banner-slider a.primary-btn4.black-bg .icon svg * {
+  stroke: #ffffff !important;
+}
+
+.home4-banner-slider a.primary-btn4.black-bg:hover .content,
+.home4-banner-slider a.primary-btn4.black-bg:focus-visible .content,
+.home4-banner-slider a.primary-btn4.black-bg:hover .icon,
+.home4-banner-slider a.primary-btn4.black-bg:focus-visible .icon {
+  background-color: #153a7a !important;
 }
 
 .home4-banner-slider
