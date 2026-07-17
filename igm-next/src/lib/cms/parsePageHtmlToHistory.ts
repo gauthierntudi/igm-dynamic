@@ -4,7 +4,9 @@ import type { HistoryBlock, HistoryListItem } from "@/lib/cms/who-we-are/parseHi
 /** Séparateur interne : chaque bloc `<ul>` / `<ol>` du CMS reste une liste distincte. */
 export const HISTORY_LIST_BREAK = "__HISTORY_LIST_BREAK__";
 
-const BLOCK_PATTERN = /<(p|ul|ol)[^>]*>([\s\S]*?)<\/\1>/gi;
+/** Lexical / Payload peut sortir des intertitres en h1–h6 (pas seulement des <p>). */
+const BLOCK_PATTERN = /<(p|ul|ol|h[1-6])[^>]*>([\s\S]*?)<\/\1>/gi;
+const HEADING_TAGS = new Set(["h1", "h2", "h3", "h4", "h5", "h6"]);
 const LI_PATTERN = /<li[^>]*>([\s\S]*?)<\/li>/gi;
 const NESTED_LIST_PATTERN = /<(ul|ol)[^>]*>([\s\S]*?)<\/\1>/i;
 
@@ -106,7 +108,7 @@ export function htmlToHistoryBlocks(html: string): HistoryBlock[] {
     const tag = match[1]?.toLowerCase();
     const inner = match[2] ?? "";
 
-    if (tag === "p") {
+    if (tag === "p" || (tag && HEADING_TAGS.has(tag))) {
       const text = stripHtml(inner).trim();
       if (text) blocks.push({ type: "paragraph", text });
       continue;

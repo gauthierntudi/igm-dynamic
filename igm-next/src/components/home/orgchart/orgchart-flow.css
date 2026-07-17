@@ -209,6 +209,12 @@
   border-color: rgba(15, 110, 140, 0.55);
 }
 
+.igm-orgchart-flow-node--service {
+  background: #fff2f2;
+  border-color: rgba(226, 4, 5, 0.65);
+  color: #e20405;
+}
+
 .igm-orgchart-flow-node__label {
   display: block;
   font-family: "Google Sans", Inter, system-ui, sans-serif;

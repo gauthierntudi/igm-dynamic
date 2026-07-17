@@ -74,6 +74,24 @@ describe("htmlToHistoryBlocks", () => {
     ]);
   });
 
+  it("conserve les intertitres Lexical (h1–h6) comme paragraphes", () => {
+    const html = `
+      <p>Introduction.</p>
+      <h5>Selon ces textes, les sanctions visent à réprimer :</h5>
+      <ul><li>Premier</li><li>Deuxième</li></ul>
+      <h4>Les sanctions prévues peuvent notamment inclure :</h4>
+      <ul><li>Amendes</li></ul>
+    `;
+
+    expect(htmlToHistoryBlocks(html)).toEqual([
+      { type: "paragraph", text: "Introduction." },
+      { type: "paragraph", text: "Selon ces textes, les sanctions visent à réprimer :" },
+      { type: "list", items: ["Premier", "Deuxième"] },
+      { type: "paragraph", text: "Les sanctions prévues peuvent notamment inclure :" },
+      { type: "list", items: ["Amendes"] },
+    ]);
+  });
+
 });
 
 describe("htmlToHistoryParagraphs", () => {

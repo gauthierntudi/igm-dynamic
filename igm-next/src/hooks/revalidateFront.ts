@@ -9,7 +9,8 @@ import { pageHeroRouteKeysForRevalidation } from "@/lib/page-heroes/constants";
 function revalidateSite(tags: string[]) {
   try {
     for (const tag of tags) {
-      revalidateTag(tag, "max");
+      // expire: 0 → invalidation immédiate (évite de servir un contentHtml obsolète sans <ul>)
+      revalidateTag(tag, { expire: 0 });
     }
     revalidatePath("/");
     for (const locale of SUPPORTED_LOCALES) {

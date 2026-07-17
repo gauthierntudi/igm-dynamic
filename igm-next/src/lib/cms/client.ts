@@ -452,14 +452,10 @@ export async function getPageBySlug(
   slug: string,
   locale: SupportedLocale = DEFAULT_LOCALE,
 ): Promise<CmsPage | null> {
-  const cached = unstable_cache(
-    () => fetchPageBySlug(slug, locale),
-    ["cms-page", slug, locale],
-    {
-      tags: ["collection:pages", `page:slug:${slug}`, `page:slug:${slug}:${locale}`],
-    },
-  );
-  return cached();
+  // Les pages CMS changent souvent depuis l’admin ; un cache durable
+  // a déjà servi un contentHtml obsolète (listes / paragraphes manquants).
+  // On lit toujours la source à jour ; le HTML de page reste mis en cache par Next au besoin.
+  return fetchPageBySlug(slug, locale);
 }
 
 export function isCmsConfigured(): boolean {
