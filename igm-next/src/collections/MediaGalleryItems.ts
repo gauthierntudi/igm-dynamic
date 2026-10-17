@@ -1,6 +1,6 @@
 import type { CollectionConfig } from "payload";
 
-import { isAdmin, publishedRead } from "../access/isAdmin";
+import { adminHidden, publishedAccess } from "../access/can";
 import { LOCALIZED } from "../fields/localized";
 import { revalidateFrontCollection } from "../hooks/revalidateFront";
 import { parseYoutubeVideoId } from "../lib/cms/media-gallery/parseYoutubeUrl";
@@ -19,6 +19,7 @@ export const MediaGalleryItems: CollectionConfig = {
     description:
       "Vidéos affichées sur /videos. Collez l’URL YouTube (watch, shorts ou youtu.be). Les photos se gèrent dans « Albums photos ».",
     group: "Contenu",
+    hidden: adminHidden("mediaGallery"),
     pagination: {
       defaultLimit: 25,
     },
@@ -27,12 +28,7 @@ export const MediaGalleryItems: CollectionConfig = {
   versions: {
     drafts: true,
   },
-  access: {
-    read: publishedRead,
-    create: isAdmin,
-    update: isAdmin,
-    delete: isAdmin,
-  },
+  access: publishedAccess("mediaGallery"),
   hooks: {
     afterChange: [revalidateFrontCollection],
   },

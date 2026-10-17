@@ -1,6 +1,6 @@
 import type { CollectionConfig } from "payload";
 
-import { isAdmin } from "../access/isAdmin";
+import { adminHidden, can } from "../access/can";
 
 export const ContactMessages: CollectionConfig = {
   slug: "contact-messages",
@@ -14,12 +14,14 @@ export const ContactMessages: CollectionConfig = {
     listSearchableFields: ["name", "email", "phone", "subject", "message"],
     description:
       "Messages transmis via le formulaire de contact public. Les champs soumis ne sont pas modifiables.",
+    group: "Signalements",
+    hidden: adminHidden("contactMessages"),
   },
   access: {
     create: () => false,
-    read: isAdmin,
-    update: isAdmin,
-    delete: isAdmin,
+    read: can("contactMessages"),
+    update: can("contactMessages"),
+    delete: can("contactMessages"),
   },
   fields: [
     {

@@ -1,6 +1,6 @@
 import type { GlobalConfig } from "payload";
 
-import { isAdmin } from "../access/isAdmin";
+import { adminHidden, can } from "../access/can";
 import { footerLinkFields, headerNavField } from "../fields/navMenuFields";
 import { LOCALIZED } from "../fields/localized";
 import { revalidateFrontGlobal } from "../hooks/revalidateFront";
@@ -10,10 +10,12 @@ export const SiteSettings: GlobalConfig = {
   label: "Paramètres du site",
   admin: {
     description: "Coordonnées, menu header et colonnes du pied de page (FR / EN).",
+    group: "Administration",
+    hidden: adminHidden("siteSettings"),
   },
   access: {
     read: () => true,
-    update: isAdmin,
+    update: can("siteSettings"),
   },
   hooks: {
     afterChange: [revalidateFrontGlobal],

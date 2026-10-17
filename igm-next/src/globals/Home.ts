@@ -1,6 +1,6 @@
 import type { GlobalConfig } from "payload";
 
-import { isAdmin } from "../access/isAdmin";
+import { adminHidden, globalAccess } from "../access/can";
 import { bannerCtaFields } from "../fields/bannerCtaFields";
 import { LOCALIZED } from "../fields/localized";
 import { revalidateFrontGlobal } from "../hooks/revalidateFront";
@@ -11,11 +11,10 @@ export const Home: GlobalConfig = {
   admin: {
     description:
       "Contenu éditorial de la page d'accueil. Renseignez chaque section en français et en anglais (onglets FR / EN).",
+    group: "Contenu",
+    hidden: adminHidden("home"),
   },
-  access: {
-    read: () => true,
-    update: isAdmin,
-  },
+  access: globalAccess("home"),
   hooks: {
     afterChange: [revalidateFrontGlobal],
   },

@@ -33,6 +33,7 @@
     "db:sync-cartography-settings": "node --env-file=.env.local scripts/db-sync-cartography-settings.mjs",
     "db:sync-media-gallery": "node --env-file=.env.local scripts/db-sync-media-gallery.mjs",
     "db:sync-photo-albums": "node --env-file=.env.local scripts/db-sync-photo-albums.mjs",
+    "db:sync-roles": "node --env-file=.env.local scripts/db-sync-roles.mjs",
     "db:sync-globals": "node --env-file=.env.local scripts/db-sync-globals.mjs",
     "db:sync-page-images": "node --env-file=.env.local scripts/db-sync-page-images.mjs",
     "db:sync-new-collections": "node --env-file=.env.local scripts/db-sync-new-collections.mjs",

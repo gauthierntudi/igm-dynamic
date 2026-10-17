@@ -1,6 +1,6 @@
 import type { GlobalConfig } from "payload";
 
-import { isAdmin } from "../access/isAdmin";
+import { adminHidden, globalAccess } from "../access/can";
 import { LOCALIZED } from "../fields/localized";
 import { LEGISLATION_CATEGORIES, LEGISLATION_CATEGORY_LABELS } from "../lib/legislation/constants";
 import { getMessages } from "../i18n/messages";
@@ -24,11 +24,9 @@ export const Legislation: GlobalConfig = {
     description:
       "Bannières des pages Ordonnances, Lois, Décrets, Arrêtés et Décisions : image, titre (H1) et sous-titre.",
     group: "Contenu",
+    hidden: adminHidden("legislation"),
   },
-  access: {
-    read: () => true,
-    update: isAdmin,
-  },
+  access: globalAccess("legislation"),
   hooks: {
     afterChange: [revalidateFrontGlobal],
   },

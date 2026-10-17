@@ -1,6 +1,6 @@
 import type { CollectionConfig } from "payload";
 
-import { isAdmin } from "../access/isAdmin";
+import { adminHidden, can } from "../access/can";
 import { restrictSignalementAdminUpdate } from "../hooks/restrictSignalementAdminUpdate";
 import { PROVINCES_RDC, TYPES_INFRACTION } from "../lib/signalement/constants";
 import { SIGNALEMENT_STATUS_OPTIONS } from "../lib/signalement/signalementStatus";
@@ -35,13 +35,15 @@ export const Signalements: CollectionConfig = {
     ],
     description:
       "Signalements transmis via le formulaire public. Les données soumises sont en lecture seule ; seuls le statut de traitement et les notes internes peuvent être modifiés.",
+    group: "Signalements",
+    hidden: adminHidden("signalements"),
   },
   access: {
     // Création réservée au formulaire public (Local API serveur, overrideAccess).
     create: () => false,
-    read: isAdmin,
-    update: isAdmin,
-    delete: isAdmin,
+    read: can("signalements"),
+    update: can("signalements"),
+    delete: can("signalements"),
   },
   hooks: {
     beforeChange: [restrictSignalementAdminUpdate],

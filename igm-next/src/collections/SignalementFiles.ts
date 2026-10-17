@@ -1,6 +1,6 @@
 import type { CollectionConfig } from "payload";
 
-import { isAdmin } from "../access/isAdmin";
+import { adminHidden, can } from "../access/can";
 import { signalementFileAdminUrl } from "../hooks/signalementFileAdminUrl";
 
 const privatePrefix = process.env.S3_PRIVATE_PREFIX || "private/signalements";
@@ -12,13 +12,14 @@ export const SignalementFiles: CollectionConfig = {
     plural: "Fichiers signalement",
   },
   access: {
-    create: isAdmin,
-    read: isAdmin,
-    update: isAdmin,
-    delete: isAdmin,
+    create: can("signalements"),
+    read: can("signalements"),
+    update: can("signalements"),
+    delete: can("signalements"),
   },
   admin: {
-    hidden: ({ user }) => !user,
+    hidden: adminHidden("signalements"),
+    group: "Signalements",
     useAsTitle: "filename",
     defaultColumns: ["filename", "mimeType", "filesize", "createdAt"],
   },

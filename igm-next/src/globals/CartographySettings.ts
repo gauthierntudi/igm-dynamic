@@ -1,6 +1,6 @@
 import type { GlobalConfig } from "payload";
 
-import { isAdmin } from "../access/isAdmin";
+import { adminHidden, globalAccess } from "../access/can";
 import {
   ensureCartographyProvincesAfterRead,
   ensureCartographyProvincesBeforeChange,
@@ -21,13 +21,11 @@ export const CartographySettings: GlobalConfig = {
   label: "Cartographie",
   admin: {
     group: "Contenu",
+    hidden: adminHidden("cartography"),
     description:
       "Les provinces déployées sur la carte sont listées automatiquement. Pour chaque province, renseignez l'adresse physique, le téléphone et les inspecteurs (nom obligatoire ; titre, photo et minerais optionnels).",
   },
-  access: {
-    read: () => true,
-    update: isAdmin,
-  },
+  access: globalAccess("cartography"),
   hooks: {
     afterRead: [ensureCartographyProvincesAfterRead],
     beforeChange: [ensureCartographyProvincesBeforeChange],

@@ -1,6 +1,6 @@
 import type { GlobalConfig } from "payload";
 
-import { isAdmin } from "../access/isAdmin";
+import { adminHidden, globalAccess } from "../access/can";
 import { LOCALIZED } from "../fields/localized";
 import { revalidateFrontGlobal } from "../hooks/revalidateFront";
 
@@ -11,11 +11,9 @@ export const ContactPage: GlobalConfig = {
     description:
       "Textes de la page /contact (bannière, formulaire, bloc coordonnées). L’image de bannière se configure dans « Bannières de pages ». Téléphone, e-mail et adresse : « Paramètres du site ».",
     group: "Contenu",
+    hidden: adminHidden("contactPage"),
   },
-  access: {
-    read: () => true,
-    update: isAdmin,
-  },
+  access: globalAccess("contactPage"),
   hooks: {
     afterChange: [revalidateFrontGlobal],
   },

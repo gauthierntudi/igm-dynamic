@@ -1,6 +1,6 @@
 import type { GlobalConfig } from "payload";
 
-import { isAdmin } from "../access/isAdmin";
+import { adminHidden, globalAccess } from "../access/can";
 import { LOCALIZED } from "../fields/localized";
 import { revalidateFrontGlobal } from "../hooks/revalidateFront";
 
@@ -11,11 +11,9 @@ export const PressKitPage: GlobalConfig = {
     description:
       "PDF de présentation de l’IGM affiché sur /dossier-de-presse. L’image de bannière se configure dans « Bannières de pages ».",
     group: "Contenu",
+    hidden: adminHidden("pressKit"),
   },
-  access: {
-    read: () => true,
-    update: isAdmin,
-  },
+  access: globalAccess("pressKit"),
   hooks: {
     afterChange: [revalidateFrontGlobal],
   },

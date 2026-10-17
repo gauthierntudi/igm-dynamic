@@ -1,5 +1,4 @@
 import { MediaCollectionUpload as MediaCollectionUpload_2263bd37b2e7e373612b622e2668bba4 } from '@/components/admin/MediaCollectionUpload'
-import { BulkAddAlbumPhotosField as BulkAddAlbumPhotosField_a8c4e2f91b0d47e6a5c3d1f0e8b7a694 } from '@/components/admin/BulkAddAlbumPhotosField'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -27,7 +26,9 @@ import { SlugField as SlugField_2b8867833a34864a02ddf429b0728a40 } from '@payloa
 import { SignalementDetailPanel as SignalementDetailPanel_690af1efc3c7706deeb0aa573fa2ff44 } from '@/components/admin/SignalementDetailPanel'
 import { SignalementLanceurCell as SignalementLanceurCell_b21945ae0e77e59b5229198705032919 } from '@/components/admin/SignalementLanceurCell'
 import { ContactMessageDetailPanel as ContactMessageDetailPanel_e253186454a51d44fe66c9fe0886c186 } from '@/components/admin/ContactMessageDetailPanel'
+import { BulkAddAlbumPhotosField as BulkAddAlbumPhotosField_32dc164e97a648cf0f409a4c51f7827a } from '@/components/admin/BulkAddAlbumPhotosField'
 import { NavMenuRowLabel as NavMenuRowLabel_ecdf19676b4c67fda96896c939ca488b } from '@/components/admin/NavMenuRowLabel'
+import { RolePermissionsMatrix as RolePermissionsMatrix_c63bdbdd3478867749cfef488b2f0dc7 } from '@/components/admin/RolePermissionsMatrix'
 import { BannerSlideRowLabel as BannerSlideRowLabel_f7963e0c18066251d378bf55b98f97cd } from '@/components/admin/BannerSlideRowLabel'
 import { HexColorPickerField as HexColorPickerField_36a2bc70a639a4fb4c550d634453ba7f } from '@/components/admin/HexColorPickerField'
 import { CartographyProvinceRowLabel as CartographyProvinceRowLabel_9447a2dfc7062217ec1394b1a00ef0af } from '@/components/admin/CartographyProvinceRowLabel'
@@ -40,7 +41,6 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 /** @type import('payload').ImportMap */
 export const importMap = {
   "@/components/admin/MediaCollectionUpload#MediaCollectionUpload": MediaCollectionUpload_2263bd37b2e7e373612b622e2668bba4,
-  "@/components/admin/BulkAddAlbumPhotosField#BulkAddAlbumPhotosField": BulkAddAlbumPhotosField_a8c4e2f91b0d47e6a5c3d1f0e8b7a694,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -68,7 +68,9 @@ export const importMap = {
   "@/components/admin/SignalementDetailPanel#SignalementDetailPanel": SignalementDetailPanel_690af1efc3c7706deeb0aa573fa2ff44,
   "@/components/admin/SignalementLanceurCell#SignalementLanceurCell": SignalementLanceurCell_b21945ae0e77e59b5229198705032919,
   "@/components/admin/ContactMessageDetailPanel#ContactMessageDetailPanel": ContactMessageDetailPanel_e253186454a51d44fe66c9fe0886c186,
+  "@/components/admin/BulkAddAlbumPhotosField#BulkAddAlbumPhotosField": BulkAddAlbumPhotosField_32dc164e97a648cf0f409a4c51f7827a,
   "@/components/admin/NavMenuRowLabel#NavMenuRowLabel": NavMenuRowLabel_ecdf19676b4c67fda96896c939ca488b,
+  "@/components/admin/RolePermissionsMatrix#RolePermissionsMatrix": RolePermissionsMatrix_c63bdbdd3478867749cfef488b2f0dc7,
   "@/components/admin/BannerSlideRowLabel#BannerSlideRowLabel": BannerSlideRowLabel_f7963e0c18066251d378bf55b98f97cd,
   "@/components/admin/HexColorPickerField#HexColorPickerField": HexColorPickerField_36a2bc70a639a4fb4c550d634453ba7f,
   "@/components/admin/CartographyProvinceRowLabel#CartographyProvinceRowLabel": CartographyProvinceRowLabel_9447a2dfc7062217ec1394b1a00ef0af,

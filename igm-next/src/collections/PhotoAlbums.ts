@@ -1,7 +1,7 @@
 import type { CollectionConfig } from "payload";
 import { slugField } from "payload";
 
-import { isAdmin, publishedRead } from "../access/isAdmin";
+import { adminHidden, publishedAccess } from "../access/can";
 import { LOCALIZED } from "../fields/localized";
 import { revalidateFrontCollection } from "../hooks/revalidateFront";
 import { slugifyTitle } from "../lib/slugify";
@@ -19,6 +19,7 @@ export const PhotoAlbums: CollectionConfig = {
     description:
       "Albums affichés sur /photos. Ajoutez une ou plusieurs images par album (Médias publics). Les vidéos se gèrent dans « Vidéos médiathèque ».",
     group: "Contenu",
+    hidden: adminHidden("photoAlbums"),
     pagination: {
       defaultLimit: 25,
     },
@@ -26,12 +27,7 @@ export const PhotoAlbums: CollectionConfig = {
   versions: {
     drafts: true,
   },
-  access: {
-    read: publishedRead,
-    create: isAdmin,
-    update: isAdmin,
-    delete: isAdmin,
-  },
+  access: publishedAccess("photoAlbums"),
   hooks: {
     afterChange: [revalidateFrontCollection],
   },

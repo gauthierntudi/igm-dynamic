@@ -1,7 +1,7 @@
 import { lexicalHTMLField } from "@payloadcms/richtext-lexical";
 import type { CollectionConfig, Field } from "payload";
 
-import { isAdmin, publishedRead } from "../access/isAdmin";
+import { adminHidden, publishedAccess } from "../access/can";
 import { LOCALIZED } from "../fields/localized";
 import { revalidateFrontCollection } from "../hooks/revalidateFront";
 
@@ -16,16 +16,13 @@ export const Pages: CollectionConfig = {
     defaultColumns: ["title", "slug", "_status", "updatedAt"],
     description:
       "Chaque page correspond à une URL du site. Renseignez le contenu en français et en anglais (onglets FR / EN). Le slug peut différer par langue (ex. a-propos / about).",
+    group: "Contenu",
+    hidden: adminHidden("pages"),
   },
   versions: {
     drafts: true,
   },
-  access: {
-    read: publishedRead,
-    create: isAdmin,
-    update: isAdmin,
-    delete: isAdmin,
-  },
+  access: publishedAccess("pages"),
   hooks: {
     afterChange: [revalidateFrontCollection],
   },

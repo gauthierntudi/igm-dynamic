@@ -1,6 +1,6 @@
 import type { Field, GlobalConfig } from "payload";
 
-import { isAdmin } from "../access/isAdmin";
+import { adminHidden, globalAccess } from "../access/can";
 import { LOCALIZED } from "../fields/localized";
 import {
   PAGE_HERO_CTA_ROUTE_KEYS,
@@ -78,11 +78,9 @@ export const PageHeroes: GlobalConfig = {
     description:
       "Bannières des pages Présentation, LCFCM, Multimédia (Photos, Vidéos, Revue de presse) : image, titre (H1) et sous-titre si applicable. Contact et Dossier de presse : textes dans leurs globals dédiés. Pages À propos : global « Page À propos ».",
     group: "Contenu",
+    hidden: adminHidden("pageHeroes"),
   },
-  access: {
-    read: () => true,
-    update: isAdmin,
-  },
+  access: globalAccess("pageHeroes"),
   hooks: {
     afterChange: [revalidateFrontGlobal],
   },

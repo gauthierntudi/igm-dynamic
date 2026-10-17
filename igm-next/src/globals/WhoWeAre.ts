@@ -1,6 +1,6 @@
 import type { GlobalConfig } from "payload";
 
-import { isAdmin } from "../access/isAdmin";
+import { adminHidden, globalAccess } from "../access/can";
 import { bannerCtaFields } from "../fields/bannerCtaFields";
 import { hexColorField } from "../fields/hexColorField";
 import { LOCALIZED } from "../fields/localized";
@@ -12,11 +12,10 @@ export const WhoWeAre: GlobalConfig = {
   admin: {
     description:
       "Contenu éditorial de la page Qui sommes-nous (/a-propos). Renseignez chaque section en français et en anglais.",
+    group: "Contenu",
+    hidden: adminHidden("whoWeAre"),
   },
-  access: {
-    read: () => true,
-    update: isAdmin,
-  },
+  access: globalAccess("whoWeAre"),
   hooks: {
     afterChange: [revalidateFrontGlobal],
   },

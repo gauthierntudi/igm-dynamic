@@ -107,6 +107,7 @@ export interface Config {
   fallbackLocale: ('false' | 'none' | 'null') | false | null | ('fr' | 'en') | ('fr' | 'en')[];
   globals: {
     'site-settings': SiteSetting;
+    autorisations: Autorisation;
     home: Home;
     'who-we-are': WhoWeAre;
     legislation: Legislation;
@@ -117,6 +118,7 @@ export interface Config {
   };
   globalsSelect: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    autorisations: AutorisationsSelect<false> | AutorisationsSelect<true>;
     home: HomeSelect<false> | HomeSelect<true>;
     'who-we-are': WhoWeAreSelect<false> | WhoWeAreSelect<true>;
     legislation: LegislationSelect<false> | LegislationSelect<true>;
@@ -154,11 +156,17 @@ export interface UserAuthOperations {
   };
 }
 /**
+ * Comptes de l’admin. Le rôle détermine les droits, ajustables dans Autorisations.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
   id: number;
+  /**
+   * Super Admin a tous les droits. Les deux autres rôles suivent la page Autorisations.
+   */
+  role?: ('super-admin' | 'signalements' | 'publication') | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -663,6 +671,7 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  role?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -1184,6 +1193,26 @@ export interface SiteSetting {
    * Ex. « Copyright 2026 IGM | All Right Reserved. »
    */
   footerCopyright?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Cochez les droits de chaque rôle. Le Super Admin conserve toujours l’ensemble des droits. Enregistrez pour appliquer.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "autorisations".
+ */
+export interface Autorisation {
+  id: number;
+  grants?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2154,6 +2183,16 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         id?: T;
       };
   footerCopyright?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "autorisations_select".
+ */
+export interface AutorisationsSelect<T extends boolean = true> {
+  grants?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
 
+import { adminHidden, can } from "../access/can";
 import { invalidateMediaCdn } from "../hooks/invalidateMediaCdn";
 import { mediaAdminFileUrl } from "../hooks/mediaAdminFileUrl";
 import {
@@ -18,10 +19,15 @@ export const Media: CollectionConfig = {
   },
   access: {
     read: () => true,
+    create: can("media"),
+    update: can("media"),
+    delete: can("media"),
   },
   admin: {
     useAsTitle: "filename",
     defaultColumns: ["filename", "alt", "updatedAt"],
+    group: "Contenu",
+    hidden: adminHidden("media"),
     components: {
       edit: {
         Upload: "@/components/admin/MediaCollectionUpload#MediaCollectionUpload",

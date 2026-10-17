@@ -1,6 +1,6 @@
 import type { CollectionConfig } from "payload";
 
-import { isAdmin } from "../access/isAdmin";
+import { adminHidden, publishedAccess } from "../access/can";
 import { LOCALIZED } from "../fields/localized";
 import { revalidateFrontCollection } from "../hooks/revalidateFront";
 
@@ -13,12 +13,12 @@ export const Stats: CollectionConfig = {
   admin: {
     useAsTitle: "label",
     defaultColumns: ["key", "label", "value", "order"],
+    group: "Contenu",
+    hidden: adminHidden("stats"),
   },
   access: {
+    ...publishedAccess("stats"),
     read: () => true,
-    create: isAdmin,
-    update: isAdmin,
-    delete: isAdmin,
   },
   hooks: {
     afterChange: [revalidateFrontCollection],

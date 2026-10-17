@@ -17,6 +17,8 @@ import { SignalementFiles, signalementFilesS3CollectionConfig } from "./collecti
 import { Signalements } from "./collections/Signalements";
 import { Stats } from "./collections/Stats";
 import { Users } from "./collections/Users";
+import { ensureGrants } from "./access/permissionStore";
+import { Autorisations } from "./globals/Autorisations";
 import { SiteSettings } from "./globals/SiteSettings";
 import { Home } from "./globals/Home";
 import { ContactPage } from "./globals/ContactPage";
@@ -68,7 +70,10 @@ export default buildConfig({
     },
   },
   collections: [Users, Media, SignalementFiles, Pages, News, Stats, Signalements, ContactMessages, LegislationDocuments, MediaGalleryItems, PhotoAlbums],
-  globals: [SiteSettings, Home, WhoWeAre, Legislation, PageHeroes, ContactPage, PressKitPage, CartographySettings],
+  globals: [SiteSettings, Autorisations, Home, WhoWeAre, Legislation, PageHeroes, ContactPage, PressKitPage, CartographySettings],
+  onInit: async (payload) => {
+    await ensureGrants(payload);
+  },
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
   ...(payloadEmail ? { email: payloadEmail } : {}),
@@ -80,7 +85,7 @@ export default buildConfig({
       connectionString: databaseUri,
     },
     // Évite le prompt interactif Drizzle à chaque requête (bloque le serveur).
-    // Après changement de schéma : npm run db:sync-site-settings
+    // Après changement de schéma : npm run db:sync-roles (rôles) ou le script db:sync-* concerné.
     push: false,
   }),
   sharp,

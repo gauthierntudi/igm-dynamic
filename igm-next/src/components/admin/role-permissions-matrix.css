@@ -1,0 +1,96 @@
+.role-permissions {
+  margin-bottom: 1.5rem;
+}
+
+.role-permissions__intro {
+  margin: 0 0 1rem;
+  color: var(--theme-elevation-700);
+}
+
+.role-permissions__scroll {
+  overflow-x: auto;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: 8px;
+  background: var(--theme-elevation-0);
+}
+
+.role-permissions__table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 46rem;
+}
+
+.role-permissions__table th,
+.role-permissions__table td {
+  padding: 0.75rem 0.9rem;
+  border-bottom: 1px solid var(--theme-elevation-100);
+  text-align: left;
+  vertical-align: top;
+}
+
+.role-permissions__table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--theme-elevation-50);
+  font-size: 0.85rem;
+}
+
+.role-permissions__table td {
+  text-align: center;
+  vertical-align: middle;
+  width: 11rem;
+}
+
+.role-permissions__group th {
+  background: var(--theme-elevation-100);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.role-permissions__label {
+  display: block;
+  font-weight: 600;
+}
+
+.role-permissions__hint {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--theme-elevation-550);
+  font-size: 0.78rem;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.role-permissions__role {
+  display: block;
+}
+
+.role-permissions__bulk {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.45rem;
+}
+
+.role-permissions__bulk button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--theme-elevation-800);
+  font: inherit;
+  font-size: 0.72rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.role-permissions__table input[type="checkbox"] {
+  width: 1.05rem;
+  height: 1.05rem;
+  accent-color: var(--theme-elevation-800);
+  cursor: pointer;
+}
+
+.role-permissions__table input[type="checkbox"]:disabled {
+  cursor: default;
+}

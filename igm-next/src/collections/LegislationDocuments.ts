@@ -1,6 +1,6 @@
 import type { CollectionConfig } from "payload";
 
-import { isAdmin, publishedRead } from "../access/isAdmin";
+import { adminHidden, publishedAccess } from "../access/can";
 import { LOCALIZED } from "../fields/localized";
 import { revalidateFrontCollection } from "../hooks/revalidateFront";
 import { LEGISLATION_CATEGORIES, LEGISLATION_CATEGORY_LABELS } from "../lib/legislation/constants";
@@ -20,16 +20,13 @@ export const LegislationDocuments: CollectionConfig = {
     pagination: {
       defaultLimit: 25,
     },
+    group: "Contenu",
+    hidden: adminHidden("legislationDocuments"),
   },
   versions: {
     drafts: true,
   },
-  access: {
-    read: publishedRead,
-    create: isAdmin,
-    update: isAdmin,
-    delete: isAdmin,
-  },
+  access: publishedAccess("legislationDocuments"),
   hooks: {
     afterChange: [revalidateFrontCollection],
   },

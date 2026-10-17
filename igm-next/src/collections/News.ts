@@ -2,7 +2,7 @@ import { lexicalHTMLField } from "@payloadcms/richtext-lexical";
 import type { CollectionConfig, Field } from "payload";
 import { slugField } from "payload";
 
-import { isAdmin, publishedRead } from "../access/isAdmin";
+import { adminHidden, publishedAccess } from "../access/can";
 import { LOCALIZED } from "../fields/localized";
 import { newsCategoryFields } from "../fields/newsCategoryFields";
 import { revalidateFrontCollection } from "../hooks/revalidateFront";
@@ -20,16 +20,13 @@ export const News: CollectionConfig = {
     description:
       "Articles publiés sur la page Actualités et dans le carrousel de la page d'accueil. Renseignez le contenu en français et en anglais (onglets FR / EN).",
     listSearchableFields: ["title", "slug", "category", "categoryCustom", "excerpt"],
+    group: "Contenu",
+    hidden: adminHidden("news"),
   },
   versions: {
     drafts: true,
   },
-  access: {
-    read: publishedRead,
-    create: isAdmin,
-    update: isAdmin,
-    delete: isAdmin,
-  },
+  access: publishedAccess("news"),
   hooks: {
     afterChange: [revalidateFrontCollection],
   },
