@@ -21,6 +21,8 @@ const pool = new pg.Pool({ connectionString });
 try {
   const sql = readFileSync(sqlPath, "utf8");
   await pool.query(sql);
+  // Valeur d'enum ajoutée seule : PostgreSQL refuse de l'utiliser dans la même commande.
+  await pool.query(`ALTER TYPE "enum_users_role" ADD VALUE IF NOT EXISTS 'technique'`);
   const { rows } = await pool.query(`SELECT id, email, role FROM users ORDER BY id`);
   console.log(`Rôles appliqués (${rows.length} compte(s)).`);
   for (const row of rows) {

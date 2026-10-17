@@ -2,7 +2,7 @@ import { APIError, type CollectionBeforeChangeHook, type CollectionBeforeDeleteH
 
 import { actorCan } from "../access/can";
 import { resolveRole } from "../access/permissionStore";
-import { ROLES, type Role } from "../access/permissions";
+import { isRole, ROLES, type Role } from "../access/permissions";
 
 async function superAdminCount(req: Parameters<CollectionBeforeChangeHook>[0]["req"]): Promise<number> {
   const { totalDocs } = await req.payload.count({
@@ -15,10 +15,7 @@ async function superAdminCount(req: Parameters<CollectionBeforeChangeHook>[0]["r
 }
 
 function asRole(value: unknown): Role | null {
-  if (value === ROLES.superAdmin || value === ROLES.signalements || value === ROLES.publication) {
-    return value;
-  }
-  return null;
+  return isRole(value) ? value : null;
 }
 
 /** Premier compte = Super Admin. Empêche de retirer le dernier Super Admin ou de s'auto-promouvoir. */

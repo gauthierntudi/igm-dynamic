@@ -513,6 +513,10 @@ header.style-4 .main-menu a.primary-btn4:focus-visible {
   background: transparent !important;
 }
 
+.footer-section.style-3 .copyright-and-social-area > p {
+  color: #fff;
+}
+
 .footer-section.style-3 .footer-contact-wrap {
   border-bottom: none !important;
 }

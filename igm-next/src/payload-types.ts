@@ -164,9 +164,9 @@ export interface UserAuthOperations {
 export interface User {
   id: number;
   /**
-   * Super Admin a tous les droits. Les deux autres rôles suivent la page Autorisations.
+   * Super Admin a tous les droits. Les autres rôles suivent la page Autorisations.
    */
-  role?: ('super-admin' | 'signalements' | 'publication') | null;
+  role?: ('super-admin' | 'technique' | 'signalements' | 'publication') | null;
   updatedAt: string;
   createdAt: string;
   email: string;

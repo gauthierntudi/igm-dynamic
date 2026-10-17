@@ -38,7 +38,7 @@ export const SiteSettings: GlobalConfig = {
             {
               name: "phoneVert",
               type: "text",
-              label: "Numéro vert (header)",
+              label: "Numéro contact (header)",
               defaultValue: "+243 97 684 4563",
             },
             {

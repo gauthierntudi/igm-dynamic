@@ -33,7 +33,7 @@ const fr = {
     contact: "Contact",
   },
   common: {
-    greenNumber: "Numéro Vert",
+    greenNumber: "Numéro Contact",
     report: "Dénoncer",
     home: "Accueil",
     readMore: "Lire la suite",
@@ -363,7 +363,7 @@ const en = {
     contact: "Contact",
   },
   common: {
-    greenNumber: "Green line",
+    greenNumber: "Contact number",
     report: "Report",
     home: "Home",
     readMore: "Read more",

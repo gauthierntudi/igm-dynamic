@@ -21,7 +21,7 @@ export const DEFAULT_HOME_ORG_CHART_FR: CmsHomeOrgChartSection = {
     },
     {
       name: "Départements centraux",
-      role: "DIT, DIJ, DRIO, DAF, DITIC",
+      role: "DIOT, DEJU, DRIO, DAF, DITIC",
     },
     {
       name: "Inspection provinciale des mines",
@@ -54,7 +54,7 @@ export const DEFAULT_HOME_ORG_CHART_EN: CmsHomeOrgChartSection = {
     },
     {
       name: "Central departments",
-      role: "DIT, DIJ, DRIO, DAF, DITIC",
+      role: "DIOT, DEJU, DRIO, DAF, DITIC",
     },
     {
       name: "Provincial mine inspection",

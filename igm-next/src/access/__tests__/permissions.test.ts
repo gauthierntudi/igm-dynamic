@@ -16,6 +16,10 @@ describe("normalizeGrants", () => {
     expect(grants.publication.news).toBe(true);
     expect(grants.publication.users).toBe(false);
     expect(grants.publication.siteSettings).toBe(false);
+    expect(grants.technique.siteSettings).toBe(true);
+    expect(grants.technique.media).toBe(true);
+    expect(grants.technique.users).toBe(false);
+    expect(grants.technique.news).toBe(false);
   });
 
   it("keeps explicit booleans and fills the rest with defaults", () => {

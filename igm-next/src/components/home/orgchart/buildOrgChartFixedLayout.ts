@@ -35,8 +35,8 @@ const NODE_LAYOUT: Record<string, NodeLayout> = {
   CIG: { x: 1110, y: 225, width: 360, height: 54 },
   CIP: { x: 1110, y: 285, width: 360, height: 54 },
   CAI: { x: 1110, y: 345, width: 360, height: 54 },
-  DIT: { x: 260, y: 430, width: 208, height: 168 },
-  DIJ: { x: 520, y: 430, width: 208, height: 168 },
+  DIOT: { x: 260, y: 430, width: 208, height: 168 },
+  DEJU: { x: 520, y: 430, width: 208, height: 168 },
   DRIO: { x: 780, y: 430, width: 208, height: 168 },
   DAF: { x: 1040, y: 430, width: 208, height: 168 },
   DITIC: { x: 1280, y: 430, width: 208, height: 168 },
@@ -53,8 +53,8 @@ const IPM_BRANCH_GAP = 18;
 
 const DEPT_DISPLAY_LINES: Record<string, string[]> = {
   IPM: ["INSPECTION", "PROVINCIALE", "DES MINES"],
-  DIT: ["DÉPARTEMENT", "INSPECTIONS DES", "TECHNIQUES (DIT)"],
-  DIJ: ["DÉPARTEMENT", "JURIDIQUE (DIJ)"],
+  DIOT: ["DÉPARTEMENT", "INSPECTION DES", "OPÉRATIONS", "TECHNIQUES (DIOT)"],
+  DEJU: ["DÉPARTEMENT", "JURIDIQUE (DEJU)"],
   DRIO: ["DÉPARTEMENT", "RENSEIGNEMENT,", "INVESTIGATIONS ET", "OPÉRATIONS (DRIO)"],
   DAF: ["DÉPARTEMENT", "ADMINISTRATION ET", "FINANCES (DAF)"],
   DITIC: [
@@ -69,14 +69,14 @@ const DEPT_DISPLAY_LINES: Record<string, string[]> = {
 
 const DEPT_DISPLAY_LINES_EN: Record<string, string[]> = {
   IPM: ["PROVINCIAL", "MINE", "INSPECTION"],
-  DIT: ["TECHNICAL", "INSPECTIONS", "DEPARTMENT (DIT)"],
-  DIJ: ["LEGAL", "DEPARTMENT (DIJ)"],
+  DIOT: ["TECHNICAL OPERATIONS", "INSPECTION", "DEPARTMENT (DIOT)"],
+  DEJU: ["LEGAL", "DEPARTMENT (DEJU)"],
   DRIO: ["INTELLIGENCE,", "INVESTIGATIONS AND", "OPERATIONS", "DEPARTMENT (DRIO)"],
   DAF: ["ADMINISTRATION", "AND FINANCE", "DEPARTMENT (DAF)"],
   DITIC: ["IT AND ICT", "DEPARTMENT", "(DITIC)"],
 };
 
-const MAIN_DEPARTMENTS = ["DIT", "DIJ", "DRIO", "DAF", "DITIC"] as const;
+const MAIN_DEPARTMENTS = ["DIOT", "DEJU", "DRIO", "DAF", "DITIC"] as const;
 const SUPPORT_LEFT = ["CelCom", "CPM", "CPRP"] as const;
 const SUPPORT_RIGHT = ["CIG", "CIP", "CAI"] as const;
 

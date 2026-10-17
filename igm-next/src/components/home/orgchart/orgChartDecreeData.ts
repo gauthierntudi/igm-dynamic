@@ -49,8 +49,8 @@ const DEPARTMENTS_FR: OrgChartDepartment[] = [
     services: [],
   },
   {
-    label: "Département Inspections des Techniques",
-    abbr: "DIT",
+    label: "Département Inspection des Opérations Techniques",
+    abbr: "DIOT",
     services: [
       { label: "Service Contrôle des Opérations Domaniales", abbr: "SCOD" },
       { label: "Service Contrôle des Normes et Procédures", abbr: "SCONP" },
@@ -58,7 +58,7 @@ const DEPARTMENTS_FR: OrgChartDepartment[] = [
   },
   {
     label: "Département Juridique",
-    abbr: "DIJ",
+    abbr: "DEJU",
     services: [
       { label: "Service Réglementation et Partenariat", abbr: "SEREPA" },
       {
@@ -122,8 +122,8 @@ const DEPARTMENTS_EN: OrgChartDepartment[] = [
     services: [],
   },
   {
-    label: "Technical Inspections Department",
-    abbr: "DIT",
+    label: "Technical Operations Inspection Department",
+    abbr: "DIOT",
     services: [
       { label: "Mining Rights Operations Control Service", abbr: "SCOD" },
       { label: "Standards and Procedures Control Service", abbr: "SCONP" },
@@ -131,7 +131,7 @@ const DEPARTMENTS_EN: OrgChartDepartment[] = [
   },
   {
     label: "Legal Department",
-    abbr: "DIJ",
+    abbr: "DEJU",
     services: [
       { label: "Regulation and Partnership Service", abbr: "SEREPA" },
       {

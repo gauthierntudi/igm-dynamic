@@ -52,7 +52,7 @@ export const Users: CollectionConfig = {
       admin: {
         position: "sidebar",
         condition: (_data, _sibling, { user }) => Boolean(user),
-        description: "Super Admin a tous les droits. Les deux autres rôles suivent la page Autorisations.",
+        description: "Super Admin a tous les droits. Les autres rôles suivent la page Autorisations.",
       },
     },
   ],

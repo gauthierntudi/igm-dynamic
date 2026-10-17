@@ -1,6 +1,6 @@
 -- Rôles utilisateurs + global Autorisations
 DO $$ BEGIN
-  CREATE TYPE "enum_users_role" AS ENUM ('super-admin', 'signalements', 'publication');
+  CREATE TYPE "enum_users_role" AS ENUM ('super-admin', 'technique', 'signalements', 'publication');
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 

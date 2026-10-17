@@ -46,8 +46,7 @@ export const RolePermissionsMatrix: JSONFieldClientComponent = ({ path }) => {
   return (
     <div className="role-permissions">
       <p className="role-permissions__intro">
-        Le Super Admin a toutes les autorisations. Cochez ou décochez les droits des autres rôles, puis
-        enregistrez.
+        Le Super Admin a toutes les autorisations. Cochez ou décochez les droits des autres rôles, puis enregistrez.
       </p>
 
       <div className="role-permissions__scroll">

@@ -2,24 +2,27 @@
 
 export const ROLES = {
   superAdmin: "super-admin",
+  technique: "technique",
   signalements: "signalements",
   publication: "publication",
 } as const;
 
 export type Role = (typeof ROLES)[keyof typeof ROLES];
 
-export const CONFIGURABLE_ROLES = [ROLES.signalements, ROLES.publication] as const;
+export const CONFIGURABLE_ROLES = [ROLES.technique, ROLES.signalements, ROLES.publication] as const;
 
 export type ConfigurableRole = (typeof CONFIGURABLE_ROLES)[number];
 
 export const ROLE_OPTIONS: { label: string; value: Role }[] = [
   { label: "Super Admin", value: ROLES.superAdmin },
+  { label: "Administrateur technique", value: ROLES.technique },
   { label: "Gestionnaire des signalements", value: ROLES.signalements },
   { label: "Responsable de publication", value: ROLES.publication },
 ];
 
 export const ROLE_LABELS: Record<Role, string> = {
   [ROLES.superAdmin]: "Super Admin",
+  [ROLES.technique]: "Administrateur technique",
   [ROLES.signalements]: "Gestionnaire des signalements",
   [ROLES.publication]: "Responsable de publication",
 };
@@ -91,6 +94,8 @@ export const PERMISSION_KEYS = PERMISSION_GROUPS.flatMap((group) =>
   group.permissions.map((permission) => permission.key),
 ) as PermissionKey[];
 
+const TECHNICAL_PERMISSIONS = new Set<PermissionKey>(["siteSettings", "media"]);
+
 const PUBLICATION_PERMISSIONS = new Set<PermissionKey>([
   "pages",
   "news",
@@ -112,12 +117,14 @@ export type RoleGrants = Record<PermissionKey, boolean>;
 
 export type Grants = Record<ConfigurableRole, RoleGrants>;
 
+const ROLE_VALUES = new Set<string>(Object.values(ROLES));
+
 export function isRole(value: unknown): value is Role {
-  return value === ROLES.superAdmin || value === ROLES.signalements || value === ROLES.publication;
+  return typeof value === "string" && ROLE_VALUES.has(value);
 }
 
 export function isConfigurableRole(value: unknown): value is ConfigurableRole {
-  return value === ROLES.signalements || value === ROLES.publication;
+  return (CONFIGURABLE_ROLES as readonly string[]).includes(String(value));
 }
 
 export function getRole(user: unknown): Role | null {
@@ -144,13 +151,16 @@ function emptyGrants(): RoleGrants {
 }
 
 export function defaultGrants(): Grants {
+  const technique = emptyGrants();
+  for (const key of TECHNICAL_PERMISSIONS) technique[key] = true;
+
   const signalements = emptyGrants();
   signalements.signalements = true;
 
   const publication = emptyGrants();
   for (const key of PUBLICATION_PERMISSIONS) publication[key] = true;
 
-  return { signalements, publication };
+  return { technique, signalements, publication };
 }
 
 export function normalizeGrants(input: unknown): Grants {
