@@ -9,6 +9,11 @@ UPDATE "users" SET "role" = 'super-admin' WHERE "role" IS NULL;
 ALTER TABLE "users" ALTER COLUMN "role" SET DEFAULT 'publication';
 ALTER TABLE "users" ALTER COLUMN "role" SET NOT NULL;
 
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "blocked" boolean DEFAULT false;
+UPDATE "users" SET "blocked" = false WHERE "blocked" IS NULL;
+
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "name" varchar;
+
 CREATE TABLE IF NOT EXISTS "autorisations" (
   "id" serial PRIMARY KEY NOT NULL,
   "grants" jsonb,

@@ -1,3 +1,6 @@
+import { UserBlockedCell as UserBlockedCell_de02bc78bad1570c637f22ae3495a713 } from '@/components/admin/UserRowActionsCell'
+import { UserRowActionsField as UserRowActionsField_de02bc78bad1570c637f22ae3495a713 } from '@/components/admin/UserRowActionsCell'
+import { UserRowActionsCell as UserRowActionsCell_de02bc78bad1570c637f22ae3495a713 } from '@/components/admin/UserRowActionsCell'
 import { MediaCollectionUpload as MediaCollectionUpload_2263bd37b2e7e373612b622e2668bba4 } from '@/components/admin/MediaCollectionUpload'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -40,6 +43,9 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 
 /** @type import('payload').ImportMap */
 export const importMap = {
+  "@/components/admin/UserRowActionsCell#UserBlockedCell": UserBlockedCell_de02bc78bad1570c637f22ae3495a713,
+  "@/components/admin/UserRowActionsCell#UserRowActionsField": UserRowActionsField_de02bc78bad1570c637f22ae3495a713,
+  "@/components/admin/UserRowActionsCell#UserRowActionsCell": UserRowActionsCell_de02bc78bad1570c637f22ae3495a713,
   "@/components/admin/MediaCollectionUpload#MediaCollectionUpload": MediaCollectionUpload_2263bd37b2e7e373612b622e2668bba4,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,

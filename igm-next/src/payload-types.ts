@@ -163,10 +163,15 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  name?: string | null;
   /**
    * Super Admin a tous les droits. Les autres rôles suivent la page Autorisations.
    */
   role?: ('super-admin' | 'technique' | 'signalements' | 'publication') | null;
+  /**
+   * Un compte bloqué ne peut plus se connecter à l’admin.
+   */
+  blocked?: boolean | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -671,7 +676,9 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  name?: T;
   role?: T;
+  blocked?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;

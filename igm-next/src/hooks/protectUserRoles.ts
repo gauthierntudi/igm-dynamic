@@ -48,6 +48,7 @@ export const protectUserRoles: CollectionBeforeChangeHook = async ({
 
   if (req.user && !canManageUsers) {
     next.role = originalDoc?.role ?? next.role;
+    next.blocked = originalDoc?.blocked ?? false;
   }
 
   if (actorRole && actorRole !== ROLES.superAdmin) {
@@ -56,7 +57,34 @@ export const protectUserRoles: CollectionBeforeChangeHook = async ({
     }
     if (originalDoc?.role === ROLES.superAdmin) {
       next.role = ROLES.superAdmin;
+      next.blocked = originalDoc.blocked ?? false;
     }
+  }
+
+  if (
+    operation === "update" &&
+    next.blocked === true &&
+    req.user &&
+    String(req.user.id) === String(originalDoc?.id)
+  ) {
+    throw new APIError("Vous ne pouvez pas bloquer votre propre compte.", 400);
+  }
+
+  if (operation === "update" && next.blocked === true && originalDoc?.blocked !== true) {
+    if (originalDoc?.role === ROLES.superAdmin) {
+      const { totalDocs } = await req.payload.count({
+        collection: "users",
+        overrideAccess: true,
+        req,
+        where: {
+          and: [{ role: { equals: ROLES.superAdmin } }, { blocked: { not_equals: true } }],
+        },
+      });
+      if (totalDocs <= 1) {
+        throw new APIError("Le dernier Super Admin actif ne peut pas être bloqué.", 400);
+      }
+    }
+    next.sessions = [];
   }
 
   const previous = asRole(originalDoc?.role);
@@ -72,6 +100,10 @@ export const protectUserRoles: CollectionBeforeChangeHook = async ({
 };
 
 export const protectLastSuperAdminDelete: CollectionBeforeDeleteHook = async ({ req, id }) => {
+  if (req.user && String(req.user.id) === String(id)) {
+    throw new APIError("Vous ne pouvez pas supprimer votre propre compte.", 400);
+  }
+
   const doc = await req.payload.findByID({
     collection: "users",
     id,
